@@ -1,1 +1,1 @@
-web: gunicorn santeinfantile.wsgi --log-file -
+web: gunicorn santeinfantile.wsgi --bind 0.0.0.0:$PORT --log-file -
