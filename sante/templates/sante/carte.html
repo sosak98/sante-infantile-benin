@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Carte - Centres de Santé & Pharmacies</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 550px; }
+        body { background: #e0f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .container { margin-top: 20px; }
+        .btn-localiser {
+            background-color: #00796b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .btn-localiser:hover {
+            background-color: #004d40;
+        }
+        .info {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-success">📍 Centres de Santé & Pharmacies</h1>
+        <div>
+            <button id="localiserBtn" class="btn-localiser">📍 Me localiser</button>
+            <span class="info">🏥 Bleu = Centre de santé | 💊 Vert = Pharmacie</span>
+        </div>
+        <div id="map"></div>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">Retour au dashboard</a>
+    </div>
+
+    {{ etablissements|json_script:"etablissements-data" }}
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialisation de la carte centrée sur Cotonou (Bénin)
+        var map = L.map('map').setView([6.36, 2.42], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // Marqueur spécial pour la géolocalisation (utilisateur)
+        var userMarker = null;
+
+        // Définition d'icônes personnalisées pour les établissements
+        function getIcon(type) {
+            if (type === 'centre') {
+                return L.divIcon({
+                    html: '🏥',
+                    className: 'custom-icon',
+                    iconSize: [30, 30],
+                    popupAnchor: [0, -15]
+                });
+            } else {
+                return L.divIcon({
+                    html: '💊',
+                    className: 'custom-icon',
+                    iconSize: [30, 30],
+                    popupAnchor: [0, -15]
+                });
+            }
+        }
+
+        // Récupération des établissements depuis le JSON
+        var etablissements = JSON.parse(document.getElementById('etablissements-data').textContent);
+
+        // Ajout des marqueurs
+        for (var i = 0; i < etablissements.length; i++) {
+            var e = etablissements[i];
+            var icon = getIcon(e.type_etab);
+            var marker = L.marker([e.latitude, e.longitude], { icon: icon }).addTo(map);
+            marker.bindPopup("<b>" + e.nom + "</b><br>" + e.adresse + "<br>Tél: " + e.telephone);
+        }
+
+        // Gestion du bouton "Me localiser"
+        document.getElementById('localiserBtn').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    // Centrer la carte sur l'utilisateur
+                    map.setView([lat, lng], 14);
+                    // Supprimer l'ancien marqueur s'il existe
+                    if (userMarker) {
+                        map.removeLayer(userMarker);
+                    }
+                    // Ajouter un marqueur spécial (étoile)
+                    userMarker = L.marker([lat, lng], {
+                        icon: L.divIcon({
+                            html: '⭐',
+                            className: 'user-marker',
+                            iconSize: [30, 30]
+                        })
+                    }).addTo(map);
+                    userMarker.bindPopup("Vous êtes ici").openPopup();
+                }, function(error) {
+                    alert("Impossible d'obtenir votre position : " + error.message);
+                });
+            } else {
+                alert("Votre navigateur ne supporte pas la géolocalisation.");
+            }
+        });
+    </script>
+    <style>
+        .custom-icon, .user-marker {
+            background: rgba(255,255,240,0.8);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-size: 18px;
+            border: 2px solid white;
+            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+        }
+        .user-marker {
+            background: #ffd966;
+            border-color: #ffaa00;
+        }
+      </script>
+
+    <!-- Footer -->
+    <footer class="text-center py-3 mt-4" style="background-color: #004d40; color: white;">
+        <p class="mb-0">© 2026 Santé Infantile Bénin — Développé par <strong>SOSSA GNINAZÉ MINGNISSÊ DARIUS</strong></p>
+        <p class="mb-0">📧 <a href="mailto:sante.infantile.benin@gmail.com" style="color: #80cbc4;">sante.infantile.benin@gmail.com</a></p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,46 @@
+import os
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'santeinfantile.settings')
+django.setup()
+
+from conseils.models import ConseilNutritionnel
+
+ConseilNutritionnel.objects.all().delete()
+
+conseils = [
+    # 0-6 mois - Allaitement exclusif
+    {"titre": "Allaitement maternel exclusif", "age_min_mois": 0, "age_max_mois": 6, "categorie": "aliment", "contenu": "L'OMS recommande l'allaitement maternel exclusif pendant les 6 premiers mois. Le lait maternel contient tous les nutriments nécessaires : protéines, glucides, lipides, vitamines et anticorps. Aucun autre aliment ni liquide n'est nécessaire, pas même l'eau.", "mots_cles": "allaitement, lait maternel, nouveau-né"},
+    {"titre": "Colostrum — premier lait précieux", "age_min_mois": 0, "age_max_mois": 1, "categorie": "aliment", "contenu": "Le colostrum est le premier lait produit après l'accouchement. Il est jaune et épais, riche en anticorps et en nutriments. Il protège le nouveau-né contre les infections et favorise le développement de son système immunitaire. Ne jamais le jeter.", "mots_cles": "colostrum, nouveau-né, immunité"},
+    {"titre": "Fréquence des tétées", "age_min_mois": 0, "age_max_mois": 6, "categorie": "aliment", "contenu": "Allaiter à la demande, au moins 8 à 12 fois par 24 heures. Ne pas imposer un horaire fixe. Plus l'enfant tète, plus la production de lait augmente. La nuit, les tétées sont importantes pour maintenir la lactation.", "mots_cles": "allaitement, tétée, fréquence"},
+    {"titre": "Signes de bonne prise du sein", "age_min_mois": 0, "age_max_mois": 6, "categorie": "probleme", "contenu": "Vérifier que l'enfant prend bien le sein : bouche grande ouverte, lèvres retroussées, menton contre le sein, joues rondes. Si la prise est mauvaise, l'enfant ne mange pas suffisamment et la mère peut avoir des crevasses.", "mots_cles": "allaitement, prise du sein, position"},
+
+    # 6-12 mois - Allaitement + aliments complémentaires
+    {"titre": "Introduction des aliments complémentaires à 6 mois", "age_min_mois": 6, "age_max_mois": 12, "categorie": "aliment", "contenu": "À partir de 6 mois, introduire progressivement des aliments complémentaires tout en continuant l'allaitement. Commencer par des purées lisses : légumes (carotte, patate douce), céréales enrichies, fruits mûrs écrasés. Un seul aliment nouveau à la fois, attendre 3 jours avant d'en introduire un autre.", "mots_cles": "diversification, purée, introduction aliments"},
+    {"titre": "Aliments riches en fer à 6 mois", "age_min_mois": 6, "age_max_mois": 12, "categorie": "aliment", "contenu": "Les réserves en fer du nourrisson s'épuisent vers 6 mois. Introduire des aliments riches en fer : viande mixée, foie de volaille, légumineuses (haricots, lentilles), légumes verts. La carence en fer cause l'anémie et retarde le développement.", "mots_cles": "fer, anémie, viande, légumineuses"},
+    {"titre": "Continuer l'allaitement jusqu'à 2 ans", "age_min_mois": 6, "age_max_mois": 24, "categorie": "aliment", "contenu": "L'OMS recommande de continuer l'allaitement maternel jusqu'à 2 ans et au-delà, en complément des aliments solides. Le lait maternel reste une source importante de nutriments, d'anticorps et de réconfort pour l'enfant.", "mots_cles": "allaitement, 2 ans, complément"},
+    {"titre": "Texture des aliments selon l'âge", "age_min_mois": 6, "age_max_mois": 12, "categorie": "aliment", "contenu": "6-7 mois : purées très lisses. 7-8 mois : purées avec petits morceaux. 8-10 mois : aliments écrasés à la fourchette. 10-12 mois : petits morceaux tendres. Adapter toujours la texture aux capacités de l'enfant.", "mots_cles": "texture, purée, morceaux, diversification"},
+    {"titre": "Diarrhée chez le nourrisson", "age_min_mois": 0, "age_max_mois": 12, "categorie": "probleme", "contenu": "En cas de diarrhée, continuer l'allaitement maternel. Donner des SRO (Sels de Réhydratation Orale). Ne pas interrompre l'alimentation. Éviter les jus sucrés. Consulter immédiatement si la diarrhée dure plus de 3 jours ou si l'enfant présente des signes de déshydratation.", "mots_cles": "diarrhée, SRO, réhydratation, déshydratation"},
+    {"titre": "Fièvre et alimentation", "age_min_mois": 0, "age_max_mois": 12, "categorie": "probleme", "contenu": "En cas de fièvre, augmenter les tétées ou les prises de liquides. L'enfant peut avoir moins d'appétit — c'est normal. Ne pas forcer. Privilégier les aliments faciles à digérer. Consulter si la fièvre dépasse 38,5°C chez un nourrisson de moins de 3 mois.", "mots_cles": "fièvre, hydratation, appétit"},
+
+    # 12-24 mois
+    {"titre": "Alimentation à 12-24 mois", "age_min_mois": 12, "age_max_mois": 24, "categorie": "aliment", "contenu": "L'enfant mange 3 repas par jour + 2 collations. Continuer l'allaitement. Proposer : céréales (mil, maïs, riz), légumineuses (haricots, niébé), légumes variés, fruits, viande/poisson/œufs. Éviter le sel ajouté, le sucre raffiné et les aliments ultra-transformés.", "mots_cles": "repas, céréales, légumineuses, diversification"},
+    {"titre": "Aliments locaux nutritifs au Bénin", "age_min_mois": 12, "age_max_mois": 120, "categorie": "aliment", "contenu": "Privilégier les aliments locaux disponibles au Bénin : gari, akassa, ablo à base de maïs (énergie), haricots et niébé (protéines), feuilles de moringa (vitamines et fer), huile de palme rouge (vitamine A), poisson fumé (protéines et oméga-3), patate douce orange (vitamine A).", "mots_cles": "aliments locaux, Bénin, moringa, niébé, gari"},
+    {"titre": "Malnutrition — signes d'alerte", "age_min_mois": 0, "age_max_mois": 60, "categorie": "probleme", "contenu": "Signes de malnutrition à surveiller : poids insuffisant pour l'âge, œdèmes aux pieds (kwashiorkor), cheveux roux et cassants, ventre gonflé, enfant apathique et sans énergie, MUAC inférieur à 11,5 cm. Consulter immédiatement un centre de santé.", "mots_cles": "malnutrition, kwashiorkor, marasme, œdèmes, MUAC"},
+
+    # 2-5 ans
+    {"titre": "Alimentation équilibrée 2-5 ans", "age_min_mois": 24, "age_max_mois": 60, "categorie": "aliment", "contenu": "3 repas principaux + 1 à 2 collations par jour. Chaque repas doit contenir : une source d'énergie (céréales, tubercules), une source de protéines (viande, poisson, œufs, légumineuses), des légumes et fruits variés, et une petite quantité de matières grasses saines (huile de palme rouge).", "mots_cles": "équilibre alimentaire, repas, protéines, légumes"},
+    {"titre": "Vitamine A — importance cruciale", "age_min_mois": 6, "age_max_mois": 60, "categorie": "aliment", "contenu": "La carence en vitamine A est fréquente au Bénin et cause la cécité nocturne et augmente le risque de décès. Sources : huile de palme rouge, patate douce orange, mangue, papaye, feuilles vertes, foie. La supplémentation en vitamine A est recommandée tous les 6 mois.", "mots_cles": "vitamine A, cécité, huile de palme, carence"},
+    {"titre": "Parasitoses intestinales", "age_min_mois": 24, "age_max_mois": 120, "categorie": "probleme", "contenu": "Les vers intestinaux causent malnutrition et anémie chez l'enfant. Prévention : se laver les mains avant de manger et après les toilettes, boire de l'eau potable, cuire les aliments. Déparasitage recommandé tous les 6 mois après 12 mois.", "mots_cles": "vers, parasites, déparasitage, hygiène"},
+    {"titre": "Hydratation de l'enfant", "age_min_mois": 6, "age_max_mois": 120, "categorie": "aliment", "contenu": "Après 6 mois, donner de l'eau potable à l'enfant. Éviter les sodas, jus industriels et boissons sucrées. L'eau reste la meilleure boisson. En saison chaude, augmenter les apports en liquides. Un enfant bien hydraté urine régulièrement et a les lèvres humides.", "mots_cles": "eau, hydratation, boisson, sodas"},
+
+    # 5-10 ans
+    {"titre": "Alimentation scolaire 5-10 ans", "age_min_mois": 60, "age_max_mois": 120, "categorie": "aliment", "contenu": "L'enfant d'âge scolaire a besoin d'un petit-déjeuner complet pour se concentrer à l'école. 3 repas équilibrés par jour. Limiter les biscuits industriels, bonbons et sodas vendus devant les écoles. Privilégier les fruits locaux comme collation : banane, mangue, papaye.", "mots_cles": "école, petit-déjeuner, collation, concentration"},
+    {"titre": "Anémie chez l'enfant scolarisé", "age_min_mois": 60, "age_max_mois": 120, "categorie": "probleme", "contenu": "L'anémie touche de nombreux enfants scolarisés au Bénin. Signes : fatigue, pâleur des conjonctives, difficultés de concentration. Causes : carence en fer, parasites, paludisme. Traitement : alimentation riche en fer + vitamine C pour favoriser l'absorption. Consulter un professionnel.", "mots_cles": "anémie, fer, pâleur, fatigue, école"},
+    {"titre": "Obésité et surpoids — prévention", "age_min_mois": 24, "age_max_mois": 120, "categorie": "probleme", "contenu": "L'obésité infantile est en augmentation en Afrique. Prévention : limiter les aliments ultra-transformés et sucrés, encourager l'activité physique, privilégier les repas faits maison. Un enfant en surpoids n'est pas forcément bien nourri — il peut avoir des carences en micronutriments.", "mots_cles": "obésité, surpoids, sucre, activité physique"},
+]
+
+for c in conseils:
+    ConseilNutritionnel.objects.create(**c)
+
+print(f"✅ {len(conseils)} conseils nutritionnels ajoutés avec succès !")

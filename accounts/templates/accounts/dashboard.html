@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Santé Infantile Bénin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #e0f7fa; }
+        .card-hover:hover { transform: translateY(-5px); transition: 0.3s; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; }
+        .btn-urgent { background-color: #d32f2f; color: white; }
+        .btn-urgent:hover { background-color: #b71c1c; color: white; }
+        .card { border-radius: 15px; }
+        .header-section { background: linear-gradient(135deg, #00796b, #004d40); color: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+
+        <!-- Header -->
+        <div class="header-section d-flex justify-content-between align-items-center">
+            <div>
+                <h1>🏥 Santé Infantile Bénin</h1>
+                <p class="mb-0">Bienvenue, <strong>{{ user.first_name }} {{ user.last_name }}</strong> !</p>
+            </div>
+            <a href="{% url 'logout' %}" class="btn btn-outline-light">Déconnexion</a>
+        </div>
+
+        <!-- Menu principal -->
+        <h5 class="text-muted mb-3">Que voulez-vous faire ?</h5>
+        <div class="row g-4">
+
+            <div class="col-md-4 col-sm-6">
+                <div class="card text-center card-hover shadow-sm h-100">
+                    <div class="card-body">
+                        <h2>🏥</h2>
+                        <h5 class="card-title">Centres de Santé</h5>
+                        <p class="text-muted small">Trouvez les centres de santé proches de vous</p>
+                        <a href="{% url 'carte' %}" class="btn btn-sm btn-outline-success">Voir la carte</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div class="card text-center card-hover shadow-sm h-100">
+                    <div class="card-body">
+                        <h2>💊</h2>
+                        <h5 class="card-title">Pharmacies</h5>
+                        <p class="text-muted small">Localisez les pharmacies à proximité</p>
+                        <a href="{% url 'carte' %}" class="btn btn-sm btn-outline-success">Voir la carte</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div class="card text-center card-hover shadow-sm h-100">
+                    <div class="card-body">
+                        <h2>💉</h2>
+                        <h5 class="card-title">Calendrier Vaccinal</h5>
+                        <p class="text-muted small">Programme élargi de vaccination PEV Bénin 2024</p>
+                        <a href="{% url 'calendrier_vaccinal' %}" class="btn btn-sm btn-outline-success">Voir</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div class="card text-center card-hover shadow-sm h-100">
+                    <div class="card-body">
+                        <h2>⚖️</h2>
+                        <h5 class="card-title">Détection Malnutrition</h5>
+                        <p class="text-muted small">Évaluez l'état nutritionnel de votre enfant</p>
+                        <a href="{% url 'detection_malnutrition' %}" class="btn btn-sm btn-outline-success">Évaluer</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div class="card text-center card-hover shadow-sm h-100">
+                    <div class="card-body">
+                        <h2>🥗</h2>
+                        <h5 class="card-title">Conseils Nutritionnels</h5>
+                        <p class="text-muted small">Recommandations OMS de 0 à 10 ans</p>
+                        <a href="{% url 'conseils_nutritionnels' %}" class="btn btn-sm btn-outline-success">Lire</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div class="card text-center card-hover shadow-sm h-100">
+                    <div class="card-body">
+                        <h2>🚨</h2>
+                        <h5 class="card-title">Urgences</h5>
+                        <p class="text-muted small">Numéros d'urgence disponibles 24h/24</p>
+                        <a href="tel:117" class="btn btn-sm btn-urgent">Appeler</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Numéros d'urgence -->
+        <div class="row mt-4 mb-5 g-3">
+    <div class="col-md-4">
+        <div class="bg-danger text-white p-3 rounded text-center">
+            <strong>🚑 SAMU : 112</strong>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="bg-warning text-dark p-3 rounded text-center">
+            <strong>🔥 Pompiers : 118</strong>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="bg-primary text-white p-3 rounded text-center">
+            <strong>👮 Police : 117</strong>
+        </div>
+    </div>
+</div>       
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Footer -->
+    <footer class="text-center py-3 mt-4" style="background-color: #004d40; color: white;">
+        <p class="mb-0">© 2026 Santé Infantile Bénin — Développé par <strong>SOSSA GNINAZÉ MINGNISSÊ DARIUS</strong></p>
+        <p class="mb-0">📧 <a href="mailto:sante.infantile.benin@gmail.com" style="color: #80cbc4;">sante.infantile.benin@gmail.com</a></p>
+    </footer>
+</body>
+</html>
