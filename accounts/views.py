@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+kkfrom django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import ParentRegisterForm
 
@@ -10,8 +10,7 @@ def register(request):
         form = ParentRegisterForm(request.POST)
         if form.is_valid():
             form.save()
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Compte créé pour {username} ! Vous pouvez maintenant vous connecter.')
+            messages.success(request, 'Compte créé avec succès ! Connectez-vous.')
             return redirect('login')
     else:
         form = ParentRegisterForm()
