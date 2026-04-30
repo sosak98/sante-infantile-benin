@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santé Infantile Bénin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; }
+
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(135deg, #004d40 0%, #00796b 50%, #26a69a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+        }
+        .hero-content { position: relative; z-index: 1; }
+        .hero h1 { font-size: 3rem; font-weight: 800; margin-bottom: 20px; }
+        .hero p { font-size: 1.2rem; opacity: 0.9; margin-bottom: 30px; }
+        .btn-hero {
+            background: white;
+            color: #00796b;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            margin-right: 15px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+        .btn-hero:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); color: #004d40; }
+        .btn-hero-outline {
+            border: 2px solid white;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+        }
+        .btn-hero-outline:hover { background: white; color: #00796b; transform: translateY(-3px); }
+
+        /* STATS */
+        .stats { background: #f8f9fa; padding: 40px 0; }
+        .stat-item { text-align: center; padding: 20px; }
+        .stat-number { font-size: 2.5rem; font-weight: 800; color: #00796b; }
+        .stat-label { color: #666; font-size: 0.9rem; }
+
+        /* FEATURES */
+        .features { padding: 80px 0; background: white; }
+        .feature-card {
+            border: none;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.08);
+            transition: 0.3s;
+            height: 100%;
+        }
+        .feature-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(0,0,0,0.15); }
+        .feature-icon { font-size: 3rem; margin-bottom: 15px; }
+        .feature-card h4 { color: #004d40; font-weight: 700; margin-bottom: 10px; }
+        .feature-card p { color: #666; font-size: 0.9rem; }
+
+        /* URGENCES */
+        .urgences { background: #004d40; padding: 40px 0; color: white; }
+        .urgence-item {
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.1);
+            margin: 10px;
+        }
+        .urgence-number { font-size: 2rem; font-weight: 800; }
+
+        /* FOOTER */
+        footer {
+            background: #002921;
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 30px;
+        }
+        footer strong { color: white; }
+        footer a { color: #80cbc4; }
+
+        /* NAVBAR */
+        .navbar-custom {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 20px 0;
+            z-index: 100;
+        }
+        .navbar-brand-custom {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar-custom">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="navbar-brand-custom">🏥 Santé Infantile Bénin</span>
+            <div>
+                <a href="{% url 'login' %}" class="btn-hero-outline" style="padding: 8px 20px; font-size: 0.9rem;">Connexion</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1>🇧🇯 La santé de vos enfants, notre priorité</h1>
+                    <p>Plateforme de santé infantile au Bénin — Vaccination, Nutrition, Malnutrition et Établissements de santé à portée de main.</p>
+                    <a href="{% url 'register' %}" class="btn-hero">S'inscrire gratuitement</a>
+                    <a href="{% url 'login' %}" class="btn-hero-outline">Se connecter</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number">20+</div>
+                        <div class="stat-label">Vaccins répertoriés</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number">20+</div>
+                        <div class="stat-label">Conseils nutritionnels</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number">0-10</div>
+                        <div class="stat-label">Ans couverts</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Gratuit</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features">
+        <div class="container">
+            <h2 class="text-center text-success fw-bold mb-5">Nos fonctionnalités</h2>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">🗺️</div>
+                        <h4>Carte Interactive</h4>
+                        <p>Trouvez les centres de santé et pharmacies les plus proches de vous au Bénin.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">💉</div>
+                        <h4>Calendrier Vaccinal</h4>
+                        <p>Programme Élargi de Vaccination du Bénin (PEV) mis à jour 2024.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">⚖️</div>
+                        <h4>Détection Malnutrition</h4>
+                        <p>Évaluez l'état nutritionnel de votre enfant selon les standards OMS.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon">🥗</div>
+                        <h4>Conseils Nutritionnels</h4>
+                        <p>Recommandations OMS pour les enfants de 0 à 10 ans.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- URGENCES -->
+    <section class="urgences">
+        <div class="container">
+            <h3 class="text-center mb-4">🚨 Numéros d'urgence au Bénin</h3>
+            <div class="row justify-content-center">
+                <div class="col-md-3 col-6">
+                    <div class="urgence-item">
+                        <div class="urgence-number">🚑 112</div>
+                        <div>SAMU</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="urgence-item">
+                        <div class="urgence-number">🔥 118</div>
+                        <div>Pompiers</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="urgence-item">
+                        <div class="urgence-number">👮 117</div>
+                        <div>Police</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>© 2026 Santé Infantile Bénin — Développé par <strong>SOSSA GNINAZÉ MINGNISSÊ DARIUS</strong></p>
+        <p>Infirmier Diplômé d'État | Master Puériculture & Pédiatrie</p>
+        <p>📧 <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a></p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

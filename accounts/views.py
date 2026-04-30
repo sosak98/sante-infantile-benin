@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import ParentRegisterForm
 
+def accueil(request):
+    return render(request, 'accounts/accueil.html')
+
 def register(request):
     if request.method == 'POST':
         form = ParentRegisterForm(request.POST)
