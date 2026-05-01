@@ -226,16 +226,16 @@
         var countPharmacies = 0;
         var countHopitaux = 0;
 
-        function getIcon(type) {
-            var emoji = type === 'centre' ? '🏥' : type === 'hopital' ? '🏨' : '💊';
-            return L.divIcon({
-                html: emoji,
-                className: 'custom-icon',
-                iconSize: [32, 32],
-                popupAnchor: [0, -15]
-            });
-        }
-
+          function getIcon(type) {
+    var color = type === 'centre' ? '#00796b' : type === 'hopital' ? '#1565c0' : '#e65100';
+    var emoji = type === 'centre' ? '🏥' : type === 'hopital' ? '🏨' : '💊';
+    return L.divIcon({
+        html: '<div style="background:' + color + ';width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:3px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.3);">' + emoji + '</div>',
+        className: '',
+        iconSize: [36, 36],
+        popupAnchor: [0, -18]
+    });
+}
         // Établissements depuis la base de données
         var etablissements = {{ etablissements_json|safe }};
         etablissements.forEach(function(e) {
@@ -299,8 +299,7 @@
                 out center;
             `;
 
-            fetch('https://overpass-api.de/api/interpreter', {
-                method: 'POST',
+            fetch('https://overpass.kumi.systems/api/interpreter', {                method: 'POST',
                 body: query
             })
             .then(response => response.json())
