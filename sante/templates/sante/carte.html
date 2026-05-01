@@ -2,138 +2,341 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Carte - Centres de Santé & Pharmacies</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte - Santé Infantile Bénin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-          #map { height: 80vh; width: 100%; }
-        body { background: #e0f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .container { margin-top: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
+
+        /* NAVBAR */
+        .navbar-custom {
+            background: linear-gradient(135deg, #004d40, #00796b);
+            padding: 15px 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+        }
+        .navbar-brand-custom {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: white !important;
+        }
+        .btn-retour {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .btn-retour:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        /* HEADER */
+        .page-header {
+            background: linear-gradient(135deg, #004d40, #00796b);
+            color: white;
+            padding: 20px 0;
+        }
+        .page-header h2 { font-weight: 800; }
+        .page-header p { opacity: 0.85; margin: 0; }
+
+        /* CONTROLS */
+        .controls {
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
         .btn-localiser {
-            background-color: #00796b;
+            background: linear-gradient(135deg, #004d40, #00796b);
             color: white;
             border: none;
-            padding: 8px 16px;
             border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
-            margin-bottom: 10px;
-            font-size: 14px;
+            transition: 0.3s;
         }
         .btn-localiser:hover {
-            background-color: #004d40;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,121,107,0.4);
         }
-        .info {
+        .btn-osm {
+            background: linear-gradient(135deg, #1565c0, #1976d2);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-osm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(21,101,192,0.4);
+        }
+        .legend {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: #666;
+            flex-wrap: wrap;
+        }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+
+        /* MAP */
+        #map {
+            height: 75vh;
+            width: 100%;
+            z-index: 1;
+        }
+
+        /* STATS BAR */
+        .stats-bar {
             background: white;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            margin-bottom: 10px;
-            display: inline-block;
+            padding: 12px 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            color: #666;
         }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1 class="text-success">📍 Centres de Santé & Pharmacies</h1>
-        <div>
-            <button id="localiserBtn" class="btn-localiser">📍 Me localiser</button>
-            <span class="info">🏥 Bleu = Centre de santé | 💊 Vert = Pharmacie</span>
-        </div>
-        <div id="map"></div>
-        <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">Retour au dashboard</a>
-    </div>
+        .stat-item { display: flex; align-items: center; gap: 5px; }
+        .stat-count { font-weight: 700; color: #00796b; }
 
-    {{ etablissements|json_script:"etablissements-data" }}
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        // Initialisation de la carte centrée sur Cotonou (Bénin)
-        var map = L.map('map').setView([6.36, 2.42], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
-
-        // Marqueur spécial pour la géolocalisation (utilisateur)
-        var userMarker = null;
-
-        // Définition d'icônes personnalisées pour les établissements
-        function getIcon(type) {
-            if (type === 'centre') {
-                return L.divIcon({
-                    html: '🏥',
-                    className: 'custom-icon',
-                    iconSize: [30, 30],
-                    popupAnchor: [0, -15]
-                });
-            } else {
-                return L.divIcon({
-                    html: '💊',
-                    className: 'custom-icon',
-                    iconSize: [30, 30],
-                    popupAnchor: [0, -15]
-                });
-            }
+        /* FOOTER */
+        footer {
+            background: #004d40;
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 15px;
+            font-size: 0.85rem;
         }
+        footer strong { color: white; }
+        footer a { color: #80cbc4; }
 
-        // Récupération des établissements depuis le JSON
-        var etablissements = JSON.parse(document.getElementById('etablissements-data').textContent);
-
-        // Ajout des marqueurs
-        for (var i = 0; i < etablissements.length; i++) {
-            var e = etablissements[i];
-            var icon = getIcon(e.type_etab);
-            var marker = L.marker([e.latitude, e.longitude], { icon: icon }).addTo(map);
-            marker.bindPopup("<b>" + e.nom + "</b><br>" + e.adresse + "<br>Tél: " + e.telephone);
-        }
-
-        // Gestion du bouton "Me localiser"
-        document.getElementById('localiserBtn').addEventListener('click', function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var lat = position.coords.latitude;
-                    var lng = position.coords.longitude;
-                    // Centrer la carte sur l'utilisateur
-                    map.setView([lat, lng], 14);
-                    // Supprimer l'ancien marqueur s'il existe
-                    if (userMarker) {
-                        map.removeLayer(userMarker);
-                    }
-                    // Ajouter un marqueur spécial (étoile)
-                    userMarker = L.marker([lat, lng], {
-                        icon: L.divIcon({
-                            html: '⭐',
-                            className: 'user-marker',
-                            iconSize: [30, 30]
-                        })
-                    }).addTo(map);
-                    userMarker.bindPopup("Vous êtes ici").openPopup();
-                }, function(error) {
-                    alert("Impossible d'obtenir votre position : " + error.message);
-                });
-            } else {
-                alert("Votre navigateur ne supporte pas la géolocalisation.");
-            }
-        });
-    </script>
-    <style>
+        /* CUSTOM ICONS */
         .custom-icon, .user-marker {
-            background: rgba(255,255,240,0.8);
+            background: rgba(255,255,240,0.95);
             border-radius: 50%;
             text-align: center;
-            line-height: 30px;
+            line-height: 32px;
             font-size: 18px;
             border: 2px solid white;
-            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
         }
         .user-marker {
             background: #ffd966;
             border-color: #ffaa00;
         }
-      </script>
 
-    <!-- Footer -->
-    <footer class="text-center py-3 mt-4" style="background-color: #004d40; color: white;">
-        <p class="mb-0">© 2026 Santé Infantile Bénin — Développé par <strong>SOSSA GNINAZÉ MINGNISSÊ DARIUS</strong></p>
-        <p class="mb-0">📧 <a href="mailto:sante.infantile.benin@gmail.com" style="color: #80cbc4;">sante.infantile.benin@gmail.com</a></p>
+        /* LOADING */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,77,64,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOADING -->
+    <div class="loading-overlay" id="loading">
+        <div class="text-center">
+            <div class="spinner-border text-light mb-3" role="status"></div>
+            <br>Chargement des établissements...
+        </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar-custom">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="navbar-brand-custom">🏥 Santé Infantile Bénin</span>
+            <a href="{% url 'dashboard' %}" class="btn-retour">← Dashboard</a>
+        </div>
+    </nav>
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div class="container">
+            <h2>📍 Centres de Santé & Pharmacies</h2>
+            <p>Trouvez les établissements de santé près de vous au Bénin</p>
+        </div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls">
+        <button class="btn-localiser" id="localiserBtn">📍 Me localiser</button>
+        <button class="btn-osm" id="osmBtn">🔄 Charger établissements proches</button>
+        <div class="legend">
+            <div class="legend-item">🏥 Centre de santé</div>
+            <div class="legend-item">💊 Pharmacie</div>
+            <div class="legend-item">🏨 Hôpital</div>
+            <div class="legend-item">⭐ Ma position</div>
+        </div>
+    </div>
+
+    <!-- MAP -->
+    <div id="map"></div>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+        <div class="stat-item">🏥 Centres : <span class="stat-count" id="countCentres">0</span></div>
+        <div class="stat-item">💊 Pharmacies : <span class="stat-count" id="countPharmacies">0</span></div>
+        <div class="stat-item">🏨 Hôpitaux : <span class="stat-count" id="countHopitaux">0</span></div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>© 2026 Santé Infantile Bénin — Développé par <strong>SOSSA GNINAZÉ MINGNISSÊ DARIUS</strong></p>
+        <p>📧 <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a></p>
     </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialisation carte
+        var map = L.map('map').setView([6.36, 2.42], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        var userMarker = null;
+        var osmMarkers = [];
+        var countCentres = 0;
+        var countPharmacies = 0;
+        var countHopitaux = 0;
+
+        function getIcon(type) {
+            var emoji = type === 'centre' ? '🏥' : type === 'hopital' ? '🏨' : '💊';
+            return L.divIcon({
+                html: emoji,
+                className: 'custom-icon',
+                iconSize: [32, 32],
+                popupAnchor: [0, -15]
+            });
+        }
+
+        // Établissements depuis la base de données
+        var etablissements = {{ etablissements_json|safe }};
+        etablissements.forEach(function(e) {
+            var marker = L.marker([e.latitude, e.longitude], { icon: getIcon(e.type_etab) }).addTo(map);
+            marker.bindPopup(
+                '<div style="font-family:Segoe UI;min-width:150px;">' +
+                '<h6 style="color:#004d40;margin-bottom:5px;">' + e.nom + '</h6>' +
+                '<p style="margin:0;font-size:0.85rem;color:#666;">' + e.adresse + '</p>' +
+                (e.telephone ? '<p style="margin:5px 0 0;font-size:0.85rem;">📞 ' + e.telephone + '</p>' : '') +
+                '</div>'
+            );
+            if (e.type_etab === 'centre') countCentres++;
+            else countPharmacies++;
+        });
+
+        document.getElementById('countCentres').textContent = countCentres;
+        document.getElementById('countPharmacies').textContent = countPharmacies;
+
+        // Géolocalisation
+        document.getElementById('localiserBtn').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    map.setView([lat, lng], 15);
+                    if (userMarker) map.removeLayer(userMarker);
+                    userMarker = L.marker([lat, lng], {
+                        icon: L.divIcon({
+                            html: '⭐',
+                            className: 'user-marker',
+                            iconSize: [32, 32]
+                        })
+                    }).addTo(map);
+                    userMarker.bindPopup('<b>📍 Vous êtes ici</b>').openPopup();
+                }, function(error) {
+                    alert("Impossible d'obtenir votre position : " + error.message);
+                });
+            }
+        });
+
+        // Charger établissements OpenStreetMap
+        document.getElementById('osmBtn').addEventListener('click', function() {
+            var center = map.getCenter();
+            var lat = center.lat;
+            var lng = center.lng;
+
+            document.getElementById('loading').style.display = 'flex';
+
+            // Requête Overpass API
+            var query = `
+                [out:json][timeout:25];
+                (
+                    node["amenity"="hospital"](around:5000,${lat},${lng});
+                    node["amenity"="clinic"](around:5000,${lat},${lng});
+                    node["amenity"="health_centre"](around:5000,${lat},${lng});
+                    node["amenity"="pharmacy"](around:5000,${lat},${lng});
+                    way["amenity"="hospital"](around:5000,${lat},${lng});
+                    way["amenity"="clinic"](around:5000,${lat},${lng});
+                    way["amenity"="pharmacy"](around:5000,${lat},${lng});
+                );
+                out center;
+            `;
+
+            fetch('https://overpass-api.de/api/interpreter', {
+                method: 'POST',
+                body: query
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+
+                // Supprimer anciens marqueurs OSM
+                osmMarkers.forEach(m => map.removeLayer(m));
+                osmMarkers = [];
+                countHopitaux = 0;
+
+                data.elements.forEach(function(element) {
+                    var elLat = element.lat || element.center.lat;
+                    var elLng = element.lon || element.center.lon;
+                    var amenity = element.tags.amenity;
+                    var nom = element.tags.name || 'Établissement de santé';
+                    var type = amenity === 'pharmacy' ? 'pharmacie' : 'hopital';
+
+                    var marker = L.marker([elLat, elLng], { icon: getIcon(type) }).addTo(map);
+                    marker.bindPopup(
+                        '<div style="font-family:Segoe UI;min-width:150px;">' +
+                        '<h6 style="color:#004d40;margin-bottom:5px;">' + nom + '</h6>' +
+                        '<p style="margin:0;font-size:0.85rem;color:#666;">Source: OpenStreetMap</p>' +
+                        '</div>'
+                    );
+                    osmMarkers.push(marker);
+                    if (type === 'hopital') countHopitaux++;
+                });
+
+                document.getElementById('countHopitaux').textContent = countHopitaux;
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                alert('Erreur lors du chargement. Vérifiez votre connexion.');
+            });
+        });
+    </script>
 </body>
 </html>
