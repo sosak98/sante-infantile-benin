@@ -152,7 +152,7 @@
             var lng = userLng || 2.42;
             document.getElementById('loading').style.display = 'flex';
             var query = '[out:json][timeout:25];(node["amenity"="hospital"](around:5000,' + lat + ',' + lng + ');node["amenity"="clinic"](around:5000,' + lat + ',' + lng + ');node["amenity"="pharmacy"](around:5000,' + lat + ',' + lng + ');way["amenity"="hospital"](around:5000,' + lat + ',' + lng + '););out center;';
-            var url = 'https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query);
+            var url = '/carte/osm/?lat=' + lat + '&lng=' + lng;
             fetch(url)
             .then(function(response) { return response.json(); })
             .then(function(data) {
