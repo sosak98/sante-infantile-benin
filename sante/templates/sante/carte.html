@@ -6,7 +6,8 @@
     <title>Carte - Santé Infantile Bénin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
 
@@ -213,6 +214,7 @@
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <script>
         // Initialisation carte
         var map = L.map('map').setView([6.36, 2.42], 13);
@@ -221,6 +223,9 @@
         }).addTo(map);
 
         var userMarker = null;
+        var routingControl = null;
+        var userLat = null;
+        var userLng = null;
         var osmMarkers = [];
         var countCentres = 0;
         var countPharmacies = 0;
@@ -269,8 +274,10 @@
                             iconSize: [32, 32]
                         })
                     }).addTo(map);
-                    userMarker.bindPopup('<b>📍 Vous êtes ici</b>').openPopup();
                 }, function(error) {
+                userMarker.bindPopup('<b>📍 Vous êtes ici</b>').openPopup();
+                userLat = lat;
+                userLng = lng;
                     alert("Impossible d'obtenir votre position : " + error.message);
                 });
             }
@@ -319,12 +326,16 @@
                     var type = amenity === 'pharmacy' ? 'pharmacie' : 'hopital';
 
                     var marker = L.marker([elLat, elLng], { icon: getIcon(type) }).addTo(map);
+                    var destLat = e.latitude;
+                    var destLng = e.longitude;
                     marker.bindPopup(
-                        '<div style="font-family:Segoe UI;min-width:150px;">' +
-                        '<h6 style="color:#004d40;margin-bottom:5px;">' + nom + '</h6>' +
-                        '<p style="margin:0;font-size:0.85rem;color:#666;">Source: OpenStreetMap</p>' +
-                        '</div>'
-                    );
+                     '<div style="font-family:Segoe UI;min-width:150px;">' +
+                     '<h6 style="color:#004d40;margin-bottom:5px;">' + e.nom + '</h6>' +
+                     '<p style="margin:0;font-size:0.85rem;color:#666;">' + e.adresse + '</p>' +
+                     (e.telephone ? '<p style="margin:5px 0 0;font-size:0.85rem;">📞 ' + e.telephone + '</p>' : '') +
+                     '<button onclick="allerVers(' + destLat + ',' + destLng + ')" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;cursor:pointer;width:100%;">🧭 Y aller</button>' +
+                     '</div>'
+                     );
                     osmMarkers.push(marker);
                     if (type === 'hopital') countHopitaux++;
                 });
@@ -336,6 +347,28 @@
                 alert('Erreur lors du chargement. Vérifiez votre connexion.');
             });
         });
+             function allerVers(destLat, destLng) {
+    if (!userLat || !userLng) {
+        alert('Veuillez d\'abord cliquer sur "Me localiser" !');
+        return;
+    }
+    if (routingControl) {
+        map.removeControl(routingControl);
+    }
+    routingControl = L.Routing.control({
+        waypoints: [
+            L.latLng(userLat, userLng),
+            L.latLng(destLat, destLng)
+        ],
+        language: 'fr',
+        routeWhileDragging: false,
+        showAlternatives: false,
+        lineOptions: {
+            styles: [{ color: '#00796b', weight: 5 }]
+        },
+        createMarker: function() { return null; }
+    }).addTo(map);
+}
     </script>
 </body>
 </html>
