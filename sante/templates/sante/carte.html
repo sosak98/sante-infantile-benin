@@ -160,7 +160,8 @@
                 osmMarkers.forEach(function(m) { map.removeLayer(m); });
                 osmMarkers = [];
                 countHopitaux = 0;
-                data.elements.forEach(function(element) {
+                var elements = data.elements || [];
+                elements.forEach(function(element) {
                     var elLat = element.lat || (element.center && element.center.lat);
                     var elLng = element.lon || (element.center && element.center.lon);
                     if (!elLat || !elLng) return;
