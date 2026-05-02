@@ -306,8 +306,12 @@
                 out center;
             `;
 
-            fetch('https://overpass.kumi.systems/api/interpreter', {                method: 'POST',
-                body: query
+               fetch('https://overpass-api.de/api/interpreter', {
+                 method: 'POST',
+                 headers: {
+                   'Content-Type': 'application/x-www-form-urlencoded'
+               },
+                body: 'data=' + encodeURIComponent(query)
             })
             .then(response => response.json())
             .then(data => {
