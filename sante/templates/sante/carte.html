@@ -284,66 +284,43 @@
         });
 
         // Charger établissements OpenStreetMap
-        document.getElementById('osmBtn').addEventListener('click', function() {
-            var center = map.getCenter();
-            var lat = center.lat;
-            var lng = center.lng;
+            var url = 'https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query);
 
-            document.getElementById('loading').style.display = 'flex';
+fetch(url)
+.then(response => response.json())
+.then(data => {
+    document.getElementById('loading').style.display = 'none';
+    osmMarkers.forEach(m => map.removeLayer(m));
+    osmMarkers = [];
+    countHopitaux = 0;
 
-            // Requête Overpass API
-            var query = `
-                [out:json][timeout:25];
-                (
-                    node["amenity"="hospital"](around:5000,${lat},${lng});
-                    node["amenity"="clinic"](around:5000,${lat},${lng});
-                    node["amenity"="health_centre"](around:5000,${lat},${lng});
-                    node["amenity"="pharmacy"](around:5000,${lat},${lng});
-                    way["amenity"="hospital"](around:5000,${lat},${lng});
-                    way["amenity"="clinic"](around:5000,${lat},${lng});
-                    way["amenity"="pharmacy"](around:5000,${lat},${lng});
-                );
-                out center;
-            `;
+    data.elements.forEach(function(element) {
+        var elLat = element.lat || (element.center && element.center.lat);
+        var elLng = element.lon || (element.center && element.center.lon);
+        if (!elLat || !elLng) return;
+        var amenity = element.tags.amenity;
+        var nom = element.tags.name || 'Établissement de santé';
+        var type = amenity === 'pharmacy' ? 'pharmacie' : 'hopital';
 
-               fetch('https://overpass-api.de/api/interpreter', {
-                 method: 'POST',
-                 headers: {
-                   'Content-Type': 'application/x-www-form-urlencoded'
-               },
-                body: 'data=' + encodeURIComponent(query)
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('loading').style.display = 'none';
+        var marker = L.marker([elLat, elLng], { icon: getIcon(type) }).addTo(map);
+        marker.bindPopup(
+            '<div style="font-family:Segoe UI;min-width:150px;">' +
+            '<h6 style="color:#004d40;margin-bottom:5px;">' + nom + '</h6>' +
+            '<p style="margin:0;font-size:0.85rem;color:#666;">Source: OpenStreetMap</p>' +
+            '<button onclick="allerVers(' + elLat + ',' + elLng + ')" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;cursor:pointer;width:100%;">🧭 Y aller</button>' +
+            '</div>'
+        );
+        osmMarkers.push(marker);
+        if (type === 'hopital') countHopitaux++;
+    });
 
-                // Supprimer anciens marqueurs OSM
-                osmMarkers.forEach(m => map.removeLayer(m));
-                osmMarkers = [];
-                countHopitaux = 0;
-
-                data.elements.forEach(function(element) {
-                    var elLat = element.lat || element.center.lat;
-                    var elLng = element.lon || element.center.lon;
-                    var amenity = element.tags.amenity;
-                    var nom = element.tags.name || 'Établissement de santé';
-                    var type = amenity === 'pharmacy' ? 'pharmacie' : 'hopital';
-
-                    var marker = L.marker([elLat, elLng], { icon: getIcon(type) }).addTo(map);
-                    var destLat = e.latitude;
-                    var destLng = e.longitude;
-                    marker.bindPopup(
-                     '<div style="font-family:Segoe UI;min-width:150px;">' +
-                     '<h6 style="color:#004d40;margin-bottom:5px;">' + e.nom + '</h6>' +
-                     '<p style="margin:0;font-size:0.85rem;color:#666;">' + e.adresse + '</p>' +
-                     (e.telephone ? '<p style="margin:5px 0 0;font-size:0.85rem;">📞 ' + e.telephone + '</p>' : '') +
-                     '<button onclick="allerVers(' + destLat + ',' + destLng + ')" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;cursor:pointer;width:100%;">🧭 Y aller</button>' +
-                     '</div>'
-                     );
-                    osmMarkers.push(marker);
-                    if (type === 'hopital') countHopitaux++;
-                });
-
+    document.getElementById('countHopitaux').textContent = countHopitaux;
+})
+.catch(error => {
+    document.getElementById('loading').style.display = 'none';
+    console.error(error);
+    alert('Erreur : ' + error.message);
+});
                 document.getElementById('countHopitaux').textContent = countHopitaux;
             })
             .catch(error => {
