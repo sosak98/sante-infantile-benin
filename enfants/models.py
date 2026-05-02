@@ -8,11 +8,27 @@ class Enfant(models.Model):
     )
     parent = models.ForeignKey(Parent, on_delete=models.CASCADE)
     nom = models.CharField(max_length=100)
+    prenom = models.CharField(max_length=100)
     date_naissance = models.DateField()
     sexe = models.CharField(max_length=1, choices=SEXE_CHOICES)
 
     def __str__(self):
-        return f"{self.nom} ({self.get_sexe_display()})"
+        return f"{self.prenom} {self.nom}"
+
+    class Meta:
+        ordering = ['date_naissance']
+
+class VaccinRecu(models.Model):
+    enfant = models.ForeignKey(Enfant, on_delete=models.CASCADE, related_name='vaccins_recus')
+    nom_vaccin = models.CharField(max_length=100)
+    date_reelle = models.DateField()
+    remarque = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.nom_vaccin} - {self.enfant.prenom} ({self.date_reelle})"
+
+    class Meta:
+        ordering = ['date_reelle']
 
 class MesureEnfant(models.Model):
     enfant = models.ForeignKey(Enfant, on_delete=models.CASCADE)
@@ -22,4 +38,4 @@ class MesureEnfant(models.Model):
     muac = models.FloatField(help_text="Périmètre brachial en cm", null=True, blank=True)
 
     def __str__(self):
-        return f"Mesure de {self.enfant.nom} le {self.date_mesure}"
+        return f"Mesure de {self.enfant.prenom} le {self.date_mesure}"
