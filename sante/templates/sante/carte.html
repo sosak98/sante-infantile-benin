@@ -27,7 +27,7 @@
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,77,64,0.8); display: none; align-items: center; justify-content: center; z-index: 9999; color: white; font-size: 1.2rem; }
     </style>
 </head>
-    <body>
+<body>
     <div class="loading-overlay" id="loading">
         <div class="text-center">
             <div class="spinner-border text-light mb-3" role="status"></div>
@@ -67,7 +67,6 @@
         <p>📧 <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a></p>
     </footer>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <script>
         var map = L.map('map').setView([6.36, 2.42], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -75,7 +74,6 @@
         }).addTo(map);
 
         var userMarker = null;
-        var routingControl = null;
         var userLat = null;
         var userLng = null;
         var osmMarkers = [];
@@ -94,22 +92,7 @@
             });
         }
 
-        function allerVers(destLat, destLng) {
-            if (!userLat || !userLng) {
-                alert('Veuillez d\'abord cliquer sur Me localiser !');
-                return;
-            }
-            if (routingControl) map.removeControl(routingControl);
-            routingControl = L.Routing.control({
-                waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
-                language: 'fr',
-                routeWhileDragging: false,
-                showAlternatives: false,
-                lineOptions: { styles: [{ color: '#00796b', weight: 5 }] },
-                createMarker: function() { return null; }
-            }).addTo(map);
-        }
-      var etablissements = {{ etablissements_json|safe }};
+        var etablissements = {{ etablissements_json|safe }};
         etablissements.forEach(function(e) {
             var marker = L.marker([e.latitude, e.longitude], { icon: getIcon(e.type_etab) }).addTo(map);
             marker.bindPopup(
@@ -117,7 +100,7 @@
                 '<h6 style="color:#004d40;margin-bottom:5px;">' + e.nom + '</h6>' +
                 '<p style="margin:0;font-size:0.85rem;color:#666;">' + e.adresse + '</p>' +
                 (e.telephone ? '<p style="margin:5px 0 0;font-size:0.85rem;">📞 ' + e.telephone + '</p>' : '') +
-                '<button onclick="allerVers(' + e.latitude + ',' + e.longitude + ')" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;cursor:pointer;width:100%;">🧭 Y aller</button>' +
+                '<a href="https://www.google.com/maps/dir/?api=1&destination=' + e.latitude + ',' + e.longitude + '" target="_blank" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;display:block;text-align:center;text-decoration:none;">🧭 Y aller (Google Maps)</a>' +
                 '</div>'
             );
             if (e.type_etab === 'centre') countCentres++;
@@ -147,11 +130,11 @@
                 });
             }
         });
-              document.getElementById('osmBtn').addEventListener('click', function() {
+
+        document.getElementById('osmBtn').addEventListener('click', function() {
             var lat = userLat || 6.36;
             var lng = userLng || 2.42;
             document.getElementById('loading').style.display = 'flex';
-            var query = '[out:json][timeout:25];(node["amenity"="hospital"](around:5000,' + lat + ',' + lng + ');node["amenity"="clinic"](around:5000,' + lat + ',' + lng + ');node["amenity"="pharmacy"](around:5000,' + lat + ',' + lng + ');way["amenity"="hospital"](around:5000,' + lat + ',' + lng + '););out center;';
             var url = '/carte/osm/?lat=' + lat + '&lng=' + lng;
             fetch(url)
             .then(function(response) { return response.json(); })
@@ -161,11 +144,15 @@
                 osmMarkers = [];
                 countHopitaux = 0;
                 var elements = data.elements || [];
+                if (elements.length === 0) {
+                    alert('Aucun etablissement trouve dans cette zone.');
+                    return;
+                }
                 elements.forEach(function(element) {
                     var elLat = element.lat || (element.center && element.center.lat);
                     var elLng = element.lon || (element.center && element.center.lon);
                     if (!elLat || !elLng) return;
-                    var nom = element.tags.name || 'Établissement de santé';
+                    var nom = element.tags.name || 'Etablissement de sante';
                     var amenity = element.tags.amenity;
                     var type = amenity === 'pharmacy' ? 'pharmacie' : 'hopital';
                     var marker = L.marker([elLat, elLng], { icon: getIcon(type) }).addTo(map);
@@ -173,7 +160,7 @@
                         '<div style="font-family:Segoe UI;min-width:150px;">' +
                         '<h6 style="color:#004d40;margin-bottom:5px;">' + nom + '</h6>' +
                         '<p style="margin:0;font-size:0.85rem;color:#666;">Source: OpenStreetMap</p>' +
-                        '<button onclick="allerVers(' + elLat + ',' + elLng + ')" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;cursor:pointer;width:100%;">🧭 Y aller</button>' +
+                        '<a href="https://www.google.com/maps/dir/?api=1&destination=' + elLat + ',' + elLng + '" target="_blank" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;display:block;text-align:center;text-decoration:none;">🧭 Y aller (Google Maps)</a>' +
                         '</div>'
                     );
                     osmMarkers.push(marker);
