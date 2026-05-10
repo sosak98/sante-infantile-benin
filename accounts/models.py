@@ -4,7 +4,11 @@ from django.contrib.auth.models import User
 class Parent(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     telephone = models.CharField(max_length=20)
-    quartier = models.CharField(max_length=100)
+    nom = models.CharField(max_length=100, blank=True)
+    prenom = models.CharField(max_length=100, blank=True)
+    quartier = models.CharField(max_length=100, blank=True)
+    ville = models.CharField(max_length=100, blank=True, default='Cotonou')
+    date_inscription = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+    def __str__(self):
+        return f"{self.prenom} {self.nom} ({self.telephone})"
