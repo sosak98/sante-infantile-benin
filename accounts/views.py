@@ -21,7 +21,8 @@ def register(request):
 
 @login_required
 def dashboard(request):
-    return render(request, 'accounts/dashboard.html')
+    parent = Parent.objects.get(user=request.user)
+    return render(request, 'accounts/dashboard.html', {'parent': parent})
 
 @login_required
 def profil(request):
@@ -33,6 +34,8 @@ def profil(request):
         parent.prenom = request.POST.get('prenom', '')
         parent.quartier = request.POST.get('quartier', '')
         parent.ville = request.POST.get('ville', 'Cotonou')
+        if request.FILES.get('photo'):
+            parent.photo = request.FILES['photo']
         parent.save()
         messages.success(request, 'Profil mis à jour avec succès !')
         return redirect('profil')

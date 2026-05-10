@@ -151,7 +151,7 @@
     <!-- WELCOME -->
     <section class="welcome-section">
         <div class="container">
-            <h2>👋 Bonjour, {{ user.username }} !</h2>
+              <h2>👋 Bonjour, {% if parent.prenom %}{{ parent.prenom }}{% else %}{{ user.username }}{% endif %} !</h2>
             <p>Bienvenue sur votre espace santé infantile. Que souhaitez-vous faire aujourd'hui ?</p>
         </div>
     </section>

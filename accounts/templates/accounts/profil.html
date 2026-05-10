@@ -42,7 +42,7 @@
     <div class="page-header">
         <div class="container">
             <div class="avatar">👤</div>
-            <h2>Mon Profil</h2>
+            <h2>{% if parent.prenom %}{{ parent.prenom }} {{ parent.nom }}{% else %}Mon Profil{% endif %}</h2>
             <p>📱 {{ parent.telephone }}</p>
         </div>
     </div>
@@ -62,7 +62,7 @@
                                 <div class="alert alert-success border-0 rounded-4">{{ message }}</div>
                             {% endfor %}
                         {% endif %}
-                        <form method="post">
+                            <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label class="form-label fw-bold">👤 Prénom</label>
@@ -80,7 +80,16 @@
                                 <label class="form-label fw-bold">🏙️ Ville</label>
                                 <input type="text" name="ville" class="form-control" value="{{ parent.ville }}" placeholder="Votre ville">
                             </div>
-                            <button type="submit" class="btn-sauvegarder">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">📷 Photo de profil</label>
+                                {% if parent.photo %}
+                                    <div class="mb-2">
+                                        <img src="{{ parent.photo.url }}" width="80" height="80" style="border-radius:50%;object-fit:cover;">
+                                    </div>
+                                {% endif %}
+                                <input type="file" name="photo" class="form-control" accept="image/*">
+                             </div>
+                             <button type="submit" class="btn-sauvegarder">
                                 💾 Sauvegarder
                             </button>
                         </form>
