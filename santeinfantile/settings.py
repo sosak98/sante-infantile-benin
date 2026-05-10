@@ -83,3 +83,4 @@ LOGOUT_REDIRECT_URL = 'login'
 CSRF_TRUSTED_ORIGINS = [
     'https://sante-infantile-benin-production.up.railway.app'
 ]
+LOGIN_URL = 'login'
