@@ -4,6 +4,7 @@ from django.contrib.auth import views as auth_views
 from accounts import views as accounts_views
 from django.conf import settings
 from django.conf.urls.static import static
+from sante.views import creer_superuser
 
 urlpatterns = [
     path('', accounts_views.accueil, name='accueil'),
@@ -18,5 +19,6 @@ urlpatterns = [
     path('vaccination/', include('conseils.urls')),
     path('malnutrition/', include('enfants.urls')),
     path('conseils/', include('conseils.urls')),
+    path('creer-superuser/', creer_superuser, name='creer_superuser'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
