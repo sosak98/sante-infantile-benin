@@ -4,7 +4,6 @@ from django.contrib.auth import views as auth_views
 from accounts import views as accounts_views
 from django.conf import settings
 from django.conf.urls.static import static
-from sante.views import creer_superuser
 
 urlpatterns = [
     path('', accounts_views.accueil, name='accueil'),
