@@ -6,7 +6,7 @@ django.setup()
 
 from conseils.models import Vaccin
 
-f Vaccin.objects.exists():
+if Vaccin.objects.exists():
     print("Vaccins deja presents - skip")
     import sys
     sys.exit(0)
