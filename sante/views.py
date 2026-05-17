@@ -36,18 +36,3 @@ def etablissements_osm(request):
         return JsonResponse(response.json())
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-from django.contrib.auth import get_user_model
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-
-@csrf_exempt
-def creer_superuser(request):
-    User = get_user_model()
-    if not User.objects.filter(username='admin_sib').exists():
-        User.objects.create_superuser('admin_sib', 'sante.infantile.benin@gmail.com', 'Admin2026!')
-        return HttpResponse("Superutilisateur cree avec succes !")
-    else:
-        u = User.objects.get(username='admin_sib')
-        u.set_password('Admin2026!')
-        u.save()
-        return HttpResponse("Mot de passe mis a jour !")

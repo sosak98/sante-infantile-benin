@@ -19,6 +19,5 @@ urlpatterns = [
     path('vaccination/', include('conseils.urls')),
     path('malnutrition/', include('enfants.urls')),
     path('conseils/', include('conseils.urls')),
-    path('creer-superuser/', creer_superuser, name='creer_superuser'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
