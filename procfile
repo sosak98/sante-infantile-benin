@@ -1,1 +1,2 @@
-web: gunicorn santeinfantile.wsgi --bind 0.0.0.0:$PORT --log-file -
+web: python manage.py migrate && python manage.py shell < conseils/seed_vaccins.py && gunicorn santeinfantile.wsgi --bind 0.0.0.0:$PORT --log-file -
+

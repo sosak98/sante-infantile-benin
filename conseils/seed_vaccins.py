@@ -6,7 +6,10 @@ django.setup()
 
 from conseils.models import Vaccin
 
-Vaccin.objects.all().delete()
+if Vaccin.objects.exists():
+    print("Vaccins deja presents - skip")
+    import sys
+    sys.exit(0)
 
 vaccins = [
     # Naissance
