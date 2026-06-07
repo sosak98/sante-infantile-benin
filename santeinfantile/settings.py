@@ -1,6 +1,9 @@
 from pathlib import Path
 from decouple import config
-
+import socket
+socket.getaddrinfo = lambda host, port, *args, **kwargs: [
+    (socket.AF_INET, socket.SOCK_STREAM, 6, '', (host, port))
+]
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
