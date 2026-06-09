@@ -36,3 +36,10 @@ def etablissements_osm(request):
         return JsonResponse(response.json())
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def charger_seeds(request):
+    from conseils.seed_vaccins import *
+    return HttpResponse("Seeds charges !")
