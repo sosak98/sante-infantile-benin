@@ -3,6 +3,7 @@ import requests
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import Etablissement
+from conseils.seed_vaccins import *
 
 def carte(request):
     etablissements = list(Etablissement.objects.values(
@@ -41,5 +42,4 @@ from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def charger_seeds(request):
-    from conseils.seed_vaccins import *
     return HttpResponse("Seeds charges !")

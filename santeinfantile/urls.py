@@ -19,4 +19,3 @@ urlpatterns = [
     path('malnutrition/', include('enfants.urls')),
     path('conseils/', include('conseils.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    path('charger-seeds/', charger_seeds, name='charger_seeds'),
