@@ -116,7 +116,7 @@ Règles importantes :
 
         try:
             completion = client.chat.completions.create(
-                model="llama3-8b-8192",
+                model="llama3-70b-8192",
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": message_user}
