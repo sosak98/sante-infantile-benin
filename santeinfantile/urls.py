@@ -18,4 +18,5 @@ urlpatterns = [
     path('vaccination/', include('conseils.urls')),
     path('malnutrition/', include('enfants.urls')),
     path('conseils/', include('conseils.urls')),
+    path('sib-intelligence/', include('sib_intelligence.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

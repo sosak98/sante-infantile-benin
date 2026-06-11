@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIB Intelligence - Triage Pédiatrique</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Nunito', sans-serif; background: #FFF8F0; }
+        .navbar-custom { background: linear-gradient(135deg, #004d40, #00796b); padding: 15px 0; }
+        .navbar-brand-custom { font-size: 1.3rem; font-weight: 900; color: white !important; }
+        .btn-retour { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 16px; font-size: 0.85rem; text-decoration: none; }
+        .page-header { background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 25px 0; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .page-header::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, rgba(255,193,7,0.05) 0, rgba(255,193,7,0.05) 2px, transparent 2px, transparent 14px); }
+        .page-header-content { position: relative; z-index: 2; }
+        .page-header h2 { font-weight: 900; font-size: 1.6rem; }
+        .page-header p { opacity: 0.85; margin: 0; }
+        .card { border: none; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .card-header-custom { background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 18px 25px; border-radius: 20px 20px 0 0; }
+        .card-header-custom h5 { margin: 0; font-weight: 800; }
+        .form-label { font-weight: 700; color: #444; font-size: 0.9rem; }
+        .form-select, .form-control { border-radius: 12px; border: 2px solid #e0f2f1; padding: 10px 15px; font-family: 'Nunito', sans-serif; transition: 0.3s; }
+        .form-select:focus, .form-control:focus { border-color: #00796b; box-shadow: 0 0 0 0.2rem rgba(0,121,107,0.15); }
+        .question-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 4px solid #00796b; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
+        .question-card.urgente { border-left-color: #f44336; }
+        .question-number { background: #00796b; color: white; border-radius: 50%; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.85rem; margin-right: 10px; }
+        .question-number.urgente { background: #f44336; }
+        .btn-submit { background: linear-gradient(135deg, #004d40, #00796b); color: white; border: none; border-radius: 12px; padding: 14px; font-size: 1rem; font-weight: 800; width: 100%; transition: 0.3s; font-family: 'Nunito', sans-serif; }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,121,107,0.4); color: white; }
+        .info-banner { background: #e0f2f1; border-radius: 15px; padding: 15px 20px; margin-bottom: 25px; }
+        .info-banner p { margin: 0; color: #004d40; font-size: 0.9rem; font-weight: 600; }
+        footer { background: #002921; color: rgba(255,255,255,0.7); text-align: center; padding: 20px; margin-top: 40px; }
+        footer strong { color: white; }
+        footer a { color: #80cbc4; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar-custom">
+    <div class="container d-flex justify-content-between align-items-center">
+        <span class="navbar-brand-custom">🤖 SIB Intelligence</span>
+        <a href="{% url 'dashboard' %}" class="btn-retour">← Dashboard</a>
+    </div>
+</nav>
+
+<div class="page-header">
+    <div class="container page-header-content">
+        <h2>🏥 Triage Pédiatrique IA</h2>
+        <p>Évaluation intelligente de l'état de santé de votre enfant</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="info-banner">
+                <p>⚠️ Cet outil ne remplace pas une consultation médicale. En cas de doute, consultez toujours un professionnel de santé.</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Sélection enfant -->
+                <div class="card">
+                    <div class="card-header-custom">
+                        <h5>👶 Quel enfant évaluez-vous ?</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if enfants %}
+                            <label class="form-label">Sélectionnez l'enfant</label>
+                            <select name="enfant_id" class="form-select" required>
+                                <option value="">-- Choisir un enfant --</option>
+                                {% for enfant in enfants %}
+                                    <option value="{{ enfant.id }}">
+                                        {% if enfant.sexe == 'M' %}👦{% else %}👧{% endif %}
+                                        {{ enfant.prenom }} {{ enfant.nom }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        {% else %}
+                            <div class="alert alert-warning border-0 rounded-4">
+                                ⚠️ Aucun enfant enregistré. <a href="{% url 'ajouter_enfant' %}">Ajoutez un enfant d'abord →</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Questions de triage -->
+                <div class="card">
+                    <div class="card-header-custom">
+                        <h5>📋 Questions de triage</h5>
+                    </div>
+                    <div class="card-body p-4">
+
+                        <!-- Q1 Fièvre -->
+                        <div class="question-card">
+                            <label class="form-label">
+                                <span class="question-number">1</span>
+                                🌡️ Votre enfant a-t-il de la fièvre ?
+                            </label>
+                            <select name="fievre" class="form-select mt-2" required>
+                                <option value="">-- Choisir --</option>
+                                <option value="non">Non, pas de fièvre</option>
+                                <option value="oui_moderee">Oui, fièvre modérée (38-39°C)</option>
+                                <option value="oui_haute">Oui, fièvre élevée (plus de 39°C)</option>
+                            </select>
+                        </div>
+
+                        <!-- Q2 Diarrhée -->
+                        <div class="question-card">
+                            <label class="form-label">
+                                <span class="question-number">2</span>
+                                💧 Votre enfant a-t-il de la diarrhée ?
+                            </label>
+                            <select name="diarrhee" class="form-select mt-2" required>
+                                <option value="">-- Choisir --</option>
+                                <option value="non">Non</option>
+                                <option value="oui_simple">Oui, diarrhée simple</option>
+                                <option value="oui_sang">Oui, avec du sang</option>
+                            </select>
+                        </div>
+
+                        <!-- Q3 Respiration -->
+                        <div class="question-card">
+                            <label class="form-label">
+                                <span class="question-number">3</span>
+                                🫁 Comment est la respiration de votre enfant ?
+                            </label>
+                            <select name="respiration" class="form-select mt-2" required>
+                                <option value="">-- Choisir --</option>
+                                <option value="normale">Normale</option>
+                                <option value="rapide">Rapide mais sans difficulté</option>
+                                <option value="difficile">Difficile, avec effort visible</option>
+                            </select>
+                        </div>
+
+                        <!-- Q4 Éveil -->
+                        <div class="question-card">
+                            <label class="form-label">
+                                <span class="question-number">4</span>
+                                👁️ Votre enfant est-il bien éveillé et réactif ?
+                            </label>
+                            <select name="eveil" class="form-select mt-2" required>
+                                <option value="">-- Choisir --</option>
+                                <option value="oui">Oui, bien éveillé et réactif</option>
+                                <option value="difficile">Difficile à réveiller</option>
+                                <option value="non">Non, ne répond pas / inconscient</option>
+                            </select>
+                        </div>
+
+                        <!-- Q5 Alimentation -->
+                        <div class="question-card">
+                            <label class="form-label">
+                                <span class="question-number">5</span>
+                                🍼 Comment mange/boit votre enfant ?
+                            </label>
+                            <select name="alimentation" class="form-select mt-2" required>
+                                <option value="">-- Choisir --</option>
+                                <option value="normale">Normalement</option>
+                                <option value="diminuee">Moins que d'habitude</option>
+                                <option value="refuse">Refuse de manger/boire</option>
+                            </select>
+                        </div>
+
+                        <!-- Q6 Vomissements -->
+                        <div class="question-card">
+                            <label class="form-label">
+                                <span class="question-number">6</span>
+                                🤢 Votre enfant vomit-il ?
+                            </label>
+                            <select name="vomissement" class="form-select mt-2" required>
+                                <option value="">-- Choisir --</option>
+                                <option value="non">Non</option>
+                                <option value="oui_simple">Oui, une ou deux fois</option>
+                                <option value="oui_repete">Oui, vomissements répétés</option>
+                            </select>
+                        </div>
+
+                        <!-- Q7 Convulsions -->
+                        <div class="question-card urgente">
+                            <label class="form-label">
+                                <span class="question-number urgente">7</span>
+                                ⚡ Votre enfant a-t-il eu des convulsions ?
+                            </label>
+                            <select name="convulsions" class="form-select mt-2" required>
+                                <option value="">-- Choisir --</option>
+                                <option value="non">Non</option>
+                                <option value="oui">Oui</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+                {% if enfants %}
+                <button type="submit" class="btn-submit">
+                    🤖 Analyser avec SIB Intelligence
+                </button>
+                {% endif %}
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 Santé Infantile Bénin — <strong>SIB Intelligence</strong></p>
+    <p>📧 <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a></p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

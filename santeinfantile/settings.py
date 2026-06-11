@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'enfants',
     'sante',
     'conseils',
+    'sib_intelligence',
 ]
 
 MIDDLEWARE = [
