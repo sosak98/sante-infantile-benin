@@ -5,134 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Santé Infantile Bénin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
-
-        /* NAVBAR */
-        .navbar-custom {
-            background: linear-gradient(135deg, #004d40, #00796b);
-            padding: 15px 0;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.2);
-        }
-        .navbar-brand-custom {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: white !important;
-        }
-        .btn-logout {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 20px;
-            padding: 6px 16px;
-            font-size: 0.85rem;
-            transition: 0.3s;
-        }
-        .btn-logout:hover {
-            background: rgba(255,255,255,0.3);
-            color: white;
-        }
-
-        /* WELCOME SECTION */
-        .welcome-section {
-            background: linear-gradient(135deg, #004d40, #00796b);
-            color: white;
-            padding: 30px 0;
-            margin-bottom: 30px;
-        }
-        .welcome-section h2 { font-weight: 800; font-size: 1.8rem; }
+        body { background: #FFF8F0; font-family: 'Nunito', sans-serif; }
+        .navbar-custom { background: linear-gradient(135deg, #004d40, #00796b); padding: 15px 0; box-shadow: 0 2px 20px rgba(0,0,0,0.2); }
+        .navbar-brand-custom { font-size: 1.3rem; font-weight: 900; color: white !important; }
+        .btn-logout { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 16px; font-size: 0.85rem; transition: 0.3s; text-decoration: none; }
+        .btn-logout:hover { background: rgba(255,255,255,0.3); color: white; }
+        .welcome-section { background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 30px 0; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .welcome-section::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, rgba(255,193,7,0.05) 0, rgba(255,193,7,0.05) 2px, transparent 2px, transparent 14px); }
+        .welcome-content { position: relative; z-index: 2; }
+        .welcome-section h2 { font-weight: 900; font-size: 1.8rem; }
         .welcome-section p { opacity: 0.85; }
-
-        /* FEATURE CARDS */
-        .feature-card {
-            background: white;
-            border: none;
-            border-radius: 20px;
-            padding: 25px 20px;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            transition: 0.3s;
-            height: 100%;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-            color: inherit;
-        }
-        .feature-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-            color: inherit;
-        }
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
-            display: block;
-        }
-        .feature-card h5 {
-            color: #004d40;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .feature-card p {
-            color: #888;
-            font-size: 0.85rem;
-            margin-bottom: 15px;
-        }
-        .btn-feature {
-            background: linear-gradient(135deg, #004d40, #00796b);
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 8px 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        .btn-feature:hover {
-            transform: translateY(-2px);
-            color: white;
-        }
-        .btn-urgence {
-            background: linear-gradient(135deg, #c62828, #d32f2f);
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 8px 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        /* URGENCES */
-        .urgence-card {
-            border-radius: 15px;
-            padding: 15px;
-            text-align: center;
-            color: white;
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
+        .feature-card { background: white; border: none; border-radius: 20px; padding: 25px 20px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: 0.3s; height: 100%; cursor: pointer; text-decoration: none; display: block; color: inherit; }
+        .feature-card:hover { transform: translateY(-8px); box-shadow: 0 15px 40px rgba(0,0,0,0.15); color: inherit; }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+        .feature-card h5 { color: #004d40; font-weight: 800; margin-bottom: 8px; }
+        .feature-card p { color: #888; font-size: 0.85rem; margin-bottom: 15px; }
+        .btn-feature { background: linear-gradient(135deg, #004d40, #00796b); color: white; border: none; border-radius: 20px; padding: 8px 20px; font-size: 0.85rem; font-weight: 700; transition: 0.3s; display: inline-block; }
+        .btn-feature:hover { transform: translateY(-2px); color: white; }
+        .btn-urgence { background: linear-gradient(135deg, #c62828, #d32f2f); color: white; border: none; border-radius: 20px; padding: 8px 20px; font-size: 0.85rem; font-weight: 700; display: inline-block; }
+        .btn-ia { background: linear-gradient(135deg, #4a148c, #7b1fa2); color: white; border: none; border-radius: 20px; padding: 8px 20px; font-size: 0.85rem; font-weight: 700; transition: 0.3s; display: inline-block; }
+        .btn-ia:hover { transform: translateY(-2px); color: white; }
+        .feature-card.ia-card { border: 2px solid #7b1fa2; }
+        .feature-card.ia-card:hover { box-shadow: 0 15px 40px rgba(123,31,162,0.2); }
+        .urgence-card { border-radius: 15px; padding: 15px; text-align: center; color: white; font-weight: 700; font-size: 1.1rem; }
         .urgence-samu { background: linear-gradient(135deg, #c62828, #d32f2f); }
         .urgence-pompiers { background: linear-gradient(135deg, #e65100, #f57c00); }
         .urgence-police { background: linear-gradient(135deg, #1565c0, #1976d2); }
-
-        /* CONSEIL DU JOUR */
-        .conseil-card {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            border-left: 5px solid #00796b;
-        }
-
-        /* FOOTER */
-        footer {
-            background: #004d40;
-            color: rgba(255,255,255,0.7);
-            text-align: center;
-            padding: 20px;
-            margin-top: 40px;
-        }
+        .conseil-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); border-left: 5px solid #E87722; }
+        .section-title { color: #555; font-weight: 800; margin-bottom: 15px; font-size: 1rem; }
+        footer { background: #002921; color: rgba(255,255,255,0.7); text-align: center; padding: 20px; margin-top: 40px; }
+        footer::before { content: ''; display: block; height: 4px; background: linear-gradient(90deg, #004d40, #E87722, #FFC107, #004d40); margin-bottom: 20px; }
         footer strong { color: white; }
         footer a { color: #80cbc4; }
     </style>
@@ -143,23 +48,25 @@
     <nav class="navbar-custom">
         <div class="container d-flex justify-content-between align-items-center">
             <span class="navbar-brand-custom">🏥 Santé Infantile Bénin</span>
-            <a href="{% url 'profil' %}" class="btn-logout me-2">👤 Profil</a>
-            <a href="{% url 'logout' %}" class="btn-logout">🚪 Déconnexion</a>
+            <div class="d-flex gap-2">
+                <a href="{% url 'profil' %}" class="btn-logout">👤 Profil</a>
+                <a href="{% url 'logout' %}" class="btn-logout">🚪 Déconnexion</a>
+            </div>
         </div>
     </nav>
 
     <!-- WELCOME -->
     <section class="welcome-section">
-        <div class="container">
-              <h2>👋 Bonjour, {% if parent.prenom %}{{ parent.prenom }}{% else %}{{ user.username }}{% endif %} !</h2>
+        <div class="container welcome-content">
+            <h2>👋 Bonjour, {% if parent.prenom %}{{ parent.prenom }}{% else %}{{ user.username }}{% endif %} !</h2>
             <p>Bienvenue sur votre espace santé infantile. Que souhaitez-vous faire aujourd'hui ?</p>
         </div>
     </section>
 
     <div class="container pb-5">
 
-        <!-- FEATURE CARDS -->
-        <h5 class="text-muted mb-3 fw-bold">🔹 Nos services</h5>
+        <!-- SERVICES -->
+        <p class="section-title">🔹 Nos services</p>
         <div class="row g-4 mb-5">
 
             <div class="col-md-4 col-sm-6">
@@ -181,6 +88,15 @@
             </div>
 
             <div class="col-md-4 col-sm-6">
+                <a href="{% url 'calculer_rdv' %}" class="feature-card">
+                    <span class="feature-icon">📅</span>
+                    <h5>RDV Vaccinal</h5>
+                    <p>Calculez les prochains rendez-vous vaccinaux de votre enfant</p>
+                    <span class="btn-feature">Calculer</span>
+                </a>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
                 <a href="{% url 'detection_malnutrition' %}" class="feature-card">
                     <span class="feature-icon">⚖️</span>
                     <h5>Détection Malnutrition</h5>
@@ -198,48 +114,48 @@
                 </a>
             </div>
 
+            <!-- SIB INTELLIGENCE -->
             <div class="col-md-4 col-sm-6">
-                <a href="tel:112" class="feature-card">
-                    <span class="feature-icon">🚨</span>
-                    <h5>Urgences</h5>
-                    <p>Numéros d'urgence disponibles 24h/24</p>
-                    <span class="btn-urgence">Appeler</span>
+                <a href="{% url 'triage' %}" class="feature-card ia-card">
+                    <span class="feature-icon">🤖</span>
+                    <h5>SIB Intelligence</h5>
+                    <p>Triage pédiatrique IA — Évaluez l'urgence des symptômes de votre enfant</p>
+                    <span class="btn-ia">🚀 Lancer le triage</span>
                 </a>
             </div>
 
         </div>
 
         <!-- CONSEIL DU JOUR -->
-        <h5 class="text-muted mb-3 fw-bold">💡 Conseil du jour</h5>
+        <p class="section-title">💡 Conseil du jour</p>
         <div class="conseil-card mb-5">
-            <h5 class="text-success">🤱 Allaitement maternel exclusif</h5>
-            <p class="text-muted mb-2">L'OMS recommande l'allaitement maternel exclusif pendant les 6 premiers mois. Le lait maternel contient tous les nutriments nécessaires et protège votre enfant contre les infections.</p>
+            <h5 style="color:#E87722;">🤱 Allaitement maternel exclusif</h5>
+            <p class="text-muted mb-3">L'OMS recommande l'allaitement maternel exclusif pendant les 6 premiers mois. Le lait maternel contient tous les nutriments nécessaires et protège votre enfant contre les infections.</p>
             <a href="{% url 'conseils_nutritionnels' %}" class="btn-feature btn">En savoir plus →</a>
         </div>
 
         <!-- URGENCES -->
-        <h5 class="text-muted mb-3 fw-bold">🚨 Numéros d'urgence</h5>
+        <p class="section-title">🚨 Numéros d'urgence</p>
         <div class="row g-3 mb-4">
             <div class="col-4">
-                <div class="urgence-card urgence-samu">
-                    🚑 SAMU<br>112
-                </div>
+                <a href="tel:112" style="text-decoration:none;">
+                    <div class="urgence-card urgence-samu">🚑 SAMU<br>112</div>
+                </a>
             </div>
             <div class="col-4">
-                <div class="urgence-card urgence-pompiers">
-                    🔥 Pompiers<br>118
-                </div>
+                <a href="tel:118" style="text-decoration:none;">
+                    <div class="urgence-card urgence-pompiers">🔥 Pompiers<br>118</div>
+                </a>
             </div>
             <div class="col-4">
-                <div class="urgence-card urgence-police">
-                    👮 Police<br>117
-                </div>
+                <a href="tel:117" style="text-decoration:none;">
+                    <div class="urgence-card urgence-police">👮 Police<br>117</div>
+                </a>
             </div>
         </div>
 
     </div>
 
-    <!-- FOOTER -->
     <footer>
         <p>© 2026 Santé Infantile Bénin — Développé par <strong>SOSSA GNINAZÉ MINGNISSÊ DARIUS</strong></p>
         <p>📧 <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a></p>
