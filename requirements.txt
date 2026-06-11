@@ -13,3 +13,4 @@ requests==2.33.1
 sqlparse==0.5.5
 urllib3==2.6.3
 whitenoise==6.12.0
+python-dotenv
