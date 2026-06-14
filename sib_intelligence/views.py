@@ -10,29 +10,32 @@ from enfants.models import Enfant
 
 client = Groq(api_key=os.getenv('GROQ_API_KEY'))
 
+
 @login_required
 def triage(request):
     parent = Parent.objects.get(user=request.user)
     enfants = Enfant.objects.filter(parent=parent)
-    
+
     if request.method == 'POST':
-        # Récupération des données du formulaire
         enfant_id = request.POST.get('enfant_id')
         fievre = request.POST.get('fievre')
         diarrhee = request.POST.get('diarrhee')
         respiration = request.POST.get('respiration')
         eveil = request.POST.get('eveil')
         alimentation = request.POST.get('alimentation')
-        
-        # Récupération de l'enfant
+        convulsions = request.POST.get('convulsions')
+        vomissement = request.POST.get('vomissement')
+        poids = request.POST.get('poids')
+        taille = request.POST.get('taille')
+        muac = request.POST.get('muac')
+
         enfant = Enfant.objects.get(id=enfant_id, parent=parent)
-        
-        # Calcul age en mois
+
         from datetime import date
         today = date.today()
         age_mois = (today.year - enfant.date_naissance.year) * 12 + (today.month - enfant.date_naissance.month)
-        
-        # Logique de triage
+
+        # ===== Calcul du score de triage =====
         score = 0
         if fievre == 'oui_haute': score += 3
         elif fievre == 'oui_moderee': score += 1
@@ -44,8 +47,25 @@ def triage(request):
         elif eveil == 'difficile': score += 2
         if alimentation == 'refuse': score += 3
         elif alimentation == 'diminuee': score += 1
-        
-        # Classification
+        if convulsions == 'oui': score += 4
+        if vomissement == 'oui_repete': score += 2
+        elif vomissement == 'oui_simple': score += 1
+
+        # Malnutrition via MUAC
+        if muac:
+            muac_val = float(muac)
+            if muac_val < 11.5: score += 4
+            elif muac_val < 12.5: score += 2
+
+        # Malnutrition via IMC
+        if poids and taille:
+            poids_val = float(poids)
+            taille_val = float(taille) / 100
+            imc = poids_val / (taille_val ** 2)
+            if imc < 14: score += 3
+            elif imc < 16: score += 1
+
+        # ===== Classification =====
         if score >= 6:
             niveau = 'rouge'
             message = '🔴 Urgence immédiate — Consultez un médecin maintenant !'
@@ -55,8 +75,7 @@ def triage(request):
         else:
             niveau = 'vert'
             message = '🟢 Conseils à domicile suffisants pour le moment'
-        
-        # Contexte pour le chatbot
+
         contexte = {
             'enfant_nom': enfant.prenom,
             'age_mois': age_mois,
@@ -67,10 +86,15 @@ def triage(request):
                 'diarrhee': diarrhee,
                 'respiration': respiration,
                 'eveil': eveil,
-                'alimentation': alimentation
+                'alimentation': alimentation,
+                'convulsions': convulsions,
+                'vomissement': vomissement,
+                'poids': poids,
+                'taille': taille,
+                'muac': muac,
             }
         }
-        
+
         return render(request, 'sib_intelligence/resultat.html', {
             'enfant': enfant,
             'niveau': niveau,
@@ -78,8 +102,9 @@ def triage(request):
             'score': score,
             'contexte': json.dumps(contexte),
             'enfants': enfants,
+            'age_mois': age_mois,
         })
-    
+
     return render(request, 'sib_intelligence/triage.html', {
         'enfants': enfants,
         'parent': parent,
@@ -93,8 +118,8 @@ def chat(request):
         data = json.loads(request.body)
         message_user = data.get('message', '')
         contexte = data.get('contexte', {})
-        
-        # Construction du prompt système
+        symptomes = contexte.get('symptomes', {})
+
         system_prompt = f"""Tu es SIB Intelligence, un assistant médical pédiatrique virtuel de la plateforme Santé Infantile Bénin.
 
 Tu aides les parents béninois à mieux comprendre l'état de santé de leurs enfants.
@@ -103,7 +128,17 @@ Contexte de l'enfant :
 - Prénom : {contexte.get('enfant_nom', 'N/A')}
 - Âge : {contexte.get('age_mois', 'N/A')} mois
 - Résultat du triage : {contexte.get('message', 'N/A')}
-- Symptômes : {contexte.get('symptomes', {})}
+- Symptômes détectés :
+  * Fièvre : {symptomes.get('fievre', 'N/A')}
+  * Diarrhée : {symptomes.get('diarrhee', 'N/A')}
+  * Respiration : {symptomes.get('respiration', 'N/A')}
+  * Éveil : {symptomes.get('eveil', 'N/A')}
+  * Alimentation : {symptomes.get('alimentation', 'N/A')}
+  * Convulsions : {symptomes.get('convulsions', 'N/A')}
+  * Vomissements : {symptomes.get('vomissement', 'N/A')}
+  * Poids : {symptomes.get('poids', 'N/A')} kg
+  * Taille : {symptomes.get('taille', 'N/A')} cm
+  * MUAC : {symptomes.get('muac', 'N/A')} cm
 
 Règles importantes :
 1. Réponds TOUJOURS en français
@@ -112,7 +147,9 @@ Règles importantes :
 4. Donne des conseils pratiques adaptés au contexte béninois
 5. Ne pose pas de diagnostic médical définitif
 6. Reste simple et compréhensible pour des parents non-médecins
-7. Limite tes réponses à 150 mots maximum"""
+7. Limite tes réponses à 150 mots maximum
+8. Si convulsions, insiste fortement sur l'urgence
+9. Si MUAC ou IMC indique une malnutrition, donne des conseils nutritionnels adaptés"""
 
         try:
             completion = client.chat.completions.create(
@@ -126,8 +163,8 @@ Règles importantes :
             )
             reponse = completion.choices[0].message.content
             return JsonResponse({'reponse': reponse, 'status': 'ok'})
-        
+
         except Exception as e:
             return JsonResponse({'reponse': f'Erreur : {str(e)}', 'status': 'error'})
-    
+
     return JsonResponse({'error': 'Méthode non autorisée'}, status=405)
