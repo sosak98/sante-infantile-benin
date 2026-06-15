@@ -25,12 +25,15 @@
         .form-select:focus, .form-control:focus { border-color: #00796b; box-shadow: 0 0 0 0.2rem rgba(0,121,107,0.15); }
         .question-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 4px solid #00796b; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
         .question-card.urgente { border-left-color: #f44336; }
+        .question-card.nutrition { border-left-color: #E87722; }
         .question-number { background: #00796b; color: white; border-radius: 50%; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.85rem; margin-right: 10px; }
         .question-number.urgente { background: #f44336; }
+        .question-number.nutrition { background: #E87722; }
         .btn-submit { background: linear-gradient(135deg, #004d40, #00796b); color: white; border: none; border-radius: 12px; padding: 14px; font-size: 1rem; font-weight: 800; width: 100%; transition: 0.3s; font-family: 'Nunito', sans-serif; }
         .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,121,107,0.4); color: white; }
         .info-banner { background: #e0f2f1; border-radius: 15px; padding: 15px 20px; margin-bottom: 25px; }
         .info-banner p { margin: 0; color: #004d40; font-size: 0.9rem; font-weight: 600; }
+        .form-text { color: #888; font-size: 0.8rem; }
         footer { background: #002921; color: rgba(255,255,255,0.7); text-align: center; padding: 20px; margin-top: 40px; }
         footer strong { color: white; }
         footer a { color: #80cbc4; }
@@ -190,6 +193,31 @@
                                 <option value="non">Non</option>
                                 <option value="oui">Oui</option>
                             </select>
+                        </div>
+
+                        <!-- Q8 Mesures nutritionnelles -->
+                        <div class="question-card nutrition">
+                            <label class="form-label">
+                                <span class="question-number nutrition">8</span>
+                                📏 Mesures nutritionnelles (optionnel)
+                            </label>
+                            <div class="row g-2 mt-2">
+                                <div class="col-4">
+                                    <label class="form-label small fw-bold">Poids (kg)</label>
+                                    <input type="number" name="poids" class="form-control" step="0.1" min="0" placeholder="8.5">
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label small fw-bold">Taille (cm)</label>
+                                    <input type="number" name="taille" class="form-control" step="0.1" min="0" placeholder="72">
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label small fw-bold">MUAC (cm)</label>
+                                    <input type="number" name="muac" class="form-control" step="0.1" min="0" placeholder="13.5">
+                                </div>
+                            </div>
+                            <div class="form-text mt-2">
+                                🔴 MUAC &lt;11.5cm = sévère | 🟠 11.5-12.5cm = modérée | 🟢 &gt;12.5cm = normal
+                            </div>
                         </div>
 
                     </div>
