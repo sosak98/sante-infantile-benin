@@ -1,65 +1,59 @@
 from django.shortcuts import render, redirect
-from django.contrib import messages
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-from .forms import ParentRegisterForm
-from .models import Parent
-from enfants.models import Enfant
-
-def accueil(request):
-    return render(request, 'accounts/accueil.html')
-
-def register(request):
-    if request.method == 'POST':
-        form = ParentRegisterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Compte créé avec succès ! Connectez-vous.')
-            return redirect('login')
-    else:
-        form = ParentRegisterForm()
-    return render(request, 'accounts/register.html', {'form': form})
 
 @login_required
 def dashboard(request):
-    parent = Parent.objects.get(user=request.user)
-    return render(request, 'accounts/dashboard.html', {'parent': parent})
+    user = request.user
 
-@login_required
-def profil(request):
-    parent = Parent.objects.get(user=request.user)
-    enfants = Enfant.objects.filter(parent=parent)
+    # Récupérer prénom de façon robuste (User.first_name ou profile.first_name)
+    first_name = (user.first_name or
+                  getattr(getattr(user, 'profile', None), 'first_name', '') or
+                  getattr(getattr(user, 'parent', None), 'first_name', '') or
+                  '')
 
-    if request.method == 'POST':
-        parent.nom = request.POST.get('nom', '')
-        parent.prenom = request.POST.get('prenom', '')
-        parent.quartier = request.POST.get('quartier', '')
-        parent.ville = request.POST.get('ville', 'Cotonou')
-        if request.FILES.get('photo'):
-            parent.photo = request.FILES['photo']
-        parent.save()
-        messages.success(request, 'Profil mis à jour avec succès !')
-        return redirect('profil')
+    # Heure locale
+    now_local = timezone.localtime(timezone.now())
+    hour = now_local.hour
 
-    return render(request, 'accounts/profil.html', {
-        'parent': parent,
-        'enfants': enfants,
-    })
+    if 5 <= hour < 12:
+        salutation = "Bonjour"
+    elif 12 <= hour < 18:
+        salutation = "Bon après-midi"
+    else:
+        salutation = "Bonsoir"
 
-@login_required
-def ajouter_enfant(request):
-    parent = Parent.objects.get(user=request.user)
-    if request.method == 'POST':
-        nom = request.POST.get('nom')
-        prenom = request.POST.get('prenom')
-        date_naissance = request.POST.get('date_naissance')
-        sexe = request.POST.get('sexe')
-        Enfant.objects.create(
-            parent=parent,
-            nom=nom,
-            prenom=prenom,
-            date_naissance=date_naissance,
-            sexe=sexe
-        )
-        messages.success(request, f'Enfant {prenom} ajouté avec succès !')
-        return redirect('profil')
-    return render(request, 'accounts/ajouter_enfant.html')
+    if first_name:
+        greeting = f"{salutation} {first_name}"
+        show_profile_prompt = False
+    else:
+        greeting = "Bienvenue"
+        show_profile_prompt = True
+
+    # Récupération robuste de la liste d'enfants (différents related_name possibles)
+    children_qs = None
+    for rel in ('children', 'child_set', 'enfants', 'enfant_set'):
+        rel_attr = getattr(user, rel, None)
+        if rel_attr:
+            try:
+                # si c'est un manager QuerySet
+                children_qs = rel_attr.all()
+                break
+            except Exception:
+                # rel_attr peut être autre chose, on ignore
+                children_qs = None
+
+    children_count = children_qs.count() if children_qs is not None else 0
+    children_sample = list(children_qs[:3]) if children_qs is not None else []
+
+    context = {
+        'greeting': greeting,
+        'show_profile_prompt': show_profile_prompt,
+        'children_count': children_count,
+        'children_sample': children_sample,
+    }
+    return render(request, 'accounts/dashboard.html', context)
+
+
+def about(request):
+    return render(request, 'accounts/a_propos.html')

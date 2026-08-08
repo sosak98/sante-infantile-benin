@@ -1,587 +1,112 @@
-{% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Santé Infantile Bénin - La santé de votre enfant, plus simple et plus sûre</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { overflow-x: hidden; max-width: 100%; }
-        body { font-family: 'Nunito', sans-serif; background: #FFF8F0; color: #333; }
-
-        /* ===== NAVBAR ===== */
-        .navbar-sib {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            background: rgba(0,77,64,0.98);
-            backdrop-filter: blur(12px);
-            padding: 10px 0;
-            box-shadow: 0 2px 24px rgba(0,0,0,0.22);
-        }
-        .navbar-sib .logo {
-            height: 68px; width: auto;
-            max-width: 200px;
-            object-fit: contain;
-            display: block;
-        }
-        .btn-register {
-            background: #E87722; color: white;
-            border: none; border-radius: 25px;
-            padding: 10px 22px; font-weight: 800; font-size: 0.9rem;
-            text-decoration: none; transition: 0.3s; white-space: nowrap;
-            display: inline-block;
-        }
-        .btn-register:hover { background: #cf6a1a; color: white; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(232,119,34,0.35); }
-        .btn-login-nav {
-            background: white; color: #004d40;
-            border: none; border-radius: 25px;
-            padding: 10px 22px; font-weight: 700; font-size: 0.9rem;
-            text-decoration: none; transition: 0.3s; white-space: nowrap;
-            display: inline-block;
-        }
-        .btn-login-nav:hover { background: #e0f2f1; color: #004d40; transform: translateY(-2px); }
-
-        /* ===== HERO ===== */
-        .hero {
-            min-height: 100vh;
-            padding-top: 95px;
-            background: linear-gradient(135deg, #003d33 0%, #004d40 40%, #00695c 70%, #2d6a4f 100%);
-            position: relative; overflow: hidden;
-        }
-        .hero::before {
-            content: ''; position: absolute; inset: 0; pointer-events: none;
-            background-image:
-                repeating-linear-gradient(45deg, rgba(255,193,7,0.04) 0, rgba(255,193,7,0.04) 2px, transparent 2px, transparent 16px),
-                repeating-linear-gradient(-45deg, rgba(232,119,34,0.04) 0, rgba(232,119,34,0.04) 2px, transparent 2px, transparent 16px);
-        }
-        .hero-inner { position: relative; z-index: 2; padding: 40px 0 60px; }
-        .hero-badge {
-            display: inline-block;
-            background: rgba(232,119,34,0.2);
-            border: 1px solid rgba(232,119,34,0.45);
-            border-radius: 30px; padding: 6px 18px;
-            font-size: 0.82rem; font-weight: 700; color: #ffc07a;
-            margin-bottom: 18px;
-        }
-        .hero h1 {
-            font-size: clamp(1.65rem, 4vw, 2.75rem);
-            font-weight: 900; color: white; line-height: 1.25; margin-bottom: 16px;
-        }
-        .hero h1 span { color: #FFC107; }
-        .hero-desc {
-            font-size: clamp(0.9rem, 2vw, 1.02rem);
-            color: rgba(255,255,255,0.88); line-height: 1.78; margin-bottom: 26px;
-        }
-        .hero-badges { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 28px; }
-        .hero-mini-badge {
-            background: rgba(255,255,255,0.11);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px; padding: 7px 13px;
-            font-size: 0.8rem; font-weight: 700; color: white;
-            white-space: nowrap;
-        }
-        .hero-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 4px; }
-        .btn-cta-primary {
-            background: #E87722; color: white;
-            border: none; border-radius: 30px;
-            padding: 13px 26px; font-weight: 800; font-size: 0.93rem;
-            text-decoration: none; transition: 0.3s;
-            box-shadow: 0 6px 20px rgba(232,119,34,0.4);
-            flex: 1 1 auto; text-align: center; min-width: 180px; max-width: 280px;
-        }
-        .btn-cta-primary:hover { background: #cf6a1a; color: white; transform: translateY(-3px); }
-        .btn-cta-secondary {
-            background: transparent; color: white;
-            border: 2px solid rgba(255,255,255,0.45);
-            border-radius: 30px; padding: 13px 26px;
-            font-weight: 700; font-size: 0.93rem;
-            text-decoration: none; transition: 0.3s;
-            flex: 1 1 auto; text-align: center; min-width: 180px; max-width: 260px;
-        }
-        .btn-cta-secondary:hover { background: rgba(255,255,255,0.12); color: white; }
-        .hero-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
-        .hero-stat {
-            background: rgba(255,255,255,0.11);
-            border: 1px solid rgba(255,255,255,0.16);
-            border-radius: 14px; padding: 11px 15px; text-align: center;
-            flex: 1 1 80px;
-        }
-        .hero-stat-n { font-size: clamp(1.2rem, 2.5vw, 1.55rem); font-weight: 900; color: #FFC107; }
-        .hero-stat-l { font-size: 0.7rem; color: rgba(255,255,255,0.78); }
-        .hero-img-wrap {
-            display: flex; align-items: center; justify-content: center;
-            margin-top: 20px;
-        }
-        .hero-img-wrap img {
-            width: 100%;
-            max-width: 430px;
-            height: 420px;
-            object-fit: contain;
-            object-position: center top;
-            background: rgba(255,255,255,0.04);
-            border-radius: 24px;
-            box-shadow: 0 25px 70px rgba(0,0,0,0.42);
-            border: 3px solid rgba(255,193,7,0.32);
-            display: block;
-        }
-
-        /* ===== SERVICES ===== */
-        .services-section { padding: 80px 0; background: #FFF8F0; }
-        .section-label {
-            display: inline-block;
-            background: #fff3e0; color: #E87722;
-            border-radius: 20px; padding: 5px 15px;
-            font-size: 0.82rem; font-weight: 700; margin-bottom: 12px;
-        }
-        .section-title { font-size: clamp(1.45rem, 3vw, 1.95rem); font-weight: 900; color: #004d40; margin-bottom: 8px; }
-        .section-sub { color: #888; font-size: 0.9rem; margin-bottom: 40px; }
-
-        .service-card {
-             background: white; border-radius: 20px;
-             padding: 28px 20px; text-align: center;
-             box-shadow: 0 4px 22px rgba(0,0,0,0.07);
-             border: 2px solid transparent;
-             transition: 0.35s; height: 100%;
-             display: flex; flex-direction: column; align-items: center;
-        }
-        .service-card p { flex-grow: 1; }
-            .btn-svc { margin-top: auto; }
-        .service-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 16px 42px rgba(0,121,107,0.16);
-            border-color: #00796b;
-        }
-        .svc-icon {
-            width: 68px; height: 68px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.85rem; margin-bottom: 15px; flex-shrink: 0;
-        }
-        .service-card h5 { font-weight: 800; color: #004d40; font-size: 0.97rem; margin-bottom: 9px; }
-        .service-card p { color: #777; font-size: 0.83rem; line-height: 1.65; margin-bottom: 16px; flex: 1; }
-        .btn-svc {
-            border-radius: 20px; padding: 8px 18px;
-            font-weight: 700; font-size: 0.82rem;
-            text-decoration: none; transition: 0.3s;
-            display: inline-block; margin-top: auto;
-        }
-        .btn-svc:hover { transform: translateY(-2px); filter: brightness(0.92); }
-
-        /* Badge featured vaccination */
-        .card-featured {
-            border: 2px solid #E87722 !important;
-            position: relative;
-        }
-        .card-featured::after {
-            content: '⭐ Prioritaire';
-            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-            background: #E87722; color: white;
-            border-radius: 20px; padding: 3px 12px; font-size: 0.72rem; font-weight: 800;
-            white-space: nowrap;
-        }
-
-        /* ===== POURQUOI NOUS ===== */
-        .why-section { padding: 80px 0; background: white; }
-        .why-card {
-            background: #FFF8F0; border-radius: 20px;
-            padding: 30px 22px; height: 100%;
-            border-left: 5px solid #E87722; transition: 0.3s;
-        }
-        .why-card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(0,0,0,0.09); }
-        .why-icon { font-size: 2.4rem; margin-bottom: 14px; display: block; }
-        .why-card h5 { font-weight: 800; color: #004d40; margin-bottom: 10px; font-size: 1rem; }
-        .why-card p { color: #666; font-size: 0.87rem; line-height: 1.72; margin: 0; }
-
-        /* ===== POURQUOI CE PROJET ===== */
-        .project-section {
-            padding: 80px 0;
-            background: linear-gradient(135deg, #004d40, #00796b);
-            color: white; position: relative; overflow: hidden;
-        }
-        .project-section::before {
-            content: ''; position: absolute; inset: 0; pointer-events: none;
-            background-image: repeating-linear-gradient(
-                45deg, rgba(255,193,7,0.05) 0, rgba(255,193,7,0.05) 2px,
-                transparent 2px, transparent 14px
-            );
-        }
-        .project-inner { position: relative; z-index: 2; }
-        .project-section .section-label-light {
-            display: inline-block;
-            background: rgba(255,193,7,0.18); color: #FFC107;
-            border-radius: 20px; padding: 5px 15px;
-            font-size: 0.82rem; font-weight: 700; margin-bottom: 14px;
-        }
-        .project-section h2 { font-size: clamp(1.45rem, 3vw, 2rem); font-weight: 900; margin-bottom: 20px; }
-        .project-section p { font-size: 0.97rem; line-height: 1.8; opacity: 0.92; margin-bottom: 14px; }
-        .project-highlight {
-            background: rgba(255,193,7,0.14);
-            border-left: 4px solid #FFC107;
-            border-radius: 0 14px 14px 0;
-            padding: 16px 20px; margin-top: 22px;
-            font-style: italic; font-size: 0.95rem; opacity: 1;
-        }
-        .project-img img {
-            width: 100%; border-radius: 22px;
-            box-shadow: 0 22px 60px rgba(0,0,0,0.32);
-            height: 380px;
-            object-fit: cover;
-            object-position: center 20%;
-            display: block;
-        }
-
-        /* ===== URGENCES ===== */
-        .urgences-section {
-            padding: 50px 0;
-            background: linear-gradient(135deg, #E87722, #cf6a1a);
-        }
-        .urgence-card {
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.25);
-            border-radius: 16px; padding: 18px 12px;
-            text-align: center; color: white;
-            transition: 0.3s; text-decoration: none; display: block;
-        }
-        .urgence-card:hover { background: rgba(255,255,255,0.25); transform: translateY(-4px); color: white; }
-        .urgence-num { font-size: clamp(1.2rem, 3vw, 1.7rem); font-weight: 900; }
-        .urgence-lbl { font-size: 0.76rem; opacity: 0.85; margin-top: 4px; }
-
-        /* ===== CTA FINAL ===== */
-        .cta-section { padding: 80px 0; background: #FFF8F0; }
-        .cta-box {
-            background: linear-gradient(135deg, #004d40, #00796b);
-            border-radius: 28px; padding: 55px 35px;
-            color: white; position: relative; overflow: hidden;
-            text-align: center;
-        }
-        .cta-box::before {
-            content: ''; position: absolute; inset: 0; pointer-events: none;
-            background-image: repeating-linear-gradient(
-                45deg, rgba(255,193,7,0.05) 0, rgba(255,193,7,0.05) 2px,
-                transparent 2px, transparent 14px
-            );
-        }
-        .cta-box-inner { position: relative; z-index: 2; }
-        .cta-box h2 { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 900; margin-bottom: 12px; }
-        .cta-box p { opacity: 0.9; margin-bottom: 28px; font-size: 0.97rem; }
-        .btn-cta-big {
-            background: #E87722; color: white;
-            border: none; border-radius: 30px;
-            padding: 15px 36px; font-weight: 800; font-size: 1rem;
-            text-decoration: none; display: inline-block;
-            transition: 0.3s; box-shadow: 0 8px 25px rgba(232,119,34,0.5);
-        }
-        .btn-cta-big:hover { background: #cf6a1a; color: white; transform: translateY(-4px); }
-
-        /* ===== FOOTER ===== */
-        footer {
-            background: #002921; padding: 45px 0 20px; position: relative;
-        }
-        footer::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-            background: linear-gradient(90deg, #004d40 0%, #E87722 33%, #FFC107 66%, #004d40 100%);
-        }
-        .footer-logo { height: 60px; width: auto; object-fit: contain; margin-bottom: 12px; display: block; }
-        .footer-desc { color: rgba(255,255,255,0.62); font-size: 0.87rem; line-height: 1.7; }
-        .footer-name { color: white; font-weight: 800; font-size: 0.93rem; margin-bottom: 4px; }
-        .footer-role { color: rgba(255,255,255,0.62); font-size: 0.83rem; margin-bottom: 8px; line-height: 1.6; }
-        .footer-email a { color: #80cbc4; font-size: 0.87rem; text-decoration: none; }
-        .footer-email a:hover { color: #FFC107; }
-        .footer-divider { border-color: rgba(255,255,255,0.1); margin: 22px 0 15px; }
-        .footer-copy { color: rgba(255,255,255,0.45); font-size: 0.8rem; text-align: center; }
-
-        /* ===== ANIMATIONS ===== */
-        .fade-up {
-            opacity: 0; transform: translateY(26px);
-            transition: opacity 0.65s ease, transform 0.65s ease;
-        }
-        .fade-up.visible { opacity: 1; transform: translateY(0); }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1199px) {
-            .hero-img-wrap img { height: 380px; }
-        }
-        @media (max-width: 991px) {
-            .hero { padding-top: 95px; }
-            .hero-img-wrap { margin-top: 38px; }
-            .hero-img-wrap img { max-width: 100%; height: 320px; object-position: center 10%; }
-            .project-img { margin-top: 35px; }
-            .project-img img { height: 300px; }
-        }
-
-        @media (max-width: 767px) {
-            .navbar-sib .logo { height: 58px; }
-            .btn-register, .btn-login-nav { padding: 8px 14px; font-size: 0.82rem; }
-            .hero { min-height: auto; padding-top: 78px; }
-            .hero-inner { padding: 18px 0 28px; }
-            .hero-badge { margin-bottom: 12px; }
-            .hero h1 { margin-bottom: 10px; line-height: 1.2; }
-            .hero-desc { margin-bottom: 18px; line-height: 1.6; }
-            .hero-badges { margin-bottom: 18px; }
-            .hero-img-wrap { margin-top: 22px; }
-            .hero-img-wrap img { height: 220px; border-radius: 20px; object-fit: contain; object-position: center top; background: rgba(255,255,255,0.04); }
-            .hero-btns { flex-direction: column; }
-            .btn-cta-primary, .btn-cta-secondary { max-width: 100%; min-width: unset; width: 100%; }
-            .hero-stats { gap: 8px; }
-            .hero-stat { padding: 9px 12px; }
-            .cta-box { padding: 38px 18px; }
-            .project-img img { height: 240px; }
-        }
-        @media (max-width: 480px) {
-            .navbar-sib .logo { height: 46px; }
-            .btn-register, .btn-login-nav { padding: 7px 12px; font-size: 0.78rem; }
-            .hero-mini-badge { font-size: 0.74rem; padding: 5px 10px; }
-            .hero-stat-n { font-size: 1.1rem; }
-            .hero-stat-l { font-size: 0.65rem; }
-            .section-title { font-size: 1.35rem; }
-            .urgence-num { font-size: 1.1rem; }
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Santé Infantile Bénin — Suivi, vaccination et conseils pour parents</title>
+  <meta name="description" content="Santé Infantile Bénin (SIB) — conseils de puériculture, calendrier vaccinal, suivi de croissance et outils pour parents. Créé par SOSSA G. M. Darius, infirmier-puériculteur et développeur web.">
+  <!-- Open Graph minimal -->
+  <meta property="og:title" content="Santé Infantile Bénin (SIB)">
+  <meta property="og:description" content="Conseils, calendrier vaccinal et outils de suivi pour la santé des nourrissons et jeunes enfants au Bénin.">
+  <meta property="og:type" content="website">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Logo navbar : hauteur fixe, enlever max-width par défaut */
+    .navbar-brand img { height: 80px; max-width: none; width: auto; }
+    @media (max-width: 576px) {
+      .navbar-brand img { height: 62px; }
+    }
+    /* Hero compact */
+    .hero {
+      padding: 2.25rem 1rem;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:1rem;
+    }
+    .hero .hero-text { flex:1 1 60%; }
+    .hero .hero-cta { flex: 0 0 35%; text-align:right; }
+    @media (max-width: 768px) {
+      .hero { flex-direction:column; text-align:center; }
+      .hero .hero-cta { text-align:center; }
+    }
+  </style>
 </head>
-<body>
+<body class="bg-white text-dark">
 
-<!-- ===== NAVBAR ===== -->
-<nav class="navbar-sib">
-    <div class="container d-flex justify-content-between align-items-center">
-        <a href="/"><img src="{% static 'sante/images/logo.png' %}" alt="Santé Infantile Bénin" class="logo"></a>
-        <div class="d-flex gap-2 align-items-center">
-            <a href="{% url 'register' %}" class="btn-register">S'inscrire</a>
-            <a href="{% url 'login' %}" class="btn-login-nav">Connexion</a>
-        </div>
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <img src="{% static 'images/logo.png' %}" alt="SIB Logo" class="d-inline-block align-text-top">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMain">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
+        <li class="nav-item"><a class="nav-link" href="/a-propos/">À propos</a></li>
+        <li class="nav-item"><a class="nav-link" href="/enfants/">Enfants</a></li>
+        <li class="nav-item"><a class="nav-link" href="/vaccination/">Vaccination</a></li>
+        <li class="nav-item"><a class="nav-link" href="/triage/">Triage</a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
+        {% if user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="/accounts/dashboard/">Mon espace</a></li>
+          <li class="nav-item"><a class="nav-link" href="/accounts/logout/">Se déconnecter</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="/accounts/login/">Connexion</a></li>
+        {% endif %}
+      </ul>
     </div>
+  </div>
 </nav>
 
-<!-- ===== HERO ===== -->
-<section class="hero">
-    <div class="container hero-inner">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <div class="hero-badge">🇧🇯 Plateforme de santé infantile au Bénin</div>
-                <h1>La santé de votre enfant,<br><span>plus simple et plus sûre</span> 💚</h1>
-                <p class="hero-desc">
-                    Vaccinations, rendez-vous personnalisés, détection de malnutrition,
-                    centres de santé proches et conseils nutritionnels OMS —
-                    tout ce dont votre famille a besoin, en un seul endroit.
-                </p>
-                <div class="hero-badges">
-                    <span class="hero-mini-badge">💉 Suivi vaccinal personnalisé</span>
-                    <span class="hero-mini-badge">⚖️ Détection malnutrition</span>
-                    <span class="hero-mini-badge">🏥 Centres de santé proches</span>
-                    <span class="hero-mini-badge">🥗 Conseils OMS</span>
-                </div>
-                <div class="hero-btns">
-                    <a href="{% url 'register' %}" class="btn-cta-primary">🚀 Créer un compte gratuitement</a>
-                    <a href="#services" class="btn-cta-secondary">Découvrir les services ↓</a>
-                </div>
-                <div class="hero-stats">
-                    <div class="hero-stat">
-                        <div class="hero-stat-n">273+</div>
-                        <div class="hero-stat-l">Établissements</div>
-                    </div>
-                    <div class="hero-stat">
-                        <div class="hero-stat-n">20</div>
-                        <div class="hero-stat-l">Vaccins PEV</div>
-                    </div>
-                    <div class="hero-stat">
-                        <div class="hero-stat-n">100%</div>
-                        <div class="hero-stat-l">Gratuit</div>
-                    </div>
-                    <div class="hero-stat">
-                        <div class="hero-stat-n">0-10</div>
-                        <div class="hero-stat-l">Ans couverts</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 hero-img-wrap">
-                <img src="https://images.pexels.com/photos/30110240/pexels-photo-30110240.jpeg?auto=compress&cs=tinysrgb&w=700"
-                     alt="Mère et enfant béninois">
-            </div>
-        </div>
-    </div>
-</section>
+<header class="hero container">
+  <div class="hero-text">
+    <h1 class="display-6 text-success">Santé Infantile Bénin — outils fiables pour le suivi et la prévention</h1>
+    <p class="lead text-muted">Suivi croissance, calendrier vaccinal, dépistage nutritionnel et conseils pratiques pour les parents.</p>
+    <p class="mb-0">
+      <a class="btn btn-success me-2" href="/enfants/">Gérer mes enfants</a>
+      <a class="btn btn-outline-secondary" href="/a-propos/">En savoir plus</a>
+    </p>
+  </div>
+  <div class="hero-cta">
+    <img src="{% static 'images/hero-illustration.png' %}" alt="bébé" class="img-fluid" style="max-height:160px;">
+  </div>
+</header>
 
-<!-- ===== SERVICES ===== -->
-<section class="services-section" id="services">
-    <div class="container">
-        <div class="text-center">
-            <div class="section-label">✨ Nos services</div>
-            <h2 class="section-title">Tout pour la santé de votre enfant</h2>
-            <p class="section-sub">Des outils fiables, simples et gratuits — basés sur les recommandations OMS</p>
+<main class="container my-4">
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title text-success">Gestion des enfants</h5>
+          <p class="card-text text-muted">Créez et suivez un profil par enfant (croissance, vaccins, nutrition).</p>
+          <a href="/enfants/" class="stretched-link"></a>
         </div>
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-4 fade-up">
-                <div class="service-card card-featured">
-                    <div class="svc-icon" style="background:#fce4ec;">💉</div>
-                    <h5>Vaccination & RDV Personnalisé</h5>
-                    <p>Calendrier PEV Bénin 2024 complet + calculateur de rendez-vous vaccinaux personnalisé selon la date de naissance de votre enfant et la logique OMS.</p>
-                    <a href="{% url 'login' %}" class="btn-svc" style="background:#fce4ec;color:#c62828;">Consulter →</a>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 fade-up">
-                <div class="service-card">
-                    <div class="svc-icon" style="background:#f3e5f5;">⚖️</div>
-                    <h5>Détection de Malnutrition</h5>
-                    <p>Évaluez l'état nutritionnel de votre enfant via le Z-score, l'IMC et le périmètre brachial MUAC selon les standards OMS.</p>
-                    <a href="{% url 'login' %}" class="btn-svc" style="background:#f3e5f5;color:#6a1b9a;">Évaluer →</a>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 fade-up">
-                <div class="service-card">
-                    <div class="svc-icon" style="background:#e0f2f1;">🏥</div>
-                    <h5>Centres de Santé Proches</h5>
-                    <p>273+ établissements de Cotonou cartographiés — centres de santé, hôpitaux et pharmacies avec navigation Google Maps intégrée.</p>
-                    <a href="{% url 'login' %}" class="btn-svc" style="background:#e0f2f1;color:#004d40;">Voir la carte →</a>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 fade-up">
-                <div class="service-card">
-                    <div class="svc-icon" style="background:#e8f5e9;">🥗</div>
-                    <h5>Conseils Nutritionnels OMS</h5>
-                    <p>Recommandations personnalisées de 0 à 10 ans — allaitement maternel, diversification alimentaire et aliments locaux béninois.</p>
-                    <a href="{% url 'login' %}" class="btn-svc" style="background:#e8f5e9;color:#2e7d32;">Lire →</a>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 fade-up">
-                <div class="service-card">
-                    <div class="svc-icon" style="background:#e3f2fd;">👶</div>
-                    <h5>Suivi Personnalisé de l'Enfant</h5>
-                    <p>Créez le profil de votre enfant et accédez à son planning vaccinal, son historique et ses mesures de croissance.</p>
-                    <a href="{% url 'register' %}" class="btn-svc" style="background:#e3f2fd;color:#1565c0;">Créer un profil →</a>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 fade-up">
-                <div class="service-card">
-                    <div class="svc-icon" style="background:#fff8e1;">📅</div>
-                    <h5>Calculateur de RDV Vaccinal</h5>
-                    <p>Entrez les vaccins déjà reçus et obtenez les dates exactes de chaque prochain rendez-vous vaccinal de votre enfant.</p>
-                    <a href="{% url 'login' %}" class="btn-svc" style="background:#fff8e1;color:#e65100;">Calculer →</a>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-</section>
-
-<!-- ===== POURQUOI NOUS ===== -->
-<section class="why-section">
-    <div class="container">
-        <div class="text-center mb-5">
-            <div class="section-label">💚 Pourquoi nous choisir</div>
-            <h2 class="section-title">Une plateforme pensée pour vous</h2>
-            <p class="section-sub">Sérieuse, fiable et humaine</p>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title text-success">Calendrier vaccinal</h5>
+          <p class="card-text text-muted">Calendrier adapté au PEV du Bénin et historique des vaccinations.</p>
+          <a href="/vaccination/" class="stretched-link"></a>
         </div>
-        <div class="row g-4">
-            <div class="col-md-4 fade-up">
-                <div class="why-card">
-                    <span class="why-icon">🔬</span>
-                    <h5>Basé sur les recommandations OMS</h5>
-                    <p>Toutes nos informations — vaccins, nutrition, malnutrition — suivent strictement les dernières directives de l'OMS et du Programme Élargi de Vaccination du Bénin 2024.</p>
-                </div>
-            </div>
-            <div class="col-md-4 fade-up">
-                <div class="why-card">
-                    <span class="why-icon">🇧🇯</span>
-                    <h5>Pensé pour les familles béninoises</h5>
-                    <p>Interface simple en français, optimisée Android et connexions 3G/4G. 273+ établissements de Cotonou cartographiés. Données locales et actualisées.</p>
-                </div>
-            </div>
-            <div class="col-md-4 fade-up">
-                <div class="why-card">
-                    <span class="why-icon">🎓</span>
-                    <h5>Développé par un professionnel de santé</h5>
-                    <p>Créé par <strong>SOSSA GNINAZÉ MINGNISSÊ DARIUS</strong>, Infirmier Diplômé d'État, étudiant en Master 1 Puériculture-Pédiatrie — INMeS/Cotonou.</p>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-</section>
-
-<!-- ===== POURQUOI CE PROJET ===== -->
-<section class="project-section">
-    <div class="container project-inner">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6">
-                <div class="section-label-light">💡 Pourquoi ce projet ?</div>
-                <h2>Un projet né d'un constat de terrain</h2>
-                <p>Au Bénin, de nombreux parents ont difficilement accès à des informations fiables et rapides sur la vaccination, la nutrition, la malnutrition et les structures sanitaires proches.</p>
-                <p>Les retards vaccinaux, la malnutrition non détectée et les consultations tardives restent des réalités quotidiennes qui coûtent des vies.</p>
-                <div class="project-highlight">
-                    « Santé Infantile Bénin a été créé pour rapprocher l'information médicale des familles béninoises — gratuitement, simplement, partout. »
-                </div>
-            </div>
-            <div class="col-lg-6 project-img fade-up">
-                <img src="https://images.pexels.com/photos/19178588/pexels-photo-19178588.jpeg?auto=compress&cs=tinysrgb&w=700"
-                     alt="Allaitement maternel">
-            </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title text-success">Triage & IA</h5>
+          <p class="card-text text-muted">Assistant de triage pour orienter en cas de signes d'alerte (outil d'aide, non substitut au médecin).</p>
+          <a href="/triage/" class="stretched-link"></a>
         </div>
+      </div>
     </div>
-</section>
-
-<!-- ===== URGENCES ===== -->
-<section class="urgences-section">
-    <div class="container">
-        <h3 class="text-center text-white fw-bold mb-4">🚨 Numéros d'urgence au Bénin</h3>
-        <div class="row g-3 justify-content-center">
-            <div class="col-4 col-md-3">
-                <a href="tel:112" class="urgence-card">
-                    <div class="urgence-num">🚑 112</div>
-                    <div class="urgence-lbl">SAMU</div>
-                </a>
-            </div>
-            <div class="col-4 col-md-3">
-                <a href="tel:118" class="urgence-card">
-                    <div class="urgence-num">🔥 118</div>
-                    <div class="urgence-lbl">Pompiers</div>
-                </a>
-            </div>
-            <div class="col-4 col-md-3">
-                <a href="tel:117" class="urgence-card">
-                    <div class="urgence-num">👮 117</div>
-                    <div class="urgence-lbl">Police</div>
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== CTA FINAL ===== -->
-<section class="cta-section">
-    <div class="container">
-        <div class="cta-box">
-            <div class="cta-box-inner">
-                <h2>Rejoignez les familles béninoises 🇧🇯</h2>
-                <p>Inscrivez-vous gratuitement et prenez soin de la santé de vos enfants dès aujourd'hui.</p>
-                <a href="{% url 'register' %}" class="btn-cta-big">🚀 Créer mon compte gratuitement</a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===== FOOTER ===== -->
-<footer>
-    <div class="container">
-        <div class="row align-items-start g-4">
-            <div class="col-md-6">
-                <img src="{% static 'sante/images/logo.png' %}" alt="Logo Santé Infantile Bénin" class="footer-logo">
-                <p class="footer-desc">Plateforme numérique de suivi de la santé infantile au Bénin.<br>Basée sur les recommandations OMS.</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <p class="footer-name">SOSSA GNINAZÉ MINGNISSÊ DARIUS</p>
-                <p class="footer-role">Infirmier Diplômé d'État | Étudiant en Master 1 Puériculture-Pédiatrie — INMeS/Cotonou</p>
-                <p class="footer-email"><a href="mailto:sante.infantile.benin@gmail.com">📧 sante.infantile.benin@gmail.com</a></p>
-            </div>
-        </div>
-        <hr class="footer-divider">
-        <p class="footer-copy">© 2026 Santé Infantile Bénin — Tous droits réservés</p>
-    </div>
-</footer>
+  </div>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-</script>
 </body>
 </html>
