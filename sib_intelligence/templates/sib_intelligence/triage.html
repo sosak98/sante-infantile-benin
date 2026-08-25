@@ -22,15 +22,26 @@
       <div class="sub">Sélectionnez l'enfant et renseignez les signes</div>
       <form method="post">
         {% csrf_token %}
+        {% if enfants %}
         <div class="field">
-          <label>👶 Enfant</label>
-          <select name="enfant_id" class="form-control" required>
+          <label>Enfant</label>
+          <select name="enfant_id" class="form-control">
+            <option value="">— Essai sans dossier —</option>
             {% for enfant in enfants %}
               <option value="{{ enfant.id }}">{{ enfant.prenom }} {{ enfant.nom }} ({{ enfant.date_naissance|date:"d/m/Y" }})</option>
-            {% empty %}
-              <option value="">Aucun enfant - ajoutez-en un d'abord</option>
             {% endfor %}
           </select>
+        </div>
+        {% endif %}
+        <div class="grid2">
+          <div class="field">
+            <label>Prénom (si pas de dossier)</label>
+            <input type="text" name="prenom" class="form-control" placeholder="Optionnel" value="votre enfant">
+          </div>
+          <div class="field">
+            <label>Âge (mois)</label>
+            <input type="number" name="age_mois" class="form-control" min="0" max="120" placeholder="ex. 18" {% if not enfants %}required{% endif %}>
+          </div>
         </div>
 
         <div class="grid2">

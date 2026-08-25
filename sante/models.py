@@ -4,6 +4,9 @@ class Etablissement(models.Model):
     TYPES = (
         ('centre', 'Centre de Santé'),
         ('pharmacie', 'Pharmacie'),
+        ('hopital', 'Hôpital'),
+        ('hopital_zone', 'Hôpital de zone'),
+        ('clinique', 'Clinique'),
     )
     nom = models.CharField(max_length=200)
     type_etab = models.CharField(max_length=20, choices=TYPES)

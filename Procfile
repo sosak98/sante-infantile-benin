@@ -1,1 +1,1 @@
-web: python manage.py migrate && python manage.py seed && python manage.py collectstatic --noinput && gunicorn santeinfantile.wsgi --bind 0.0.0.0:$PORT --log-file -
+web: python manage.py migrate && python manage.py seed && python manage.py seed_etablissements && python manage.py collectstatic --noinput && gunicorn santeinfantile.wsgi --bind 0.0.0.0:$PORT --log-file -

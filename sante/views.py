@@ -22,23 +22,41 @@ def etablissements_osm(request):
     query = f'''
     [out:json][timeout:25];
     (
-        node["amenity"="hospital"](around:5000,{lat},{lng});
-        node["amenity"="clinic"](around:5000,{lat},{lng});
-        node["amenity"="pharmacy"](around:5000,{lat},{lng});
-        way["amenity"="hospital"](around:5000,{lat},{lng});
+        node["amenity"="hospital"](around:15000,{lat},{lng});
+        node["amenity"="clinic"](around:15000,{lat},{lng});
+        node["amenity"="pharmacy"](around:15000,{lat},{lng});
+        way["amenity"="hospital"](around:15000,{lat},{lng});
+        way["amenity"="clinic"](around:15000,{lat},{lng});
+        way["amenity"="pharmacy"](around:15000,{lat},{lng});
     );
     out center;
     '''
 
+    def local_as_overpass():
+        elements = []
+        for e in Etablissement.objects.all():
+            amenity = 'pharmacy' if e.type_etab == 'pharmacie' else 'hospital'
+            elements.append({
+                'type': 'node',
+                'lat': e.latitude,
+                'lon': e.longitude,
+                'tags': {'name': e.nom, 'amenity': amenity, 'phone': e.telephone or ''},
+            })
+        return {'elements': elements}
+
     try:
         response = requests.post(
             'https://overpass-api.de/api/interpreter',
-            data=query,
-            timeout=25
+            data={'data': query},
+            timeout=25,
+            headers={'User-Agent': 'SanteInfantileBenin/1.0'},
         )
-        return JsonResponse(response.json())
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+        data = response.json()
+        if not data.get('elements'):
+            data = local_as_overpass()
+        return JsonResponse(data)
+    except Exception:
+        return JsonResponse(local_as_overpass())
 
 
 @staff_member_required

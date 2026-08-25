@@ -13,7 +13,7 @@
   <meta property="og:type" content="website">
 
   <!-- PWA -->
-  <meta name="theme-color" content="#004d40">
+  <meta name="theme-color" content="#f4ebe0">
   <link rel="manifest" href="{% url 'manifest' %}">
   <link rel="apple-touch-icon" href="{% static 'img/icons/apple-touch-icon.png' %}">
   <link rel="icon" type="image/png" href="{% static 'img/icons/icon-192.png' %}">
@@ -42,6 +42,9 @@
       </div>
       <div class="nav-cta">
         {% if user.is_authenticated %}
+          {% if user.parent and user.parent.photo %}
+            <a href="{% url 'accounts:profil' %}" title="Mon profil"><img src="{{ user.parent.photo.url }}" alt="" width="36" height="36" style="width:36px;height:36px;border-radius:50%;object-fit:cover;object-position:50% 18%;"></a>
+          {% endif %}
           <a class="btn btn-ghost btn-sm" href="{% url 'accounts:dashboard' %}">Mon espace</a>
           <a class="btn btn-primary btn-sm" href="{% url 'accounts:logout' %}">Se déconnecter</a>
         {% else %}
@@ -83,9 +86,10 @@
         <div>
           <h5>Contact</h5>
           <ul>
-            <li>📧 sante.infantile.benin@gmail.com</li>
-            <li>📍 Cotonou, Bénin</li>
-            <li>💬 WhatsApp · Facebook · LinkedIn</li>
+            <li><a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a></li>
+            <li>Cotonou, Bénin</li>
+            <li><a href="https://wa.me/2290198419240">WhatsApp +229 01 98 41 92 40</a></li>
+            <li><a href="https://www.linkedin.com/in/darius-sossa-743721376">LinkedIn</a></li>
           </ul>
         </div>
       </div>

@@ -17,10 +17,22 @@
       <div class="sub">Date de naissance et vaccins déjà reçus</div>
       <form method="post" id="formRdv">
         {% csrf_token %}
+        {% if enfants %}
         <div class="field">
-          <label>📅 Date de naissance</label>
+          <label>Enfant</label>
+          <select name="enfant_id" class="form-control" required>
+            {% for e in enfants %}
+              <option value="{{ e.id }}">{{ e.prenom }} ({{ e.date_naissance|date:"d/m/Y" }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <p class="sub">La date de naissance est celle enregistrée pour cet enfant.</p>
+        {% else %}
+        <div class="field">
+          <label>Date de naissance</label>
           <input type="date" name="date_naissance" class="form-control" required value="{{ request.POST.date_naissance|default:'' }}">
         </div>
+        {% endif %}
 
         <hr style="border-color:var(--line);margin:18px 0;">
         <h3 style="font-size:1rem;">💉 Vaccins déjà reçus <span style="font-weight:400;color:var(--muted);font-size:.85rem;">(optionnel)</span></h3>

@@ -87,7 +87,11 @@
         <a class="btn btn-amber btn-block" style="margin-bottom:10px;" href="{% url 'sante:carte' %}">🗺️ Voir les centres de santé proches</a>
       {% endif %}
       <a class="btn btn-primary btn-block" style="margin-bottom:10px;" href="{% url 'sib:triage' %}">🔄 Nouveau triage</a>
-      <a class="btn btn-ghost btn-block" href="{% url 'accounts:dashboard' %}">🏠 Retour au tableau de bord</a>
+      {% if user.is_authenticated %}
+      <a class="btn btn-ghost btn-block" href="{% url 'accounts:dashboard' %}">Retour à mon espace</a>
+      {% else %}
+      <a class="btn btn-ghost btn-block" href="{% url 'accounts:register' %}">Créer un compte pour garder le suivi</a>
+      {% endif %}
 
       <hr style="border-color:var(--line);margin:20px 0;">
       <h3>💬 Questions fréquentes</h3>

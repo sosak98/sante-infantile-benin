@@ -12,7 +12,8 @@ from datetime import timedelta, date
 from .forms import ParentRegisterForm, PhoneSendForm, PhoneVerifyForm
 from .models import Parent, Profile, PhoneOTP
 from .utils import send_sms
-from enfants.models import Enfant
+from enfants.models import Enfant, VaccinRecu
+from conseils.pev import planifier
 
 OTP_EXPIRY_MINUTES = getattr(settings, 'OTP_EXPIRY_MINUTES', 10)
 OTP_MAX_ATTEMPTS = getattr(settings, 'OTP_MAX_ATTEMPTS', 5)

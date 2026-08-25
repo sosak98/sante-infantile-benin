@@ -13,7 +13,7 @@ def manifest(request):
 
     data = {
         'name': 'Santé Infantile Bénin',
-        'short_name': 'SIB',
+        'short_name': 'Santé Enfant',
         'description': (
             'Plateforme de suivi de la santé des nourrissons et jeunes enfants au Bénin : '
             'vaccination, nutrition, dépistage de la malnutrition et triage pédiatrique assisté par IA.'

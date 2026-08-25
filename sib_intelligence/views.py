@@ -2,7 +2,6 @@ import os
 import json
 from datetime import date
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -10,9 +9,11 @@ from groq import Groq
 from accounts.models import Parent
 from enfants.models import Enfant
 
+from types import SimpleNamespace
+
 # Initialisation du client Groq (optionnelle : l'IA est désactivée si la clé est absente)
 GROQ_API_KEY = os.getenv('GROQ_API_KEY') or getattr(settings, 'GROQ_API_KEY', '')
-GROQ_MODEL = os.getenv('GROQ_MODEL') or getattr(settings, 'GROQ_MODEL', 'llama-3.3-70b-versatile')
+GROQ_MODEL = os.getenv('GROQ_MODEL') or getattr(settings, 'GROQ_MODEL', 'openai/gpt-oss-20b')
 client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 
@@ -137,60 +138,70 @@ Règles importantes :
     return system_prompt
 
 
-@login_required
+def _symptomes_from_post(post):
+    return {
+        'fievre': post.get('fievre'),
+        'diarrhee': post.get('diarrhee'),
+        'respiration': post.get('respiration'),
+        'eveil': post.get('eveil'),
+        'alimentation': post.get('alimentation'),
+        'convulsions': post.get('convulsions'),
+        'vomissement': post.get('vomissement'),
+        'poids': post.get('poids'),
+        'taille': post.get('taille'),
+        'muac': post.get('muac'),
+    }
+
+
 def triage(request):
-    parent, _ = Parent.objects.get_or_create(user=request.user)
-    enfants = Enfant.objects.filter(parent=parent)
+    parent = None
+    enfants = Enfant.objects.none()
+    if request.user.is_authenticated:
+        parent, _ = Parent.objects.get_or_create(user=request.user)
+        enfants = Enfant.objects.filter(parent=parent)
 
     if request.method == 'POST':
         enfant_id = request.POST.get('enfant_id')
+        enfant = None
+        if enfant_id and request.user.is_authenticated and parent:
+            enfant = get_object_or_404(Enfant, id=enfant_id, parent=parent)
+            today = date.today()
+            age_mois = (today.year - enfant.date_naissance.year) * 12 + (
+                today.month - enfant.date_naissance.month
+            )
+            prenom = enfant.prenom
+        else:
+            prenom = (request.POST.get('prenom') or 'votre enfant').strip()
+            try:
+                age_mois = int(request.POST.get('age_mois') or 0)
+            except ValueError:
+                age_mois = 0
+            enfant = SimpleNamespace(prenom=prenom)
 
-        # Sécurité : vérifier que l'enfant appartient bien au parent
-        enfant = get_object_or_404(Enfant, id=enfant_id, parent=parent)
-
-        # Récupération des symptômes
-        symptomes = {
-            'fievre': request.POST.get('fievre'),
-            'diarrhee': request.POST.get('diarrhee'),
-            'respiration': request.POST.get('respiration'),
-            'eveil': request.POST.get('eveil'),
-            'alimentation': request.POST.get('alimentation'),
-            'convulsions': request.POST.get('convulsions'),
-            'vomissement': request.POST.get('vomissement'),
-            'poids': request.POST.get('poids'),
-            'taille': request.POST.get('taille'),
-            'muac': request.POST.get('muac'),
-        }
-
+        symptomes = _symptomes_from_post(request.POST)
         poids = symptomes.get('poids')
         taille = symptomes.get('taille')
         muac = symptomes.get('muac')
-
-        # Calcul de l'âge en mois
-        today = date.today()
-        age_mois = (today.year - enfant.date_naissance.year) * 12 + (today.month - enfant.date_naissance.month)
-
-        # Calcul du score et classification
         niveau, message, score = calculer_score_triage(symptomes, poids, taille, muac)
 
-        # Contexte pour le chat
         contexte = {
-            'enfant_nom': enfant.prenom,
+            'enfant_nom': prenom,
             'age_mois': age_mois,
             'niveau': niveau,
             'message': message,
+            'invite': not request.user.is_authenticated,
             'symptomes': {
-                'fievre': symptomes.get('fievre', 'Non renseigné'),
-                'diarrhee': symptomes.get('diarrhee', 'Non renseigné'),
-                'respiration': symptomes.get('respiration', 'Non renseigné'),
-                'eveil': symptomes.get('eveil', 'Non renseigné'),
-                'alimentation': symptomes.get('alimentation', 'Non renseigné'),
-                'convulsions': symptomes.get('convulsions', 'Non renseigné'),
-                'vomissement': symptomes.get('vomissement', 'Non renseigné'),
-                'poids': poids if poids else 'Non renseigné',
-                'taille': taille if taille else 'Non renseigné',
-                'muac': muac if muac else 'Non renseigné',
-            }
+                'fievre': symptomes.get('fievre') or 'Non renseigné',
+                'diarrhee': symptomes.get('diarrhee') or 'Non renseigné',
+                'respiration': symptomes.get('respiration') or 'Non renseigné',
+                'eveil': symptomes.get('eveil') or 'Non renseigné',
+                'alimentation': symptomes.get('alimentation') or 'Non renseigné',
+                'convulsions': symptomes.get('convulsions') or 'Non renseigné',
+                'vomissement': symptomes.get('vomissement') or 'Non renseigné',
+                'poids': poids or 'Non renseigné',
+                'taille': taille or 'Non renseigné',
+                'muac': muac or 'Non renseigné',
+            },
         }
 
         return render(request, 'sib_intelligence/resultat.html', {
@@ -201,15 +212,16 @@ def triage(request):
             'contexte': json.dumps(contexte),
             'enfants': enfants,
             'age_mois': age_mois,
+            'invite': not request.user.is_authenticated,
         })
 
     return render(request, 'sib_intelligence/triage.html', {
         'enfants': enfants,
         'parent': parent,
+        'invite': not request.user.is_authenticated,
     })
 
 
-@login_required
 @csrf_exempt
 def chat(request):
     if request.method == 'POST':

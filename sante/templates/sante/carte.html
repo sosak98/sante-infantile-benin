@@ -61,10 +61,10 @@
   var countCentres = 0, countPharmacies = 0, countHopitaux = 0;
 
   function getIcon(type) {
-    var color = type === 'centre' ? '#00796b' : type === 'hopital' ? '#1565c0' : '#e65100';
-    var emoji = type === 'centre' ? '🏥' : type === 'hopital' ? '🏨' : '💊';
+    var color = (type === 'hopital' || type === 'hopital_zone') ? '#1565c0' : (type === 'pharmacie' ? '#e65100' : '#00796b');
+    var letter = (type === 'pharmacie') ? 'P' : ((type === 'hopital' || type === 'hopital_zone') ? 'H' : 'C');
     return L.divIcon({
-      html: '<div style="background:' + color + ';width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:3px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.3);">' + emoji + '</div>',
+      html: '<div style="background:' + color + ';color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;border:3px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.3);">' + letter + '</div>',
       className: '', iconSize: [36, 36], popupAnchor: [0, -18]
     });
   }
@@ -81,10 +81,13 @@
   etablissements.forEach(function (e) {
     var marker = L.marker([e.latitude, e.longitude], { icon: getIcon(e.type_etab) }).addTo(map);
     marker.bindPopup(popupContent(e.nom, e.adresse, e.telephone, e.latitude, e.longitude));
-    if (e.type_etab === 'centre') countCentres++; else countPharmacies++;
+    if (e.type_etab === 'pharmacie') countPharmacies++;
+    else if (e.type_etab === 'hopital' || e.type_etab === 'hopital_zone') countHopitaux++;
+    else countCentres++;
   });
   document.getElementById('countCentres').textContent = countCentres;
   document.getElementById('countPharmacies').textContent = countPharmacies;
+  document.getElementById('countHopitaux').textContent = countHopitaux;
 
   document.getElementById('localiserBtn').addEventListener('click', function () {
     if (navigator.geolocation) {
@@ -113,7 +116,10 @@
         osmMarkers.forEach(function (m) { map.removeLayer(m); });
         osmMarkers = []; countHopitaux = 0;
         var elements = data.elements || [];
-        if (elements.length === 0) { alert('Aucun établissement trouvé dans cette zone.'); return; }
+        if (elements.length === 0) {
+          alert("Aucun nouveau point en ligne. Les centres deja affiches restent sur la carte.");
+          return;
+        }
         elements.forEach(function (el) {
           var elLat = el.lat || (el.center && el.center.lat);
           var elLng = el.lon || (el.center && el.center.lon);

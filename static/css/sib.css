@@ -65,7 +65,7 @@ img { max-width: 100%; display: block; }
 }
 .sib-nav .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; }
 .sib-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; color: var(--teal-800); }
-.sib-brand img { height: 40px; width: auto; }
+.sib-brand img { height: 56px; width: auto; max-width: 200px; object-fit: contain; }
 .sib-nav .nav-links { display: flex; align-items: center; gap: 20px; font-weight: 600; font-size: .93rem; color: var(--muted); }
 .sib-nav .nav-links a { padding: 4px 0; }
 .sib-nav .nav-links a:hover, .sib-nav .nav-links a.active { color: var(--teal-700); }
@@ -247,6 +247,9 @@ section { padding: 60px 0; }
   .sib-nav .nav-links { display: none; }
   .sib-nav .nav-toggler { display: block; }
   .sib-brand span { display: none; }
+  .sib-brand img { height: 52px; }
+  .float-card { display: none; }
+  .hero-visual { position: relative; }
   .sib-nav .nav-cta { gap: 6px; }
   .sib-nav .nav-cta .btn { padding: 8px 11px; font-size: .8rem; }
   .sib-nav.open .nav-links {
