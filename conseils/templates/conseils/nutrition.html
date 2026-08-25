@@ -1,151 +1,75 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conseils Nutritionnels - Santé Infantile Bénin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
-        .navbar-custom { background: linear-gradient(135deg, #004d40, #00796b); padding: 15px 0; }
-        .navbar-brand-custom { font-size: 1.3rem; font-weight: 800; color: white !important; }
-        .btn-retour { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 16px; font-size: 0.85rem; text-decoration: none; }
-        .page-header { background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 25px 0; margin-bottom: 30px; }
-        .page-header h2 { font-weight: 800; }
-        .page-header p { opacity: 0.85; margin: 0; }
-        .card { border: none; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
-        .card-header-custom { background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 20px 25px; border-radius: 20px 20px 0 0; }
-        .form-control, .form-select { border-radius: 10px; border: 2px solid #e0f2f1; padding: 10px 15px; transition: 0.3s; }
-        .form-control:focus, .form-select:focus { border-color: #00796b; box-shadow: 0 0 0 0.2rem rgba(0,121,107,0.25); }
-        .btn-chercher { background: linear-gradient(135deg, #004d40, #00796b); color: white; border: none; border-radius: 10px; padding: 12px; font-size: 1rem; font-weight: 700; width: 100%; transition: 0.3s; }
-        .btn-chercher:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,121,107,0.4); color: white; }
-        .conseil-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 5px solid #00796b; box-shadow: 0 3px 10px rgba(0,0,0,0.06); transition: 0.3s; }
-        .conseil-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
-        .conseil-card.probleme { border-left-color: #e65100; }
-        .badge-aliment { background: #e0f2f1; color: #004d40; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-        .badge-probleme { background: #fff3e0; color: #e65100; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-        .age-range { background: #f0f4f8; color: #666; padding: 4px 10px; border-radius: 10px; font-size: 0.8rem; }
-        .tranche-info { background: linear-gradient(135deg, #e0f2f1, #b2dfdb); border-radius: 15px; padding: 15px 20px; margin-bottom: 20px; }
-        .tranche-info h6 { color: #004d40; font-weight: 700; margin: 0; }
-        .count-badge { background: #00796b; color: white; border-radius: 20px; padding: 4px 12px; font-size: 0.85rem; font-weight: 700; }
-        footer { background: #004d40; color: rgba(255,255,255,0.7); text-align: center; padding: 20px; margin-top: 40px; }
-        footer strong { color: white; }
-        footer a { color: #80cbc4; }
-        .empty-state { text-align: center; padding: 40px; color: #888; }
-        .empty-state .emoji { font-size: 3rem; margin-bottom: 15px; }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-    <nav class="navbar-custom">
-        <div class="container d-flex justify-content-between align-items-center">
-            <span class="navbar-brand-custom">🏥 Santé Infantile Bénin</span>
-            <a href="{% url 'dashboard' %}" class="btn-retour">← Dashboard</a>
-        </div>
-    </nav>
+{% block title %}Conseils nutritionnels — Santé Infantile Bénin{% endblock %}
 
-    <div class="page-header">
-        <div class="container">
-            <h2>🥗 Conseils Nutritionnels</h2>
-            <p>Recommandations OMS pour les enfants de 0 à 10 ans</p>
+{% block content %}
+<div class="page-head">
+  <div class="container">
+    <h1>🥣 Conseils nutritionnels par âge</h1>
+    <p>Recommandations adaptées à chaque étape de la croissance de votre enfant (0 à 10 ans).</p>
+  </div>
+</div>
+
+<div class="container page-body">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="panel">
+      <h3>🔍 Rechercher des conseils</h3>
+      <div class="sub">Selon l'âge et le type de conseil</div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="grid2">
+          <div class="field">
+            <label>🗓️ Âge de l'enfant (en mois)</label>
+            <input type="number" name="age_mois" class="form-control" min="0" max="120" placeholder="Ex : 6" value="{{ age_mois|default:'' }}" required>
+          </div>
+          <div class="field">
+            <label>📋 Type de conseil</label>
+            <select name="categorie" class="form-control">
+              <option value="tous">🌟 Tous les conseils</option>
+              <option value="aliment" {% if categorie == 'aliment' %}selected{% endif %}>🥗 Type d'aliment</option>
+              <option value="probleme" {% if categorie == 'probleme' %}selected{% endif %}>🏥 Problème de santé</option>
+            </select>
+          </div>
         </div>
+        <button type="submit" class="btn btn-primary btn-block">🔍 Rechercher</button>
+      </form>
     </div>
 
-    <div class="container pb-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
+    {% if conseils is not None %}
+      {% if conseils %}
+        <div class="panel" style="background:linear-gradient(135deg,var(--teal-100),#b2dfdb);border:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="color:var(--teal-800);">📊 Résultats pour {{ age_mois }} mois</strong>
+            <span class="badge-pill" style="background:var(--teal-600);color:#fff;font-size:.8rem;">{{ conseils|length }} conseil(s)</span>
+          </div>
+        </div>
 
-                <!-- Formulaire -->
-                <div class="card mb-4">
-                    <div class="card-header-custom">
-                        <h5 class="mb-0">🔍 Rechercher des conseils</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <form method="post">
-                            {% csrf_token %}
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">🗓️ Âge de l'enfant (en mois)</label>
-                                    <input type="number" name="age_mois" class="form-control"
-                                           min="0" max="120" placeholder="Ex: 6"
-                                           value="{{ age_mois|default:'' }}" required>
-                                    <div class="form-text">0 à 120 mois (10 ans)</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">📋 Type de conseil</label>
-                                    <select name="categorie" class="form-select">
-                                        <option value="tous">🌟 Tous les conseils</option>
-                                        <option value="aliment" {% if categorie == 'aliment' %}selected{% endif %}>🥗 Type d'aliment</option>
-                                        <option value="probleme" {% if categorie == 'probleme' %}selected{% endif %}>🏥 Problème de santé</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn-chercher mt-4">
-                                🔍 Rechercher
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Résultats -->
-                {% if conseils is not None %}
-                    {% if conseils %}
-                        <div class="tranche-info mb-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6>📊 Résultats pour {{ age_mois }} mois</h6>
-                                <span class="count-badge">{{ conseils|length }} conseil(s)</span>
-                            </div>
-                        </div>
-
-                        {% for conseil in conseils %}
-                        <div class="conseil-card {% if conseil.categorie == 'probleme' %}probleme{% endif %}">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="fw-bold mb-0">{{ conseil.titre }}</h6>
-                                {% if conseil.categorie == 'aliment' %}
-                                    <span class="badge-aliment">🥗 Aliment</span>
-                                {% else %}
-                                    <span class="badge-probleme">🏥 Santé</span>
-                                {% endif %}
-                            </div>
-                            <p class="text-muted mb-2" style="font-size:0.95rem;">{{ conseil.contenu }}</p>
-                            {% if conseil.mots_cles %}
-                                <div class="mt-2">
-                                    <small class="text-muted">🏷️ {{ conseil.mots_cles }}</small>
-                                </div>
-                            {% endif %}
-                            <div class="mt-2">
-                                <span class="age-range">📅 {{ conseil.age_min_mois }} - {{ conseil.age_max_mois }} mois</span>
-                            </div>
-                        </div>
-                        {% endfor %}
-
-                        <div class="alert alert-info border-0 rounded-4 mt-3">
-                            <strong>⚠️ Important :</strong> Ces conseils sont basés sur les recommandations OMS. Consultez toujours un professionnel de santé pour des conseils personnalisés.
-                        </div>
-
-                    {% else %}
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="empty-state">
-                                    <div class="emoji">🔍</div>
-                                    <h5>Aucun conseil trouvé</h5>
-                                    <p class="text-muted">Aucun conseil disponible pour {{ age_mois }} mois avec ce filtre. Essayez "Tous les conseils".</p>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endif %}
-
+        {% for conseil in conseils %}
+          <div class="panel" style="border-left:5px solid {% if conseil.categorie == 'probleme' %}var(--amber){% else %}var(--teal-600){% endif %};">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <h3 style="margin:0;">{{ conseil.titre }}</h3>
+              {% if conseil.categorie == 'aliment' %}
+                <span class="badge-pill" style="background:var(--teal-100);color:var(--teal-700);font-size:.75rem;">🥗 Aliment</span>
+              {% else %}
+                <span class="badge-pill" style="background:var(--amber-light);color:var(--amber-dark);font-size:.75rem;">🏥 Santé</span>
+              {% endif %}
             </div>
+            <p style="color:var(--muted);font-size:.95rem;margin:0 0 8px;">{{ conseil.contenu }}</p>
+            <span class="tag" style="font-size:.72rem;">📅 {{ conseil.age_min_mois }} – {{ conseil.age_max_mois }} mois</span>
+          </div>
+        {% endfor %}
+
+        <div class="alert alert-info">
+          <strong>⚠️ Important :</strong> ces conseils sont basés sur les recommandations OMS. Consultez toujours un professionnel de santé pour des conseils personnalisés.
         </div>
-    </div>
-
-    <footer>
-        <p>© 2026 Santé Infantile Bénin — Développé par <strong>SOSSA GNINAZÉ MINGNISSÊ DARIUS</strong></p>
-        <p>📧 <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a></p>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+      {% else %}
+        <div class="panel" style="text-align:center;padding:36px;">
+          <div style="font-size:3rem;">🔍</div>
+          <h3 style="color:var(--muted);">Aucun conseil trouvé</h3>
+          <p style="color:var(--muted);">Essayez le filtre « Tous les conseils ».</p>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

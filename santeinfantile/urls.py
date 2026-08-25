@@ -3,15 +3,24 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from . import pwa
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')),  # assume accounts.urls gère login, profile_edit, dashboard...
-    path('', include('main.urls')),  # page d'accueil route ou patterns existants
-]
 
-# Si vos routes d'accounts n'incluent pas /a-propos/, vous pouvez ajouter ici :
-# from accounts import views as accounts_views
-# urlpatterns += [ path('a-propos/', accounts_views.about, name='a_propos') ]
+    # PWA
+    path('manifest.json', pwa.manifest, name='manifest'),
+    path('sw.js', pwa.service_worker, name='service_worker'),
+
+    # Pages (l'accueil vit dans l'app accounts, à la racine)
+    path('', include('accounts.urls')),
+
+    # Modules
+    path('carte/', include('sante.urls')),
+    path('depistage/', include('enfants.urls')),
+    path('conseils/', include('conseils.urls')),
+    path('triage/', include('sib_intelligence.urls')),
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

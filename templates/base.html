@@ -1,0 +1,112 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Santé Infantile Bénin{% endblock %}</title>
+  <meta name="description" content="{% block description %}Plateforme de suivi de la santé des nourrissons et jeunes enfants au Bénin : vaccination, nutrition, dépistage de la malnutrition et triage pédiatrique assisté par IA.{% endblock %}">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Santé Infantile Bénin (SIB)">
+  <meta property="og:description" content="Vaccination, nutrition, dépistage de la malnutrition et triage pédiatrique pour vos enfants au Bénin.">
+  <meta property="og:type" content="website">
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#004d40">
+  <link rel="manifest" href="{% url 'manifest' %}">
+  <link rel="apple-touch-icon" href="{% static 'img/icons/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" href="{% static 'img/icons/icon-192.png' %}">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{% static 'css/sib.css' %}" rel="stylesheet">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <nav class="sib-nav">
+    <div class="container nav-inner">
+      <a class="sib-brand" href="{% url 'accounts:accueil' %}">
+        <img src="{% static 'img/logo.png' %}" alt="Santé Infantile Bénin">
+        <span>Santé&nbsp;Infantile&nbsp;Bénin</span>
+      </a>
+      <button class="nav-toggler" type="button" aria-label="Menu" onclick="document.querySelector('.sib-nav').classList.toggle('open')">☰</button>
+      <div class="nav-links">
+        <a href="{% url 'accounts:accueil' %}" {% if request.resolver_match.url_name == 'accueil' %}class="active"{% endif %}>Accueil</a>
+        <a href="{% url 'sante:carte' %}">Carte</a>
+        <a href="{% url 'enfants:detection_malnutrition' %}">Dépistage</a>
+        <a href="{% url 'conseils:calendrier_vaccinal' %}">Vaccination</a>
+        <a href="{% url 'conseils:conseils_nutritionnels' %}">Nutrition</a>
+        <a href="{% url 'sib:triage' %}">Triage IA</a>
+        <a href="{% url 'accounts:a_propos' %}">À propos</a>
+      </div>
+      <div class="nav-cta">
+        {% if user.is_authenticated %}
+          <a class="btn btn-ghost btn-sm" href="{% url 'accounts:dashboard' %}">Mon espace</a>
+          <a class="btn btn-primary btn-sm" href="{% url 'accounts:logout' %}">Se déconnecter</a>
+        {% else %}
+          <a class="btn btn-ghost btn-sm" href="{% url 'accounts:login' %}">Connexion</a>
+          <a class="btn btn-primary btn-sm" href="{% url 'accounts:register' %}">Créer un compte</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  {% if messages %}
+    <div class="container" style="padding-top:16px;">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="foot-grid">
+        <div>
+          <a class="sib-brand" href="{% url 'accounts:accueil' %}">
+            <img src="{% static 'img/logo.png' %}" alt="SIB"> Santé Infantile Bénin
+          </a>
+          <p>La plateforme de référence pour le suivi de la santé des nourrissons et jeunes enfants au Bénin.</p>
+        </div>
+        <div>
+          <h5>Outils</h5>
+          <ul>
+            <li><a href="{% url 'sante:carte' %}">Carte des centres</a></li>
+            <li><a href="{% url 'enfants:detection_malnutrition' %}">Dépistage malnutrition</a></li>
+            <li><a href="{% url 'conseils:calendrier_vaccinal' %}">Calendrier vaccinal</a></li>
+            <li><a href="{% url 'sib:triage' %}">IA de triage</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>Contact</h5>
+          <ul>
+            <li>📧 sante.infantile.benin@gmail.com</li>
+            <li>📍 Cotonou, Bénin</li>
+            <li>💬 WhatsApp · Facebook · LinkedIn</li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 Santé Infantile Bénin — Tous droits réservés.</span>
+        <span>Développé par SOSSA G. M. Darius</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Enregistrement du Service Worker (PWA)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').catch(function (err) {
+          console.log('Service Worker non enregistré :', err);
+        });
+      });
+    }
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

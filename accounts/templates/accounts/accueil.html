@@ -1,112 +1,133 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Santé Infantile Bénin — Suivi, vaccination et conseils pour parents</title>
-  <meta name="description" content="Santé Infantile Bénin (SIB) — conseils de puériculture, calendrier vaccinal, suivi de croissance et outils pour parents. Créé par SOSSA G. M. Darius, infirmier-puériculteur et développeur web.">
-  <!-- Open Graph minimal -->
-  <meta property="og:title" content="Santé Infantile Bénin (SIB)">
-  <meta property="og:description" content="Conseils, calendrier vaccinal et outils de suivi pour la santé des nourrissons et jeunes enfants au Bénin.">
-  <meta property="og:type" content="website">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    /* Logo navbar : hauteur fixe, enlever max-width par défaut */
-    .navbar-brand img { height: 80px; max-width: none; width: auto; }
-    @media (max-width: 576px) {
-      .navbar-brand img { height: 62px; }
-    }
-    /* Hero compact */
-    .hero {
-      padding: 2.25rem 1rem;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:1rem;
-    }
-    .hero .hero-text { flex:1 1 60%; }
-    .hero .hero-cta { flex: 0 0 35%; text-align:right; }
-    @media (max-width: 768px) {
-      .hero { flex-direction:column; text-align:center; }
-      .hero .hero-cta { text-align:center; }
-    }
-  </style>
-</head>
-<body class="bg-white text-dark">
+{% extends 'base.html' %}
+{% load static %}
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+{% block title %}Santé Infantile Bénin — Suivi, vaccination et conseils pour parents{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero" style="padding:0;">
+  <div class="container hero-inner">
+    <div>
+      <span class="eyebrow">🧑‍⚕️ Par un infirmier-puériculteur · Développeur web</span>
+      <h1>La santé de votre enfant,<br><span class="grad">suivie simplement</span> au Bénin.</h1>
+      <p class="lead">Vaccination, nutrition, dépistage de la malnutrition et triage pédiatrique assisté par IA — tous les outils fiables dont un parent a besoin, réunis au même endroit.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="{% url 'accounts:register' %}">Commencer gratuitement →</a>
+        <a class="btn btn-ghost" href="#outils">Découvrir les outils</a>
+      </div>
+      <div class="hero-proof">
+        <div><b>6</b> outils santé</div>
+        <div><b>100%</b> gratuit pour les parents</div>
+        <div><b>PEV</b> calendrier officiel Bénin</div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="phone">
+        <div class="screen">
+          <div class="screen-top">
+            <div class="dot"><span></span><span></span><span></span></div>
+            <span class="chip">Suivi de croissance</span>
+          </div>
+          <h4>Bilan nutritionnel · Awa, 18 mois</h4>
+          <div class="metric-row">
+            <div class="metric"><div class="k">Poids</div><div class="v">11,4 kg</div></div>
+            <div class="metric"><div class="k">Taille</div><div class="v">82 cm</div></div>
+            <div class="metric"><div class="k">Périmètre brachial</div><div class="v">14,2 cm</div></div>
+            <div class="metric"><div class="k">Âge</div><div class="v">18 mois</div></div>
+          </div>
+          <div class="gauge"><i></i></div>
+          <div class="status-pill"><span class="ic">✓</span> État nutritionnel normal</div>
+          <div class="row-item">💉 Prochain RDV vaccinal <b>3 sept.</b></div>
+          <div class="row-item">🥣 Conseil : diversification <b>voir →</b></div>
+        </div>
+      </div>
+      <div class="float-card fc1">🛡️ <span>Rappel vaccin dans 3 jours</span></div>
+      <div class="float-card fc2">🤖 IA de triage disponible 24h/7</div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTILS -->
+<section id="outils" style="padding-top:20px;">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="/">
-      <img src="{% static 'images/logo.png' %}" alt="SIB Logo" class="d-inline-block align-text-top">
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navMain">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
-        <li class="nav-item"><a class="nav-link" href="/a-propos/">À propos</a></li>
-        <li class="nav-item"><a class="nav-link" href="/enfants/">Enfants</a></li>
-        <li class="nav-item"><a class="nav-link" href="/vaccination/">Vaccination</a></li>
-        <li class="nav-item"><a class="nav-link" href="/triage/">Triage</a></li>
-        <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
-        {% if user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link" href="/accounts/dashboard/">Mon espace</a></li>
-          <li class="nav-item"><a class="nav-link" href="/accounts/logout/">Se déconnecter</a></li>
-        {% else %}
-          <li class="nav-item"><a class="nav-link" href="/accounts/login/">Connexion</a></li>
-        {% endif %}
-      </ul>
+    <div class="sec-head">
+      <span class="eyebrow">Nos outils</span>
+      <h2>Tout ce qu'un parent doit savoir, en un seul endroit</h2>
+      <p>Des outils simples, pensés par un professionnel de santé, adaptés au contexte béninois.</p>
+    </div>
+    <div class="tools">
+      <a class="tool" href="{% url 'sante:carte' %}">
+        <div class="ico">🗺️</div><h3>Carte des centres & pharmacies</h3>
+        <p>Trouvez le centre de santé ou la pharmacie la plus proche, avec itinéraire.</p><span class="tag">Géolocalisation</span>
+      </a>
+      <a class="tool" href="{% url 'enfants:detection_malnutrition' %}">
+        <div class="ico">📏</div><h3>Dépistage de la malnutrition</h3>
+        <p>Vérifiez l'état nutritionnel (poids, taille, périmètre brachial).</p><span class="tag">Z-scores OMS</span>
+      </a>
+      <a class="tool" href="{% url 'conseils:calculer_rdv' %}">
+        <div class="ico">💉</div><h3>Calculateur de RDV vaccinaux</h3>
+        <p>Générez le prochain rendez-vous vaccinal de votre enfant.</p><span class="tag">PEV Bénin</span>
+      </a>
+      <a class="tool" href="{% url 'conseils:calendrier_vaccinal' %}">
+        <div class="ico">📅</div><h3>Calendrier vaccinal</h3>
+        <p>Le calendrier officiel, âge par âge, avec historique.</p><span class="tag">Naissance à 5 ans</span>
+      </a>
+      <a class="tool" href="{% url 'conseils:conseils_nutritionnels' %}">
+        <div class="ico">🥣</div><h3>Conseils nutritionnels par âge</h3>
+        <p>Alimentation et diversification à chaque étape.</p><span class="tag">0 à 60 mois</span>
+      </a>
+      <a class="tool" href="{% url 'sib:triage' %}">
+        <div class="ico">🤖</div><h3>IA de triage pédiatrique</h3>
+        <p>Orientation rapide selon les signes d'alerte, conseils personnalisés.</p><span class="tag">Assistance intelligente</span>
+      </a>
     </div>
   </div>
-</nav>
+</section>
 
-<header class="hero container">
-  <div class="hero-text">
-    <h1 class="display-6 text-success">Santé Infantile Bénin — outils fiables pour le suivi et la prévention</h1>
-    <p class="lead text-muted">Suivi croissance, calendrier vaccinal, dépistage nutritionnel et conseils pratiques pour les parents.</p>
-    <p class="mb-0">
-      <a class="btn btn-success me-2" href="/enfants/">Gérer mes enfants</a>
-      <a class="btn btn-outline-secondary" href="/a-propos/">En savoir plus</a>
-    </p>
+<!-- COMMENT ÇA MARCHE -->
+<section style="background:var(--teal-50);">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">Simple &amp; rapide</span>
+      <h2>Comment ça marche ?</h2>
+      <p>Trois étapes suffisent pour commencer à suivre la santé de votre enfant.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><h3>Créez votre compte</h3><p>Inscription gratuite en quelques secondes avec votre numéro de téléphone.</p></div>
+      <div class="step"><div class="num">2</div><h3>Ajoutez votre enfant</h3><p>Nom, date de naissance et sexe : son profil de suivi est prêt.</p></div>
+      <div class="step"><div class="num">3</div><h3>Suivez &amp; agissez</h3><p>Vaccins, nutrition, dépistage et triage : tout est suivi et guidé.</p></div>
+    </div>
   </div>
-  <div class="hero-cta">
-    <img src="{% static 'images/hero-illustration.png' %}" alt="bébé" class="img-fluid" style="max-height:160px;">
-  </div>
-</header>
+</section>
 
-<main class="container my-4">
-  <div class="row g-3">
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title text-success">Gestion des enfants</h5>
-          <p class="card-text text-muted">Créez et suivez un profil par enfant (croissance, vaccins, nutrition).</p>
-          <a href="/enfants/" class="stretched-link"></a>
-        </div>
+<!-- À PROPOS / FREELANCE -->
+<section class="about" style="padding:64px 0;">
+  <div class="container about-inner">
+    <div class="portrait"><img src="{% static 'img/photo-darius.jpg' %}" alt="SOSSA G. M. Darius"></div>
+    <div>
+      <h2>Créé par un expert qui parle aux deux mondes</h2>
+      <p>Je suis <strong>SOSSA Gninazé Mingnissê Darius</strong>, infirmier diplômé d'État, spécialisé en puériculture et pédiatrie, et développeur web. Santé Infantile Bénin est né de cette double expertise : des outils médicalement fiables, techniquement solides.</p>
+      <div class="skills">
+        <span class="skill">🏥 Infirmier-puériculteur</span>
+        <span class="skill">👶 Pédiatrie &amp; nutrition</span>
+        <span class="skill">💻 Développement web</span>
+        <span class="skill">🤖 Santé numérique</span>
       </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title text-success">Calendrier vaccinal</h5>
-          <p class="card-text text-muted">Calendrier adapté au PEV du Bénin et historique des vaccinations.</p>
-          <a href="/vaccination/" class="stretched-link"></a>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title text-success">Triage & IA</h5>
-          <p class="card-text text-muted">Assistant de triage pour orienter en cas de signes d'alerte (outil d'aide, non substitut au médecin).</p>
-          <a href="/triage/" class="stretched-link"></a>
-        </div>
-      </div>
+      <a class="btn btn-light" href="{% url 'accounts:a_propos' %}">Travailler avec moi →</a>
     </div>
   </div>
-</main>
+</section>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<!-- DISCLAIMER -->
+<section style="padding:44px 0;">
+  <div class="container">
+    <div class="disclaimer">
+      <span class="emoji">⚠️</span>
+      <div><strong>Information médicale :</strong> les outils de Santé Infantile Bénin sont des aides au suivi et à l'orientation. Ils ne remplacent pas un avis médical professionnel. En cas d'urgence, contactez le <strong>112</strong> ou le centre de santé le plus proche.</div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

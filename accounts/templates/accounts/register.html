@@ -1,163 +1,47 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription - Santé Infantile Bénin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #004d40 0%, #00796b 50%, #26a69a 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-        .card-header {
-            background: linear-gradient(135deg, #004d40, #00796b);
-            color: white;
-            text-align: center;
-            padding: 30px;
-            border: none;
-        }
-        .card-body { padding: 40px; }
-        .form-control {
-            border-radius: 10px;
-            border: 2px solid #e0f2f1;
-            padding: 12px 15px;
-            font-size: 1rem;
-            transition: 0.3s;
-        }
-        .form-control:focus {
-            border-color: #00796b;
-            box-shadow: 0 0 0 0.2rem rgba(0,121,107,0.25);
-        }
-        .input-group .btn {
-            border-radius: 0 10px 10px 0;
-            border: 2px solid #e0f2f1;
-            border-left: none;
-            background: white;
-            color: #00796b;
-        }
-        .input-group .form-control {
-            border-radius: 10px 0 0 10px;
-        }
-        .btn-inscription {
-            background: linear-gradient(135deg, #004d40, #00796b);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            width: 100%;
-            transition: 0.3s;
-        }
-        .btn-inscription:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0,121,107,0.4);
-            color: white;
-        }
-        .error-text { color: #d32f2f; font-size: 0.85rem; margin-top: 5px; }
-        .link-connexion { color: #00796b; font-weight: 600; }
-        .link-connexion:hover { color: #004d40; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-5 col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="mb-1">🏥 Santé Infantile Bénin</h2>
-                        <p class="mb-0 opacity-75">Créez votre compte gratuitement</p>
-                    </div>
-                    <div class="card-body">
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
-                        {% endif %}
+{% extends 'base.html' %}
+{% load static %}
 
-                        <form method="post">
-                            {% csrf_token %}
+{% block title %}Inscription — Santé Infantile Bénin{% endblock %}
 
-                            <!-- Erreurs globales -->
-                            {% if form.non_field_errors %}
-                                <div class="alert alert-danger">
-                                    {% for error in form.non_field_errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-
-                            <!-- Téléphone -->
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">📱 Numéro de téléphone</label>
-                                {{ form.telephone }}
-                                {% if form.telephone.errors %}
-                                    <div class="error-text">{{ form.telephone.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Mot de passe -->
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">🔒 Mot de passe</label>
-                                <div class="input-group">
-                                    {{ form.password1 }}
-                                    <button type="button" class="btn" onclick="togglePassword('password1', this)">👁️</button>
-                                </div>
-                                {% if form.password1.errors %}
-                                    <div class="error-text">{{ form.password1.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Confirmation mot de passe -->
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">🔒 Confirmer le mot de passe</label>
-                                <div class="input-group">
-                                    {{ form.password2 }}
-                                    <button type="button" class="btn" onclick="togglePassword('password2', this)">👁️</button>
-                                </div>
-                                {% if form.password2.errors %}
-                                    <div class="error-text">{{ form.password2.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-
-                            <button type="submit" class="btn-inscription">
-                                ✅ Créer mon compte
-                            </button>
-                        </form>
-
-                        <p class="text-center mt-3 mb-0">
-                            Déjà inscrit ? <a href="{% url 'login' %}" class="link-connexion">Se connecter</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+{% block content %}
+<div class="container">
+  <div class="auth-wrap">
+    <div class="auth-head">
+      <img src="{% static 'img/logo.png' %}" alt="SIB">
+      <h2>Santé Infantile Bénin</h2>
+      <p>Créez votre compte gratuitement</p>
     </div>
+    <div class="auth-body">
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+      {% endif %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function togglePassword(fieldId, btn) {
-            var field = document.getElementById(fieldId);
-            if (field.type === 'password') {
-                field.type = 'text';
-                btn.textContent = '🙈';
-            } else {
-                field.type = 'password';
-                btn.textContent = '👁️';
-            }
-        }
-    </script>
-</body>
-</html>
+      <form method="post">
+        {% csrf_token %}
+        <div class="field">
+          <label>📱 Numéro de téléphone</label>
+          {{ form.telephone }}
+          {% if form.telephone.errors %}<div class="alert alert-danger" style="margin:8px 0 0;padding:8px 12px;">{{ form.telephone.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="field">
+          <label>🔒 Mot de passe</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}<div class="alert alert-danger" style="margin:8px 0 0;padding:8px 12px;">{{ form.password1.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="field">
+          <label>🔒 Confirmer le mot de passe</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}<div class="alert alert-danger" style="margin:8px 0 0;padding:8px 12px;">{{ form.password2.errors.0 }}</div>{% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">✅ Créer mon compte</button>
+      </form>
+
+      <p class="auth-alt">
+        Déjà inscrit ? <a href="{% url 'accounts:login' %}">Se connecter</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

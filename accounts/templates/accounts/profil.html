@@ -1,148 +1,58 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Profil - Santé Infantile Bénin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
-        .navbar-custom { background: linear-gradient(135deg, #004d40, #00796b); padding: 15px 0; }
-        .navbar-brand-custom { font-size: 1.3rem; font-weight: 800; color: white !important; }
-        .btn-retour { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 16px; font-size: 0.85rem; text-decoration: none; }
-        .page-header { background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 25px 0; margin-bottom: 30px; }
-        .page-header h2 { font-weight: 800; }
-        .card { border: none; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
-        .card-header-custom { background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 20px 25px; border-radius: 20px 20px 0 0; }
-        .form-control, .form-select { border-radius: 10px; border: 2px solid #e0f2f1; padding: 10px 15px; transition: 0.3s; }
-        .form-control:focus { border-color: #00796b; box-shadow: 0 0 0 0.2rem rgba(0,121,107,0.25); }
-        .btn-sauvegarder { background: linear-gradient(135deg, #004d40, #00796b); color: white; border: none; border-radius: 10px; padding: 12px; font-size: 1rem; font-weight: 700; width: 100%; transition: 0.3s; }
-        .btn-sauvegarder:hover { transform: translateY(-2px); color: white; }
-        .enfant-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 5px solid #00796b; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
-        .btn-rdv-enfant { background: linear-gradient(135deg, #1565c0, #1976d2); color: white; border: none; border-radius: 10px; padding: 8px 16px; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: inline-block; transition: 0.3s; }
-        .btn-rdv-enfant:hover { color: white; transform: translateY(-2px); }
-        .btn-ajouter { background: linear-gradient(135deg, #004d40, #00796b); color: white; border: none; border-radius: 10px; padding: 10px 20px; font-size: 0.9rem; font-weight: 600; text-decoration: none; display: inline-block; transition: 0.3s; }
-        .btn-ajouter:hover { color: white; transform: translateY(-2px); }
-        .avatar { width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 10px; }
-        footer { background: #004d40; color: rgba(255,255,255,0.7); text-align: center; padding: 20px; margin-top: 40px; }
-        footer strong { color: white; }
-        footer a { color: #80cbc4; }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-    <nav class="navbar-custom">
-        <div class="container d-flex justify-content-between align-items-center">
-            <span class="navbar-brand-custom">🏥 Santé Infantile Bénin</span>
-            <a href="{% url 'dashboard' %}" class="btn-retour">← Dashboard</a>
-        </div>
-    </nav>
+{% block title %}Mon profil — Santé Infantile Bénin{% endblock %}
 
-    <div class="page-header">
-        <div class="container">
-            <div class="avatar">👤</div>
-            <h2>{% if parent.prenom %}{{ parent.prenom }} {{ parent.nom }}{% else %}Mon Profil{% endif %}</h2>
-            <p>📱 {{ parent.telephone }}</p>
+{% block content %}
+<div class="page-head">
+  <div class="container">
+    <h1>{% if parent.nom_complet != parent.user.username %}{{ parent.nom_complet }}{% else %}Mon profil{% endif %}</h1>
+    <p>📱 {{ parent.telephone }}</p>
+  </div>
+</div>
+
+<div class="container page-body">
+  <div class="grid2" style="align-items:start;">
+    <div class="panel">
+      <h3>✏️ Mes informations</h3>
+      <div class="sub">Mettez à jour vos coordonnées</div>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="field"><label>👤 Prénom</label><input type="text" name="prenom" class="form-control" value="{{ parent.prenom }}" placeholder="Votre prénom"></div>
+        <div class="field"><label>👤 Nom</label><input type="text" name="nom" class="form-control" value="{{ parent.nom }}" placeholder="Votre nom"></div>
+        <div class="field"><label>📍 Quartier</label><input type="text" name="quartier" class="form-control" value="{{ parent.quartier }}" placeholder="Votre quartier"></div>
+        <div class="field"><label>🏙️ Ville</label><input type="text" name="ville" class="form-control" value="{{ parent.ville }}" placeholder="Votre ville"></div>
+        <div class="field">
+          <label>📷 Photo de profil</label>
+          {% if parent.photo %}
+            <div style="margin-bottom:8px;"><img src="{{ parent.photo.url }}" width="80" height="80" style="border-radius:50%;object-fit:cover;"></div>
+          {% endif %}
+          <input type="file" name="photo" class="form-control" accept="image/*">
         </div>
+        <button type="submit" class="btn btn-primary btn-block">💾 Sauvegarder</button>
+      </form>
     </div>
 
-    <div class="container pb-5">
-        <div class="row g-4">
-
-            <!-- Infos personnelles -->
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header-custom">
-                        <h5 class="mb-0">✏️ Mes informations</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-success border-0 rounded-4">{{ message }}</div>
-                            {% endfor %}
-                        {% endif %}
-                            <form method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">👤 Prénom</label>
-                                <input type="text" name="prenom" class="form-control" value="{{ parent.prenom }}" placeholder="Votre prénom">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">👤 Nom</label>
-                                <input type="text" name="nom" class="form-control" value="{{ parent.nom }}" placeholder="Votre nom">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">📍 Quartier</label>
-                                <input type="text" name="quartier" class="form-control" value="{{ parent.quartier }}" placeholder="Votre quartier">
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">🏙️ Ville</label>
-                                <input type="text" name="ville" class="form-control" value="{{ parent.ville }}" placeholder="Votre ville">
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">📷 Photo de profil</label>
-                                {% if parent.photo %}
-                                    <div class="mb-2">
-                                        <img src="{{ parent.photo.url }}" width="80" height="80" style="border-radius:50%;object-fit:cover;">
-                                    </div>
-                                {% endif %}
-                                <input type="file" name="photo" class="form-control" accept="image/*">
-                             </div>
-                             <button type="submit" class="btn-sauvegarder">
-                                💾 Sauvegarder
-                            </button>
-                        </form>
-                    </div>
-                </div>
+    <div class="panel">
+      <h3>👶 Mes enfants</h3>
+      <div class="sub">Profils et rendez-vous vaccinaux</div>
+      {% if enfants %}
+        {% for enfant in enfants %}
+          <div style="background:var(--teal-50);border-left:5px solid var(--teal-600);border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div>
+              <div style="font-weight:800;color:var(--teal-800);">{% if enfant.sexe == 'M' %}👦{% else %}👧{% endif %} {{ enfant.prenom }} {{ enfant.nom }}</div>
+              <div class="sub" style="margin:0;">📅 Né(e) le {{ enfant.date_naissance|date:"d/m/Y" }}</div>
             </div>
-
-            <!-- Mes enfants -->
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header-custom">
-                        <h5 class="mb-0">👶 Mes enfants</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        {% if enfants %}
-                            {% for enfant in enfants %}
-                            <div class="enfant-card">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="fw-bold mb-1">
-                                            {% if enfant.sexe == 'M' %}👦{% else %}👧{% endif %}
-                                            {{ enfant.prenom }} {{ enfant.nom }}
-                                        </h6>
-                                        <small class="text-muted">📅 Né(e) le {{ enfant.date_naissance|date:"d/m/Y" }}</small>
-                                    </div>
-                                    <a href="{% url 'calculer_rdv' %}?enfant={{ enfant.id }}" class="btn-rdv-enfant">
-                                        💉 RDV
-                                    </a>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="text-center py-3 text-muted">
-                                <div style="font-size:3rem;">👶</div>
-                                <p>Aucun enfant ajouté</p>
-                            </div>
-                        {% endif %}
-
-                        <a href="{% url 'ajouter_enfant' %}" class="btn-ajouter mt-3">
-                            + Ajouter un enfant
-                        </a>
-                    </div>
-                </div>
-            </div>
-
+            <a class="btn btn-ghost btn-sm" href="{% url 'conseils:calculer_rdv' %}?enfant={{ enfant.id }}">💉 RDV</a>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div style="text-align:center;padding:24px;color:var(--muted);">
+          <div style="font-size:3rem;">👶</div>
+          <p>Aucun enfant ajouté</p>
         </div>
+      {% endif %}
+      <a class="btn btn-primary btn-block" href="{% url 'accounts:ajouter_enfant' %}">+ Ajouter un enfant</a>
     </div>
-
-    <footer>
-        <p>© 2026 Santé Infantile Bénin — Développé par <strong>SOSSA GNINAZÉ MINGNISSÊ DARIUS</strong></p>
-        <p>📧 <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a></p>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+  </div>
+</div>
+{% endblock %}

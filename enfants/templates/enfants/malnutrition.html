@@ -1,183 +1,84 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détection Malnutrition - Santé Infantile Bénin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
-        .navbar-custom { background: linear-gradient(135deg, #004d40, #00796b); padding: 15px 0; }
-        .navbar-brand-custom { font-size: 1.3rem; font-weight: 800; color: white !important; }
-        .btn-retour { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 16px; font-size: 0.85rem; text-decoration: none; }
-        .page-header { background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 25px 0; margin-bottom: 30px; }
-        .page-header h2 { font-weight: 800; }
-        .page-header p { opacity: 0.85; margin: 0; }
-        .card { border: none; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
-        .card-header-custom { background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 20px 25px; border-radius: 20px 20px 0 0; }
-        .form-control, .form-select { border-radius: 10px; border: 2px solid #e0f2f1; padding: 10px 15px; transition: 0.3s; }
-        .form-control:focus, .form-select:focus { border-color: #00796b; box-shadow: 0 0 0 0.2rem rgba(0,121,107,0.25); }
-        .btn-evaluer { background: linear-gradient(135deg, #004d40, #00796b); color: white; border: none; border-radius: 10px; padding: 12px; font-size: 1rem; font-weight: 700; width: 100%; transition: 0.3s; }
-        .btn-evaluer:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,121,107,0.4); color: white; }
-        .result-card { border-radius: 15px; padding: 20px; margin-bottom: 15px; border-left: 6px solid; }
-        .result-success { background: #e8f5e9; border-color: #4caf50; }
-        .result-warning { background: #fff8e1; border-color: #ff9800; }
-        .result-info { background: #e3f2fd; border-color: #2196f3; }
-        .result-danger { background: #ffebee; border-color: #f44336; }
-        .info-card { background: #e0f2f1; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
-        .info-card h6 { color: #004d40; font-weight: 700; }
-        .muac-guide { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-        .muac-item { padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
-        .muac-rouge { background: #ffebee; color: #c62828; }
-        .muac-orange { background: #fff3e0; color: #e65100; }
-        .muac-vert { background: #e8f5e9; color: #2e7d32; }
-        footer { background: #004d40; color: rgba(255,255,255,0.7); text-align: center; padding: 20px; margin-top: 40px; }
-        footer strong { color: white; }
-        footer a { color: #80cbc4; }
-        .stat-box { background: white; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
-        .stat-value { font-size: 1.8rem; font-weight: 800; color: #00796b; }
-        .stat-label { font-size: 0.8rem; color: #888; }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-    <nav class="navbar-custom">
-        <div class="container d-flex justify-content-between align-items-center">
-            <span class="navbar-brand-custom">🏥 Santé Infantile Bénin</span>
-            <a href="{% url 'dashboard' %}" class="btn-retour">← Dashboard</a>
-        </div>
-    </nav>
+{% block title %}Dépistage de la malnutrition — Santé Infantile Bénin{% endblock %}
 
-    <div class="page-header">
-        <div class="container">
-            <h2>⚖️ Détection de Malnutrition</h2>
-            <p>Évaluation basée sur les standards OMS — Z-score, IMC et MUAC</p>
+{% block content %}
+<div class="page-head">
+  <div class="container">
+    <h1>📏 Vérificateur d'état nutritionnel</h1>
+    <p>Entrez les mesures de votre enfant pour détecter un éventuel risque de malnutrition (références OMS).</p>
+  </div>
+</div>
+
+<div class="container page-body">
+  <div class="panel">
+    <h3>📏 Guide MUAC (Périmètre brachial)</h3>
+    <div class="sub">Mesuré au milieu du bras gauche avec un ruban de mesure.</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <span class="badge-pill badge-danger">🔴 &lt; 11,5 cm — Malnutrition sévère</span>
+      <span class="badge-pill badge-warn">🟠 11,5 – 12,5 cm — Malnutrition modérée</span>
+      <span class="badge-pill badge-ok">🟢 &gt; 12,5 cm — Normal</span>
+    </div>
+  </div>
+
+  <div class="grid2" style="align-items:start;">
+    <div class="panel">
+      <h3>👶 Informations de l'enfant</h3>
+      <div class="sub">Renseignez les données anthropométriques</div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="grid2">
+          <div class="field"><label>👦 Prénom</label><input type="text" name="prenom" class="form-control" placeholder="Ex : Kofi" required></div>
+          <div class="field"><label>⚧ Sexe</label><select name="sexe" class="form-control" required><option value="M">👦 Masculin</option><option value="F">👧 Féminin</option></select></div>
         </div>
+        <div class="grid2">
+          <div class="field"><label>🗓️ Âge (en mois)</label><input type="number" name="age_mois" class="form-control" min="0" max="60" placeholder="Ex : 12" required></div>
+          <div class="field"><label>⚖️ Poids (kg)</label><input type="number" name="poids" class="form-control" step="0.1" min="0" placeholder="Ex : 8,5" required></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>📏 Taille (cm)</label><input type="number" name="taille" class="form-control" step="0.1" min="0" placeholder="Ex : 72" required></div>
+          <div class="field"><label>📐 MUAC — périmètre brachial (cm, optionnel)</label><input type="number" name="muac" class="form-control" step="0.1" min="0" placeholder="Ex : 13,5"></div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">🔍 Vérifier l'état nutritionnel</button>
+      </form>
     </div>
 
-    <div class="container pb-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
+    <div class="panel">
+      <h3>Résultat</h3>
+      <div class="sub">Évaluation basée sur les références OMS</div>
 
-                <!-- Info MUAC -->
-                <div class="info-card mb-4">
-                    <h6>📏 Guide MUAC (Périmètre Brachial)</h6>
-                    <p class="text-muted small mb-2">Le MUAC est mesuré au milieu du bras gauche avec un ruban de mesure.</p>
-                    <div class="muac-guide">
-                        <div class="muac-item muac-rouge">🔴 &lt; 11,5 cm — Malnutrition sévère</div>
-                        <div class="muac-item muac-orange">🟠 11,5 - 12,5 cm — Malnutrition modérée</div>
-                        <div class="muac-item muac-vert">🟢 &gt; 12,5 cm — Normal</div>
-                    </div>
-                </div>
+      {% if resultats %}
+        {% if resultats.erreur %}
+          <div class="alert alert-danger">❌ Erreur : {{ resultats.erreur }}</div>
+        {% else %}
+          <div class="grid3" style="margin-bottom:16px;">
+            <div class="step"><div class="num">{{ resultats.age_mois }}</div><p>mois</p></div>
+            <div class="step"><div class="num">{{ resultats.poids }}</div><p>kg</p></div>
+            <div class="step"><div class="num">{{ resultats.taille }}</div><p>cm</p></div>
+          </div>
 
-                <!-- Formulaire -->
-                <div class="card mb-4">
-                    <div class="card-header-custom">
-                        <h5 class="mb-0">👶 Informations de l'enfant</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <form method="post">
-                            {% csrf_token %}
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">👦 Prénom de l'enfant</label>
-                                    <input type="text" name="prenom" class="form-control" placeholder="Ex: Kofi" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">⚧ Sexe</label>
-                                    <select name="sexe" class="form-select" required>
-                                        <option value="M">👦 Masculin</option>
-                                        <option value="F">👧 Féminin</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">🗓️ Âge (en mois)</label>
-                                    <input type="number" name="age_mois" class="form-control" min="0" max="60" placeholder="Ex: 12" required>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">⚖️ Poids (kg)</label>
-                                    <input type="number" name="poids" class="form-control" step="0.1" min="0" placeholder="Ex: 8.5" required>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold">📏 Taille (cm)</label>
-                                    <input type="number" name="taille" class="form-control" step="0.1" min="0" placeholder="Ex: 72" required>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label fw-bold">📐 MUAC - Périmètre brachial (cm) <span class="text-muted fw-normal">(optionnel)</span></label>
-                                    <input type="number" name="muac" class="form-control" step="0.1" min="0" placeholder="Ex: 13.5">
-                                </div>
-                            </div>
-                            <button type="submit" class="btn-evaluer mt-4">
-                                ⚖️ Évaluer l'état nutritionnel
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-                {% if resultats %}
-                    {% if resultats.erreur %}
-                        <div class="alert alert-danger border-0 rounded-4">
-                            ❌ Erreur : {{ resultats.erreur }}
-                        </div>
-                    {% else %}
-                        <!-- Stats rapides -->
-                        <div class="row g-3 mb-4">
-                            <div class="col-4">
-                                <div class="stat-box">
-                                    <div class="stat-value">{{ resultats.age_mois }}</div>
-                                    <div class="stat-label">mois</div>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="stat-box">
-                                    <div class="stat-value">{{ resultats.poids }}</div>
-                                    <div class="stat-label">kg</div>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="stat-box">
-                                    <div class="stat-value">{{ resultats.taille }}</div>
-                                    <div class="stat-label">cm</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header-custom">
-                                <h5 class="mb-0">📊 Résultats pour {{ resultats.prenom }}</h5>
-                            </div>
-                            <div class="card-body p-4">
-                                {% for eval in resultats.evaluations %}
-                                <div class="result-card result-{{ eval.couleur }}">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>{{ eval.indicateur }}</strong>
-                                        </div>
-                                        <span class="badge bg-{{ eval.couleur }} fs-6 px-3 py-2">
-                                            {{ eval.statut }}
-                                        </span>
-                                    </div>
-                                </div>
-                                {% endfor %}
-
-                                <div class="alert alert-info border-0 rounded-4 mt-3">
-                                    <strong>⚠️ Important :</strong> Ces résultats sont indicatifs. Consultez toujours un professionnel de santé pour un diagnostic complet.
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endif %}
-
-            </div>
+          <div style="display:grid;gap:12px;">
+            {% for eval in resultats.evaluations %}
+              <div style="display:flex;justify-content:space-between;align-items:center;background:var(--teal-50);border-radius:12px;padding:12px 16px;">
+                <span style="font-weight:600;">{{ eval.indicateur }}</span>
+                {% if eval.couleur == 'success' %}<span class="badge-pill badge-ok">{{ eval.statut }}</span>
+                {% elif eval.couleur == 'warning' %}<span class="badge-pill badge-warn">{{ eval.statut }}</span>
+                {% elif eval.couleur == 'info' %}<span class="badge-pill badge-info">{{ eval.statut }}</span>
+                {% else %}<span class="badge-pill badge-danger">{{ eval.statut }}</span>{% endif %}
+              </div>
+            {% endfor %}
+          </div>
+          <div class="alert alert-info" style="margin-top:16px;">
+            <strong>⚠️ Important :</strong> ces résultats sont indicatifs. Consultez toujours un professionnel de santé pour un diagnostic complet.
+          </div>
+        {% endif %}
+      {% else %}
+        <div style="text-align:center;padding:30px;color:var(--muted);">
+          <div style="font-size:3rem;">📏</div>
+          <p>Renseignez les mesures de votre enfant pour voir le résultat ici.</p>
         </div>
+      {% endif %}
     </div>
-
-    <footer>
-        <p>© 2026 Santé Infantile Bénin — Développé par <strong>SOSSA GNINAZÉ MINGNISSÊ DARIUS</strong></p>
-        <p>📧 <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a></p>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+  </div>
+</div>
+{% endblock %}

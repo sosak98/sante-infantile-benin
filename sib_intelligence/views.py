@@ -5,12 +5,14 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 from groq import Groq
 from accounts.models import Parent
 from enfants.models import Enfant
 
-# Initialisation du client Groq
-client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+# Initialisation du client Groq (optionnelle : l'IA est désactivée si la clé est absente)
+GROQ_API_KEY = os.getenv('GROQ_API_KEY') or getattr(settings, 'GROQ_API_KEY', '')
+client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 
 def calculer_score_triage(symptomes, poids=None, taille=None, muac=None):
@@ -136,7 +138,7 @@ Règles importantes :
 
 @login_required
 def triage(request):
-    parent = Parent.objects.get(user=request.user)
+    parent, _ = Parent.objects.get_or_create(user=request.user)
     enfants = Enfant.objects.filter(parent=parent)
 
     if request.method == 'POST':
@@ -215,6 +217,14 @@ def chat(request):
             message_user = data.get('message', '')
             contexte = data.get('contexte', {})
             symptomes = contexte.get('symptomes', {})
+
+            if client is None:
+                return JsonResponse({
+                    'reponse': "L'assistant IA est temporairement indisponible (clé API non configurée). "
+                               "Veuillez consulter un professionnel de santé pour toute question.",
+                    'status': 'ok',
+                    'suggestion': contexte.get('niveau', 'vert'),
+                })
 
             system_prompt = construire_contexte_systeme(
                 enfant_nom=contexte.get('enfant_nom', 'mon enfant'),

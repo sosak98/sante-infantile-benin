@@ -2,9 +2,8 @@ import json
 import requests
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib.admin.views.decorators import staff_member_required
 from .models import Etablissement
-from conseils.seed_vaccins import *
 
 
 def carte(request):
@@ -42,7 +41,7 @@ def etablissements_osm(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-@csrf_exempt
+@staff_member_required
 def charger_seeds(request):
     url = 'https://overpass-api.de/api/interpreter'
     query = '[out:json][timeout:60];(node["amenity"="hospital"](6.2,2.2,6.5,2.7);node["amenity"="clinic"](6.2,2.2,6.5,2.7);node["amenity"="pharmacy"](6.2,2.2,6.5,2.7);way["amenity"="hospital"](6.2,2.2,6.5,2.7);way["amenity"="pharmacy"](6.2,2.2,6.5,2.7););out center;'

@@ -1,265 +1,166 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIB Intelligence - Résultat</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Nunito', sans-serif; background: #FFF8F0; }
-        .navbar-custom { background: linear-gradient(135deg, #004d40, #00796b); padding: 15px 0; }
-        .navbar-brand-custom { font-size: 1.3rem; font-weight: 900; color: white !important; }
-        .btn-retour { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 16px; font-size: 0.85rem; text-decoration: none; }
-        .page-header { background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 25px 0; margin-bottom: 30px; }
-        .page-header h2 { font-weight: 900; }
+{% extends 'base.html' %}
 
-        /* Résultat cards */
-        .result-rouge { background: linear-gradient(135deg, #c62828, #e53935); color: white; border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 8px 30px rgba(198,40,40,0.3); }
-        .result-jaune { background: linear-gradient(135deg, #e65100, #f57c00); color: white; border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 8px 30px rgba(230,81,0,0.3); }
-        .result-vert { background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 8px 30px rgba(27,94,32,0.3); }
-        .result-icon { font-size: 3rem; margin-bottom: 10px; }
-        .result-title { font-size: 1.4rem; font-weight: 900; margin-bottom: 8px; }
-        .result-message { opacity: 0.92; font-size: 1rem; }
+{% block title %}Résultat du triage — Santé Infantile Bénin{% endblock %}
 
-        /* Chatbot */
-        .chat-card { border: none; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
-        .chat-header { background: linear-gradient(135deg, #004d40, #00796b); color: white; padding: 18px 25px; border-radius: 20px 20px 0 0; }
-        .chat-header h5 { margin: 0; font-weight: 800; }
-        .chat-messages { height: 380px; overflow-y: auto; padding: 20px; background: #f8fffe; }
-        .message { margin-bottom: 15px; display: flex; flex-direction: column; }
-        .message.bot { align-items: flex-start; }
-        .message.user { align-items: flex-end; }
-        .message-bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 0.9rem; line-height: 1.6; }
-        .message.bot .message-bubble { background: white; color: #333; border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .message.user .message-bubble { background: linear-gradient(135deg, #004d40, #00796b); color: white; border-bottom-right-radius: 4px; }
-        .message-name { font-size: 0.75rem; color: #888; margin-bottom: 4px; font-weight: 700; }
-        .chat-input-area { padding: 15px 20px; background: white; border-radius: 0 0 20px 20px; border-top: 1px solid #e0f2f1; }
-        .chat-input { border-radius: 25px; border: 2px solid #e0f2f1; padding: 10px 18px; font-family: 'Nunito', sans-serif; font-size: 0.9rem; flex: 1; }
-        .chat-input:focus { border-color: #00796b; box-shadow: none; outline: none; }
-        .btn-send { background: linear-gradient(135deg, #004d40, #00796b); color: white; border: none; border-radius: 25px; padding: 10px 20px; font-weight: 700; cursor: pointer; transition: 0.3s; white-space: nowrap; }
-        .btn-send:hover { transform: translateY(-2px); }
-        .typing { display: none; padding: 8px 16px; }
-        .typing span { display: inline-block; width: 8px; height: 8px; background: #00796b; border-radius: 50%; margin: 0 2px; animation: bounce 1.2s infinite; }
-        .typing span:nth-child(2) { animation-delay: 0.2s; }
-        .typing span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+{% block extra_head %}
+<style>
+  .chat-card { border-radius: var(--radius); box-shadow: var(--shadow-sm); border:1px solid var(--line); overflow:hidden; background:#fff; }
+  .chat-header { background: linear-gradient(135deg, var(--teal-800), var(--teal-600)); color: #fff; padding: 16px 22px; }
+  .chat-header h5 { margin: 0; font-weight: 800; }
+  .chat-messages { height: 380px; overflow-y: auto; padding: 20px; background: #f8fffe; }
+  .message { margin-bottom: 15px; display: flex; flex-direction: column; }
+  .message.bot { align-items: flex-start; }
+  .message.user { align-items: flex-end; }
+  .message-bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: .9rem; line-height: 1.6; }
+  .message.bot .message-bubble { background: #fff; color: #333; border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .message.user .message-bubble { background: linear-gradient(135deg, var(--teal-800), var(--teal-600)); color: #fff; border-bottom-right-radius: 4px; }
+  .message-name { font-size: .75rem; color: #888; margin-bottom: 4px; font-weight: 700; }
+  .chat-input-area { padding: 14px 20px; background: #fff; border-top: 1px solid var(--line); }
+  .chat-input { border-radius: 25px; border: 2px solid var(--teal-100); padding: 10px 18px; font-size: .9rem; flex: 1; }
+  .chat-input:focus { border-color: var(--teal-600); box-shadow: none; outline: none; }
+  .btn-send { background: linear-gradient(135deg, var(--teal-800), var(--teal-600)); color: #fff; border: none; border-radius: 25px; padding: 10px 20px; font-weight: 700; cursor: pointer; }
+  .typing { display: none; padding: 8px 16px; }
+  .typing span { display: inline-block; width: 8px; height: 8px; background: var(--teal-600); border-radius: 50%; margin: 0 2px; animation: bounce 1.2s infinite; }
+  .typing span:nth-child(2) { animation-delay: .2s; }
+  .typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+</style>
+{% endblock %}
 
-        /* Actions */
-        .action-card { border: none; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); margin-bottom: 20px; }
-        .btn-action { border-radius: 12px; padding: 12px 20px; font-weight: 700; font-size: 0.9rem; text-decoration: none; display: block; text-align: center; transition: 0.3s; margin-bottom: 10px; }
-        .btn-carte { background: linear-gradient(135deg, #1565c0, #1976d2); color: white; }
-        .btn-carte:hover { transform: translateY(-3px); color: white; }
-        .btn-nouveau { background: linear-gradient(135deg, #004d40, #00796b); color: white; }
-        .btn-nouveau:hover { transform: translateY(-3px); color: white; }
-        .btn-dashboard { background: #f0f4f8; color: #444; }
-        .btn-dashboard:hover { background: #e0e8f0; color: #444; }
-
-        footer { background: #002921; color: rgba(255,255,255,0.7); text-align: center; padding: 20px; margin-top: 40px; }
-        footer strong { color: white; }
-        footer a { color: #80cbc4; }
-    </style>
-</head>
-<body>
-
-<nav class="navbar-custom">
-    <div class="container d-flex justify-content-between align-items-center">
-        <span class="navbar-brand-custom">🤖 SIB Intelligence</span>
-        <a href="{% url 'dashboard' %}" class="btn-retour">← Dashboard</a>
-    </div>
-</nav>
-
-<div class="page-header">
-    <div class="container">
-        <h2>📊 Résultat du Triage</h2>
-        <p>Analyse pour {{ enfant.prenom }} — {{ age_mois }} mois</p>
-    </div>
+{% block content %}
+<div class="page-head">
+  <div class="container">
+    <h1>Résultat du triage</h1>
+    <p>Analyse pour {{ enfant.prenom }} — {{ age_mois }} mois.</p>
+  </div>
 </div>
 
-<div class="container pb-5">
-    <div class="row g-4">
-
-        <!-- Colonne gauche -->
-        <div class="col-lg-7">
-
-            <!-- Résultat triage -->
-            <div class="result-{{ niveau }}">
-                <div class="result-icon">
-                    {% if niveau == 'rouge' %}🚨
-                    {% elif niveau == 'jaune' %}⚠️
-                    {% else %}✅{% endif %}
-                </div>
-                <div class="result-title">
-                    {% if niveau == 'rouge' %}Urgence Immédiate
-                    {% elif niveau == 'jaune' %}Consultation Recommandée
-                    {% else %}Situation Stable{% endif %}
-                </div>
-                <div class="result-message">{{ message }}</div>
-            </div>
-
-            <!-- Chatbot -->
-            <div class="chat-card">
-                <div class="chat-header">
-                    <h5>🤖 Assistant SIB Intelligence</h5>
-                    <small style="opacity:0.8;">Posez vos questions sur l'état de {{ enfant.prenom }}</small>
-                </div>
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message bot">
-                        <div class="message-name">SIB Intelligence</div>
-                        <div class="message-bubble">
-                            Bonjour ! J'ai analysé les symptômes de <strong>{{ enfant.prenom }}</strong> ({{ age_mois }} mois).
-                            {% if niveau == 'rouge' %}
-                            Le résultat indique une <strong>urgence médicale</strong>. Veuillez consulter un médecin immédiatement. Je suis là pour vous aider en attendant.
-                            {% elif niveau == 'jaune' %}
-                            Je recommande une <strong>consultation médicale dans les 24-48h</strong>. Posez-moi vos questions en attendant.
-                            {% else %}
-                            L'état de votre enfant semble <strong>stable</strong>. Je peux vous donner des conseils pour le suivi à domicile.
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="typing" id="typing">
-                        <span></span><span></span><span></span>
-                    </div>
-                </div>
-                <div class="chat-input-area">
-                    <div class="d-flex gap-2">
-                        <input type="text" id="chatInput" class="chat-input form-control"
-                               placeholder="Posez votre question..." />
-                        <button class="btn-send" onclick="envoyerMessage()">Envoyer</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Colonne droite -->
-        <div class="col-lg-5">
-
-            <!-- Actions recommandées -->
-            <div class="action-card p-4">
-                <h6 class="fw-bold mb-3" style="color:#004d40;">🎯 Actions recommandées</h6>
-
-                {% if niveau == 'rouge' or niveau == 'jaune' %}
-                <a href="{% url 'carte' %}" class="btn-action btn-carte">
-                    🗺️ Voir les centres de santé proches
-                </a>
-                {% endif %}
-
-                <a href="{% url 'triage' %}" class="btn-action btn-nouveau">
-                    🔄 Nouveau triage
-                </a>
-                <a href="{% url 'dashboard' %}" class="btn-action btn-dashboard">
-                    🏠 Retour au dashboard
-                </a>
-            </div>
-
-            <!-- Questions suggérées -->
-            <div class="action-card p-4">
-                <h6 class="fw-bold mb-3" style="color:#004d40;">💬 Questions fréquentes</h6>
-                <div class="d-flex flex-column gap-2">
-                    <button class="btn btn-outline-success btn-sm rounded-pill text-start"
-                            onclick="poserQuestion('Quels médicaments puis-je donner à mon enfant ?')">
-                        💊 Quels médicaments donner ?
-                    </button>
-                    <button class="btn btn-outline-success btn-sm rounded-pill text-start"
-                            onclick="poserQuestion('Comment hydrater mon enfant ?')">
-                        💧 Comment hydrater mon enfant ?
-                    </button>
-                    <button class="btn btn-outline-success btn-sm rounded-pill text-start"
-                            onclick="poserQuestion('Quand dois-je aller aux urgences ?')">
-                        🏥 Quand aller aux urgences ?
-                    </button>
-                    <button class="btn btn-outline-success btn-sm rounded-pill text-start"
-                            onclick="poserQuestion('Comment surveiller mon enfant cette nuit ?')">
-                        🌙 Surveillance cette nuit ?
-                    </button>
-                </div>
-            </div>
-
-        </div>
+<div class="container page-body">
+  <div class="level-card level-{{ niveau }}" style="margin-bottom:20px;">
+    <div class="big">
+      {% if niveau == 'rouge' %}🚨{% elif niveau == 'jaune' %}⚠️{% else %}✅{% endif %}
     </div>
+    <h2>
+      {% if niveau == 'rouge' %}Urgence immédiate
+      {% elif niveau == 'jaune' %}Consultation recommandée
+      {% else %}Situation stable{% endif %}
+    </h2>
+    <p>{{ message }}</p>
+  </div>
+
+  <div class="grid2" style="align-items:start;">
+    <div class="panel" style="padding:0;">
+      <div class="chat-card">
+        <div class="chat-header">
+          <h5>🤖 Assistant SIB Intelligence</h5>
+          <small style="opacity:.8;">Posez vos questions sur l'état de {{ enfant.prenom }}</small>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="message bot">
+            <div class="message-name">SIB Intelligence</div>
+            <div class="message-bubble">
+              Bonjour ! J'ai analysé les symptômes de <strong>{{ enfant.prenom }}</strong> ({{ age_mois }} mois).
+              {% if niveau == 'rouge' %}
+                Le résultat indique une <strong>urgence médicale</strong>. Consultez un médecin immédiatement. Je suis là pour vous aider en attendant.
+              {% elif niveau == 'jaune' %}
+                Je recommande une <strong>consultation dans les 24–48h</strong>. Posez-moi vos questions en attendant.
+              {% else %}
+                L'état de votre enfant semble <strong>stable</strong>. Je peux vous donner des conseils pour le suivi à domicile.
+              {% endif %}
+            </div>
+          </div>
+          <div class="typing" id="typing"><span></span><span></span><span></span></div>
+        </div>
+        <div class="chat-input-area">
+          <div style="display:flex;gap:10px;">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Posez votre question...">
+            <button class="btn-send" onclick="envoyerMessage()">Envoyer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>🎯 Actions recommandées</h3>
+      <div class="sub">Selon le niveau de gravité</div>
+      {% if niveau == 'rouge' or niveau == 'jaune' %}
+        <a class="btn btn-amber btn-block" style="margin-bottom:10px;" href="{% url 'sante:carte' %}">🗺️ Voir les centres de santé proches</a>
+      {% endif %}
+      <a class="btn btn-primary btn-block" style="margin-bottom:10px;" href="{% url 'sib:triage' %}">🔄 Nouveau triage</a>
+      <a class="btn btn-ghost btn-block" href="{% url 'accounts:dashboard' %}">🏠 Retour au tableau de bord</a>
+
+      <hr style="border-color:var(--line);margin:20px 0;">
+      <h3>💬 Questions fréquentes</h3>
+      <div class="sub">Cliquez pour poser la question</div>
+      <div style="display:grid;gap:8px;">
+        <button class="btn btn-ghost btn-sm" style="text-align:left;" onclick="poserQuestion('Quels médicaments puis-je donner à mon enfant ?')">💊 Quels médicaments donner ?</button>
+        <button class="btn btn-ghost btn-sm" style="text-align:left;" onclick="poserQuestion('Comment hydrater mon enfant ?')">💧 Comment hydrater mon enfant ?</button>
+        <button class="btn btn-ghost btn-sm" style="text-align:left;" onclick="poserQuestion('Quand dois-je aller aux urgences ?')">🏥 Quand aller aux urgences ?</button>
+        <button class="btn btn-ghost btn-sm" style="text-align:left;" onclick="poserQuestion('Comment surveiller mon enfant cette nuit ?')">🌙 Surveillance cette nuit ?</button>
+      </div>
+    </div>
+  </div>
 </div>
+{% endblock %}
 
-<footer>
-    <p>© 2026 Santé Infantile Bénin — <strong>SIB Intelligence</strong></p>
-    <p>📧 <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a></p>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}
 <script>
-    const contexte = {{ contexte|safe }};
-    const chatMessages = document.getElementById('chatMessages');
-    const chatInput = document.getElementById('chatInput');
-    const typing = document.getElementById('typing');
+  const contexte = {{ contexte|safe }};
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const typing = document.getElementById('typing');
 
-    function ajouterMessage(texte, type) {
-        const div = document.createElement('div');
-        div.className = `message ${type}`;
-        div.innerHTML = `
-            <div class="message-name">${type === 'bot' ? 'SIB Intelligence' : 'Vous'}</div>
-            <div class="message-bubble">${texte}</div>
-        `;
-        chatMessages.insertBefore(div, typing);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+  function ajouterMessage(texte, type) {
+    const div = document.createElement('div');
+    div.className = 'message ' + type;
+    div.innerHTML =
+      '<div class="message-name">' + (type === 'bot' ? 'SIB Intelligence' : 'Vous') + '</div>' +
+      '<div class="message-bubble">' + texte + '</div>';
+    chatMessages.insertBefore(div, typing);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function poserQuestion(question) { chatInput.value = question; envoyerMessage(); }
+
+  async function envoyerMessage() {
+    const message = chatInput.value.trim();
+    if (!message) return;
+    ajouterMessage(message, 'user');
+    chatInput.value = '';
+    typing.style.display = 'block';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+      const response = await fetch('{% url "sib:sib_chat" %}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+        body: JSON.stringify({ message, contexte })
+      });
+      const data = await response.json();
+      typing.style.display = 'none';
+      if (data.status === 'ok') ajouterMessage(data.reponse, 'bot');
+      else ajouterMessage('❌ Erreur : ' + data.reponse, 'bot');
+    } catch (error) {
+      typing.style.display = 'none';
+      ajouterMessage('❌ Erreur de connexion. Réessayez.', 'bot');
     }
+  }
 
-    function poserQuestion(question) {
-        chatInput.value = question;
-        envoyerMessage();
-    }
-
-    async function envoyerMessage() {
-        const message = chatInput.value.trim();
-        if (!message) return;
-
-        ajouterMessage(message, 'user');
-        chatInput.value = '';
-        typing.style.display = 'block';
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        try {
-            const response = await fetch('{% url "sib_chat" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                },
-                body: JSON.stringify({ message, contexte })
-            });
-
-            const data = await response.json();
-            typing.style.display = 'none';
-
-            if (data.status === 'ok') {
-                ajouterMessage(data.reponse, 'bot');
-            } else {
-                ajouterMessage('❌ Erreur : ' + data.reponse, 'bot');
-            }
-        } catch (error) {
-            typing.style.display = 'none';
-            ajouterMessage('❌ Erreur de connexion. Réessayez.', 'bot');
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
         }
+      }
     }
+    return cookieValue;
+  }
 
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    chatInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') envoyerMessage();
-    });
+  chatInput.addEventListener('keypress', function (e) { if (e.key === 'Enter') envoyerMessage(); });
 </script>
-</body>
-</html>
+{% endblock %}

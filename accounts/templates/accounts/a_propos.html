@@ -1,52 +1,46 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>À propos — Santé Infantile Bénin</title>
-  <meta name="description" content="SOSSA G. M. Darius — infirmier spécialisé en puériculture et développeur web. Découvrez le projet Santé Infantile Bénin et mes prestations freelance.">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .hero { padding: 3rem 1rem; }
-    .photo-portrait { max-width: 220px; border-radius:8px; }
-  </style>
-</head>
-<body class="bg-white text-dark">
-<nav class="navbar navbar-light bg-white shadow-sm">
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}À propos — Santé Infantile Bénin{% endblock %}
+
+{% block content %}
+<div class="page-head">
   <div class="container">
-    <a class="navbar-brand" href="/"><img src="{% static 'images/logo.png' %}" alt="SIB" style="height:48px;"></a>
-    <ul class="nav">
-      <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
-    </ul>
+    <h1>À propos</h1>
+    <p>Mon parcours, mon expertise et mes prestations freelance.</p>
   </div>
-</nav>
+</div>
 
-<main class="container hero">
-  <div class="row align-items-center">
-    <div class="col-md-6">
-      <h1 class="text-success">À propos — Santé Infantile Bénin</h1>
-      <p class="lead text-muted">Je suis SOSSA Gninazé Mingnissê Darius, infirmier diplômé d'État, spécialisé en puériculture et pédiatrie, et développeur web freelance. J'ai créé SIB pour offrir aux parents des ressources fiables et des outils pratiques.</p>
+<div class="container page-body">
+  <div class="grid2" style="align-items:start;">
+    <div class="panel" style="text-align:center;">
+      <div class="portrait" style="margin:0 auto 18px;"><img src="{% static 'img/photo-darius.jpg' %}" alt="SOSSA G. M. Darius"></div>
+      <h3 style="font-size:1.3rem;">SOSSA Gninazé Mingnissê Darius</h3>
+      <div class="sub" style="margin:0;">Infirmier d'État · Puériculture &amp; pédiatrie · Développeur web</div>
+      <div class="skills" style="justify-content:center;margin-top:16px;">
+        <span class="skill" style="background:var(--teal-100);color:var(--teal-800);border-color:transparent;">🏥 Soins infirmiers</span>
+        <span class="skill" style="background:var(--teal-100);color:var(--teal-800);border-color:transparent;">👶 Pédiatrie</span>
+        <span class="skill" style="background:var(--amber-light);color:var(--amber-dark);border-color:transparent;">💻 Web</span>
+      </div>
+    </div>
 
-      <h5>Mon parcours</h5>
-      <p class="text-muted">Formation infirmière, expérience en maternité et pédiatrie, puis formation et missions en développement web. J'allie expertise clinique et compétences techniques pour concevoir des services numériques centrés sur la santé infantile.</p>
+    <div class="panel">
+      <h3>Mon parcours</h3>
+      <p style="font-size:.93rem;color:var(--muted);margin-bottom:16px;">
+        Formation infirmière, expérience en maternité et pédiatrie, puis formation et missions en développement web.
+        J'allie expertise clinique et compétences techniques pour concevoir des services numériques centrés sur la santé infantile.
+      </p>
 
-      <h5>Ce que je propose</h5>
-      <ul class="text-muted">
+      <h3>Ce que je propose</h3>
+      <ul style="color:var(--muted);font-size:.93rem;padding-left:20px;display:grid;gap:8px;margin-bottom:18px;">
         <li>Conseils et guides de puériculture</li>
-        <li>Implémentation de sites & outils santé (confidentialité & RGPD)</li>
-        <li>Intégration d'outils de triage, calendriers vaccinaux et prises de RDV</li>
+        <li>Sites &amp; outils santé (confidentialité, RGPD)</li>
+        <li>Outils de triage, calendriers vaccinaux, prise de RDV</li>
+        <li>Plateformes web sur mesure</li>
       </ul>
 
-      <p class="mt-3">
-        <a class="btn btn-success" href="mailto:sante.infantile.benin@gmail.com">Me contacter pour un projet</a>
-      </p>
-    </div>
-
-    <div class="col-md-6 text-center">
-      <img src="{% static 'images/photo_bios.png' %}" alt="Photo" class="photo-portrait img-fluid">
+      <a class="btn btn-amber" href="mailto:sante.infantile.benin@gmail.com">✉️ Me contacter pour un projet</a>
     </div>
   </div>
-</main>
-
-</body>
-</html>
+</div>
+{% endblock %}

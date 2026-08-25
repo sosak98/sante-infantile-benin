@@ -1,0 +1,29 @@
+# Render Blueprint — déploiement en 1 clic de Santé Infantile Bénin
+# Voir https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: sante-infantile-benin
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python manage.py migrate && python manage.py collectstatic --noinput && gunicorn santeinfantile.wsgi --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GROQ_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sante-infantile-db
+          property: connectionString
+
+databases:
+  - name: sante-infantile-db
+    plan: free
