@@ -23,8 +23,8 @@ def manifest(request):
         'scope': base + '/',
         'display': 'standalone',
         'orientation': 'portrait',
-        'background_color': '#004d40',
-        'theme_color': '#004d40',
+        'background_color': '#ffffff',
+        'theme_color': '#ffffff',
         'icons': [
             {'src': full('img/icons/icon-192.png'), 'sizes': '192x192', 'type': 'image/png', 'purpose': 'any'},
             {'src': full('img/icons/icon-512.png'), 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any'},
@@ -36,7 +36,7 @@ def manifest(request):
 
 SW_JS = """
 // Santé Infantile Bénin — Service Worker (PWA)
-const CACHE = 'sib-cache-v3';
+const CACHE = 'sib-cache-v4';
 const CORE = [
   '/',
   '/static/css/sib.css',

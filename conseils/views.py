@@ -1,9 +1,23 @@
 from datetime import date
+from types import SimpleNamespace
 from django.shortcuts import render, get_object_or_404
 from .models import Vaccin, ConseilNutritionnel
 from .pev import planifier
+from .seed_data import CONSEILS
 from enfants.models import Enfant, VaccinRecu
 from accounts.models import Parent
+
+
+def _conseils_affichables(qs, age_mois=None, categorie='tous'):
+    """Si la base est vide (Render sans seed), on affiche les conseils OMS du fichier."""
+    if qs is not None and qs.exists():
+        return list(qs)
+    items = CONSEILS
+    if age_mois is not None:
+        items = [c for c in items if c['age_min_mois'] <= age_mois <= c['age_max_mois']]
+    if categorie and categorie != 'tous':
+        items = [c for c in items if c['categorie'] == categorie]
+    return [SimpleNamespace(**c) for c in items]
 
 
 def calendrier_vaccinal(request):
@@ -37,6 +51,7 @@ def conseils_nutritionnels(request):
         )
         if categorie != 'tous':
             conseils = conseils.filter(categorie=categorie)
+        conseils = _conseils_affichables(conseils, age_mois, categorie)
     else:
         if len(enfants) == 1:
             e = enfants[0]
@@ -46,8 +61,9 @@ def conseils_nutritionnels(request):
                 age_min_mois__lte=age_mois,
                 age_max_mois__gte=age_mois,
             )
+            conseils = _conseils_affichables(conseils, age_mois, 'tous')
         else:
-            conseils = ConseilNutritionnel.objects.all()
+            conseils = _conseils_affichables(ConseilNutritionnel.objects.all(), None, 'tous')
             age_mois = None
         categorie = 'tous'
 
