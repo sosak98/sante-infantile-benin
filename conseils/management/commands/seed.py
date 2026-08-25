@@ -15,8 +15,12 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"✅ {len(VACCINS)} vaccins ajoutés."))
 
         # Conseils nutritionnels
-        if ConseilNutritionnel.objects.exists():
-            self.stdout.write(self.style.WARNING(f"Conseils : déjà {ConseilNutritionnel.objects.count()} présents, ignoré."))
-        else:
-            ConseilNutritionnel.objects.bulk_create([ConseilNutritionnel(**c) for c in CONSEILS])
-            self.stdout.write(self.style.SUCCESS(f"✅ {len(CONSEILS)} conseils nutritionnels ajoutés."))
+        n = 0
+        for c in CONSEILS:
+            _, created = ConseilNutritionnel.objects.get_or_create(
+                titre=c['titre'],
+                defaults=c,
+            )
+            if created:
+                n += 1
+        self.stdout.write(self.style.SUCCESS(f"Conseils : {n} ajoutés, total {ConseilNutritionnel.objects.count()}."))

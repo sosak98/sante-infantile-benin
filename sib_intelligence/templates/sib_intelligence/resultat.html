@@ -7,7 +7,7 @@
   .chat-card { border-radius: var(--radius); box-shadow: var(--shadow-sm); border:1px solid var(--line); overflow:hidden; background:#fff; }
   .chat-header { background: linear-gradient(135deg, var(--teal-800), var(--teal-600)); color: #fff; padding: 16px 22px; }
   .chat-header h5 { margin: 0; font-weight: 800; }
-  .chat-messages { height: 380px; overflow-y: auto; padding: 20px; background: #f8fffe; }
+  .chat-messages { height: min(62vh, 520px); overflow-y: auto; padding: 20px; background: #f8fffe; }
   .message { margin-bottom: 15px; display: flex; flex-direction: column; }
   .message.bot { align-items: flex-start; }
   .message.user { align-items: flex-end; }
@@ -93,15 +93,14 @@
       <a class="btn btn-ghost btn-block" href="{% url 'accounts:register' %}">Créer un compte pour garder le suivi</a>
       {% endif %}
 
-      <hr style="border-color:var(--line);margin:20px 0;">
-      <h3>💬 Questions fréquentes</h3>
-      <div class="sub">Cliquez pour poser la question</div>
-      <div style="display:grid;gap:8px;">
-        <button class="btn btn-ghost btn-sm" style="text-align:left;" onclick="poserQuestion('Quels médicaments puis-je donner à mon enfant ?')">💊 Quels médicaments donner ?</button>
-        <button class="btn btn-ghost btn-sm" style="text-align:left;" onclick="poserQuestion('Comment hydrater mon enfant ?')">💧 Comment hydrater mon enfant ?</button>
-        <button class="btn btn-ghost btn-sm" style="text-align:left;" onclick="poserQuestion('Quand dois-je aller aux urgences ?')">🏥 Quand aller aux urgences ?</button>
-        <button class="btn btn-ghost btn-sm" style="text-align:left;" onclick="poserQuestion('Comment surveiller mon enfant cette nuit ?')">🌙 Surveillance cette nuit ?</button>
-      </div>
+      <details style="margin-top:16px;">
+        <summary style="cursor:pointer;font-weight:800;color:var(--teal-800);">Questions fréquentes</summary>
+        <div style="display:grid;gap:8px;margin-top:10px;">
+          <button class="btn btn-ghost btn-sm" style="text-align:left;" type="button" onclick="poserQuestion('Comment hydrater mon enfant ?')">Comment hydrater mon enfant ?</button>
+          <button class="btn btn-ghost btn-sm" style="text-align:left;" type="button" onclick="poserQuestion('Quand dois-je aller aux urgences ?')">Quand aller aux urgences ?</button>
+          <button class="btn btn-ghost btn-sm" style="text-align:left;" type="button" onclick="poserQuestion('Comment surveiller mon enfant cette nuit ?')">Surveillance cette nuit ?</button>
+        </div>
+      </details>
     </div>
   </div>
 </div>

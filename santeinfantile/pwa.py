@@ -36,7 +36,7 @@ def manifest(request):
 
 SW_JS = """
 // Santé Infantile Bénin — Service Worker (PWA)
-const CACHE = 'sib-cache-v1';
+const CACHE = 'sib-cache-v3';
 const CORE = [
   '/',
   '/static/css/sib.css',

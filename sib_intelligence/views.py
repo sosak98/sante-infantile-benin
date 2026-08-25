@@ -131,9 +131,10 @@ Règles importantes :
 4. Donne des conseils pratiques adaptés au contexte béninois
 5. Ne pose pas de diagnostic médical définitif
 6. Reste simple et compréhensible pour des parents non-médecins
-7. Limite tes réponses à 150 mots maximum
-8. Si convulsions, insiste fortement sur l'urgence
-9. Si MUAC ou IMC indique une malnutrition, donne des conseils nutritionnels adaptés"""
+7. Réponds en phrases courtes et COMPLÈTES. Pas de markdown : pas d'astérisques, pas de dièses, pas de tableaux.
+8. Si tu listes, utilise des tirets simples et une ligne par idée.
+9. Si convulsions, insiste fortement sur l'urgence (112).
+10. Si MUAC ou IMC indique une malnutrition, donne des conseils nutritionnels adaptés."""
 
     return system_prompt
 
@@ -253,8 +254,8 @@ def chat(request):
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": message_user}
                 ],
-                max_tokens=300,
-                temperature=0.7,
+                max_tokens=700,
+                temperature=0.4,
             )
             reponse = completion.choices[0].message.content
 

@@ -37,14 +37,18 @@ def conseils_nutritionnels(request):
         )
         if categorie != 'tous':
             conseils = conseils.filter(categorie=categorie)
-    elif len(enfants) == 1:
-        e = enfants[0]
-        today = date.today()
-        age_mois = (today.year - e.date_naissance.year) * 12 + (today.month - e.date_naissance.month)
-        conseils = ConseilNutritionnel.objects.filter(
-            age_min_mois__lte=age_mois,
-            age_max_mois__gte=age_mois,
-        )
+    else:
+        if len(enfants) == 1:
+            e = enfants[0]
+            today = date.today()
+            age_mois = (today.year - e.date_naissance.year) * 12 + (today.month - e.date_naissance.month)
+            conseils = ConseilNutritionnel.objects.filter(
+                age_min_mois__lte=age_mois,
+                age_max_mois__gte=age_mois,
+            )
+        else:
+            conseils = ConseilNutritionnel.objects.all()
+            age_mois = None
         categorie = 'tous'
 
     return render(request, 'conseils/nutrition.html', {

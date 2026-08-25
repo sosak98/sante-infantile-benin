@@ -77,19 +77,30 @@ def dashboard(request):
     parent = getattr(user, 'parent', None)
     children = Enfant.objects.filter(parent=parent) if parent else Enfant.objects.none()
 
-    now_local = timezone.localtime(timezone.now())
-    hour = now_local.hour
-    salutation = "Bonjour" if 5 <= hour < 12 else ("Bon après-midi" if 12 <= hour < 18 else "Bonsoir")
-
     prenom = ''
     if parent:
         prenom = parent.prenom or user.first_name or ''
+    greeting = f"Bienvenue, {prenom}".strip() if prenom else "Bienvenue"
+
+    recus = VaccinRecu.objects.filter(enfant__in=children).count()
+    a_venir = 0
+    today = date.today()
+    for enfant in children:
+        recus_map = {
+            v.nom_vaccin: v.date_reelle
+            for v in VaccinRecu.objects.filter(enfant=enfant)
+        }
+        for ligne in planifier(enfant.date_naissance, recus_map, today):
+            if ligne['statut'] in ('A venir', "Aujourd_hui", 'En retard'):
+                a_venir += 1
 
     context = {
-        'greeting': f"{salutation} {prenom}".strip(),
+        'greeting': greeting,
         'parent': parent,
         'children_count': children.count(),
         'children_sample': list(children[:3]),
+        'vaccins_recus_count': recus,
+        'vaccins_a_venir_count': a_venir,
     }
     return render(request, 'accounts/dashboard.html', context)
 

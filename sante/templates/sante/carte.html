@@ -19,24 +19,19 @@
     <div class="map-wrap">
       <div id="map"></div>
     </div>
-    <div style="padding:16px 20px;">
+    <div style="padding:10px 14px 14px;">
       <div class="map-legend">
         <span>🏥 Centre</span><span>💊 Pharmacie</span><span>🏨 Hôpital</span><span>⭐ Ma position</span>
       </div>
-      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
-        <button class="btn btn-primary" id="localiserBtn">📍 Me localiser</button>
-        <button class="btn btn-ghost" id="osmBtn">🔄 Charger établissements proches</button>
+      <div class="map-stats" style="display:flex;gap:12px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin:8px 0 10px;">
+        <span><b id="countCentres">0</b> centres</span>
+        <span><b id="countPharmacies">0</b> pharmacies</span>
+        <span><b id="countHopitaux">0</b> hôpitaux</span>
       </div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <h3>Statistiques</h3>
-    <div class="sub">Établissements affichés sur la carte</div>
-    <div class="grid3">
-      <div class="step"><div class="num" id="countCentres">0</div><p>Centres</p></div>
-      <div class="step"><div class="num" id="countPharmacies">0</div><p>Pharmacies</p></div>
-      <div class="step"><div class="num" id="countHopitaux">0</div><p>Hôpitaux</p></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" id="localiserBtn">Me localiser</button>
+        <button class="btn btn-ghost btn-sm" id="osmBtn">Centres proches</button>
+      </div>
     </div>
   </div>
 </div>
@@ -61,11 +56,12 @@
   var countCentres = 0, countPharmacies = 0, countHopitaux = 0;
 
   function getIcon(type) {
-    var color = (type === 'hopital' || type === 'hopital_zone') ? '#1565c0' : (type === 'pharmacie' ? '#e65100' : '#00796b');
-    var letter = (type === 'pharmacie') ? 'P' : ((type === 'hopital' || type === 'hopital_zone') ? 'H' : 'C');
+    var emoji = '🏥';
+    if (type === 'pharmacie') emoji = '💊';
+    else if (type === 'hopital' || type === 'hopital_zone') emoji = '🏨';
     return L.divIcon({
-      html: '<div style="background:' + color + ';color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;border:3px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.3);">' + letter + '</div>',
-      className: '', iconSize: [36, 36], popupAnchor: [0, -18]
+      html: '<div style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));">' + emoji + '</div>',
+      className: '', iconSize: [22, 22], iconAnchor: [11, 11], popupAnchor: [0, -12]
     });
   }
 

@@ -203,7 +203,7 @@ section { padding: 60px 0; }
 
 /* Carte */
 .map-wrap { position: relative; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); }
-#map { height: 70vh; width: 100%; }
+#map { height: 72vh; width: 100%; min-height: 320px; }
 .map-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; font-size: .85rem; color: var(--muted); }
 
 /* ------------------------------------------------------------------ Auth */
