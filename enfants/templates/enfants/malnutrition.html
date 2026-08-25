@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Dépistage de la malnutrition — Santé Infantile Bénin{% endblock %}
+{% block title %}Dépistage de la malnutrition - Santé Infantile Bénin{% endblock %}
 
 {% block content %}
 <div class="page-head">
@@ -15,9 +15,9 @@
     <h3>📏 Guide MUAC (Périmètre brachial)</h3>
     <div class="sub">Mesuré au milieu du bras gauche avec un ruban de mesure.</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <span class="badge-pill badge-danger">🔴 &lt; 11,5 cm — Malnutrition sévère</span>
-      <span class="badge-pill badge-warn">🟠 11,5 – 12,5 cm — Malnutrition modérée</span>
-      <span class="badge-pill badge-ok">🟢 &gt; 12,5 cm — Normal</span>
+      <span class="badge-pill badge-danger">🔴 &lt; 11,5 cm - Malnutrition sévère</span>
+      <span class="badge-pill badge-warn">🟠 11,5 - 12,5 cm - Malnutrition modérée</span>
+      <span class="badge-pill badge-ok">🟢 &gt; 12,5 cm - Normal</span>
     </div>
   </div>
 
@@ -37,7 +37,7 @@
         </div>
         <div class="grid2">
           <div class="field"><label>📏 Taille (cm)</label><input type="number" name="taille" class="form-control" step="0.1" min="0" placeholder="Ex : 72" required></div>
-          <div class="field"><label>📐 MUAC — périmètre brachial (cm, optionnel)</label><input type="number" name="muac" class="form-control" step="0.1" min="0" placeholder="Ex : 13,5"></div>
+          <div class="field"><label>📐 MUAC - périmètre brachial (cm, optionnel)</label><input type="number" name="muac" class="form-control" step="0.1" min="0" placeholder="Ex : 13,5"></div>
         </div>
         <button type="submit" class="btn btn-primary btn-block">🔍 Vérifier l'état nutritionnel</button>
       </form>

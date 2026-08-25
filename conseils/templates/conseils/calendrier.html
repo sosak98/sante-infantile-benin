@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Calendrier vaccinal — Santé Infantile Bénin{% endblock %}
+{% block title %}Calendrier vaccinal - Santé Infantile Bénin{% endblock %}
 
 {% block content %}
 <div class="page-head">
   <div class="container">
-    <h1>💉 Calendrier vaccinal — PEV Bénin</h1>
+    <h1>💉 Calendrier vaccinal - PEV Bénin</h1>
     <p>Programme Élargi de Vaccination du Bénin, de la naissance à 5 ans.</p>
   </div>
 </div>
@@ -16,7 +16,7 @@
       <h3 style="margin:0;">📅 Calculateur de RDV personnalisé</h3>
       <div class="sub" style="margin:0;">Obtenez un planning vaccinal avec les dates exactes de chaque rendez-vous.</div>
     </div>
-    <a class="btn btn-primary" href="{% url 'conseils:calculer_rdv' %}">📅 Calculer mes RDV →</a>
+    <a class="btn btn-primary" href="{% url 'conseils:calculer_rdv' %}">📅 Calculer mes RDV</a>
   </div>
 
   <div class="panel" style="padding:0;">
@@ -32,7 +32,7 @@
             <tr>
               <td><span class="tag">{{ vaccin.age_affichage }}</span></td>
               <td><strong>{{ vaccin.nom }}</strong></td>
-              <td>{{ vaccin.description|default:"—" }}</td>
+              <td>{{ vaccin.description|default:"-" }}</td>
               <td>
                 {% if vaccin.obligatoire %}
                   <span class="badge-pill badge-ok" style="font-size:.72rem;">Obligatoire</span>

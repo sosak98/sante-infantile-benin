@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Conseils nutritionnels — Santé Infantile Bénin{% endblock %}
+{% block title %}Conseils nutritionnels - Santé Infantile Bénin{% endblock %}
 
 {% block content %}
 <div class="page-head">
@@ -55,7 +55,7 @@
               {% endif %}
             </div>
             <p style="color:var(--muted);font-size:.95rem;margin:0 0 8px;">{{ conseil.contenu }}</p>
-            <span class="tag" style="font-size:.72rem;">📅 {{ conseil.age_min_mois }} – {{ conseil.age_max_mois }} mois</span>
+            <span class="tag" style="font-size:.72rem;">📅 {{ conseil.age_min_mois }} - {{ conseil.age_max_mois }} mois</span>
           </div>
         {% endfor %}
 

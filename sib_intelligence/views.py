@@ -12,6 +12,7 @@ from enfants.models import Enfant
 
 # Initialisation du client Groq (optionnelle : l'IA est désactivée si la clé est absente)
 GROQ_API_KEY = os.getenv('GROQ_API_KEY') or getattr(settings, 'GROQ_API_KEY', '')
+GROQ_MODEL = os.getenv('GROQ_MODEL') or getattr(settings, 'GROQ_MODEL', 'llama-3.3-70b-versatile')
 client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 
@@ -92,7 +93,7 @@ def calculer_score_triage(symptomes, poids=None, taille=None, muac=None):
 
     # Classification
     if score >= 6:
-        return 'rouge', '🔴 Urgence immédiate — Consultez un médecin maintenant !', score
+        return 'rouge', '🔴 Urgence immédiate : consultez un médecin maintenant !', score
     elif score >= 3:
         return 'jaune', '🟡 Consultation recommandée dans les 24-48h', score
     else:
@@ -235,7 +236,7 @@ def chat(request):
             )
 
             completion = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model=GROQ_MODEL,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": message_user}
@@ -253,12 +254,17 @@ def chat(request):
                 'reponse': reponse,
                 'status': 'ok',
                 'suggestion': suggestion,
-                'message_bref': contexte.get('message', '').split('—')[0] if contexte.get('message') else ''
             })
 
         except json.JSONDecodeError:
             return JsonResponse({'reponse': 'Format de message invalide', 'status': 'error'}, status=400)
         except Exception as e:
-            return JsonResponse({'reponse': 'Erreur technique. Veuillez réessayer.', 'status': 'error'}, status=500)
+            import logging
+            logging.getLogger(__name__).exception('Erreur chat IA')
+            return JsonResponse({
+                'reponse': f'Erreur technique de l\'assistant. Détail : {type(e).__name__}. '
+                           f'Vérifiez que la clé GROQ_API_KEY est valide et que le modèle "{GROQ_MODEL}" existe.',
+                'status': 'error',
+            }, status=500)
 
     return JsonResponse({'error': 'Méthode non autorisée'}, status=405)

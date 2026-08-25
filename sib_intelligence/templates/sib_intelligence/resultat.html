@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Résultat du triage — Santé Infantile Bénin{% endblock %}
+{% block title %}Résultat du triage - Santé Infantile Bénin{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -31,7 +31,7 @@
 <div class="page-head">
   <div class="container">
     <h1>Résultat du triage</h1>
-    <p>Analyse pour {{ enfant.prenom }} — {{ age_mois }} mois.</p>
+    <p>Analyse pour {{ enfant.prenom }} - {{ age_mois }} mois.</p>
   </div>
 </div>
 
@@ -63,7 +63,7 @@
               {% if niveau == 'rouge' %}
                 Le résultat indique une <strong>urgence médicale</strong>. Consultez un médecin immédiatement. Je suis là pour vous aider en attendant.
               {% elif niveau == 'jaune' %}
-                Je recommande une <strong>consultation dans les 24–48h</strong>. Posez-moi vos questions en attendant.
+                Je recommande une <strong>consultation dans les 24-48h</strong>. Posez-moi vos questions en attendant.
               {% else %}
                 L'état de votre enfant semble <strong>stable</strong>. Je peux vous donner des conseils pour le suivi à domicile.
               {% endif %}

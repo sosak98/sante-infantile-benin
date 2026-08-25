@@ -148,6 +148,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ---------------------------------------------------------------------------
 # Assistant IA de triage (Groq)
 GROQ_API_KEY = config('GROQ_API_KEY', default='')
+GROQ_MODEL = config('GROQ_MODEL', default='llama-3.3-70b-versatile')
 
 # SMS / OTP (Twilio — optionnel en attendant WhatsApp Business)
 TWILIO_ACCOUNT_SID = config('TWILIO_ACCOUNT_SID', default='')

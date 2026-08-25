@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Triage pédiatrique IA — Santé Infantile Bénin{% endblock %}
+{% block title %}Triage pédiatrique IA - Santé Infantile Bénin{% endblock %}
 
 {% block content %}
 <div class="page-head">
@@ -28,7 +28,7 @@
             {% for enfant in enfants %}
               <option value="{{ enfant.id }}">{{ enfant.prenom }} {{ enfant.nom }} ({{ enfant.date_naissance|date:"d/m/Y" }})</option>
             {% empty %}
-              <option value="">Aucun enfant — ajoutez-en un d'abord</option>
+              <option value="">Aucun enfant - ajoutez-en un d'abord</option>
             {% endfor %}
           </select>
         </div>
@@ -100,7 +100,7 @@
       <div class="sub">Un score clinique oriente la gravité</div>
       <div style="display:grid;gap:12px;">
         <div class="level-card level-vert"><div class="big">🟢</div><h2>Vert</h2><p>Conseils à domicile suffisants</p></div>
-        <div class="level-card level-jaune"><div class="big">🟡</div><h2>Jaune</h2><p>Consultation sous 24–48h</p></div>
+        <div class="level-card level-jaune"><div class="big">🟡</div><h2>Jaune</h2><p>Consultation sous 24-48h</p></div>
         <div class="level-card level-rouge"><div class="big">🔴</div><h2>Rouge</h2><p>Urgence immédiate</p></div>
       </div>
     </div>

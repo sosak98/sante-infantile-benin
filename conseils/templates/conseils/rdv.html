@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Calculateur de RDV vaccinaux — Santé Infantile Bénin{% endblock %}
+{% block title %}Calculateur de RDV vaccinaux - Santé Infantile Bénin{% endblock %}
 
 {% block content %}
 <div class="page-head">
@@ -48,7 +48,7 @@
           {% for rdv in resultats %}
             <div class="tl-item {% if rdv.statut == 'Recu' %}ok{% elif rdv.statut == 'En retard' %}late{% elif rdv.statut == 'Aujourd_hui' %}next{% endif %}">
               <div class="t">{{ rdv.nom }}</div>
-              <div class="d">📅 {{ rdv.date_prevue|date:"d/m/Y" }} — {{ rdv.statut }}</div>
+              <div class="d">📅 {{ rdv.date_prevue|date:"d/m/Y" }} - {{ rdv.statut }}</div>
             </div>
           {% endfor %}
         </div>

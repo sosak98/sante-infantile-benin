@@ -1,6 +1,6 @@
 /* ==========================================================================
    Santé Infantile Bénin — Design system
-   Palette teal médicale (#004d40 → #00796b) + accent ambre (#e0a000)
+   Palette teal médicale (#004d40 vers #00796b) + accent ambre (#e0a000)
    ========================================================================== */
 
 :root {
@@ -244,15 +244,16 @@ section { padding: 60px 0; }
   .about .skills { justify-content: center; }
   .foot-grid { grid-template-columns: 1fr; }
   .grid3 { grid-template-columns: 1fr; }
-  .sib-nav .nav-links, .sib-nav .nav-cta { display: none; }
+  .sib-nav .nav-links { display: none; }
   .sib-nav .nav-toggler { display: block; }
+  .sib-brand span { display: none; }
+  .sib-nav .nav-cta { gap: 6px; }
+  .sib-nav .nav-cta .btn { padding: 8px 11px; font-size: .8rem; }
   .sib-nav.open .nav-links {
     display: flex; flex-direction: column; position: absolute; top: 68px; left: 0; right: 0;
     background: #fff; padding: 16px 20px; gap: 14px; border-bottom: 1px solid var(--line);
     box-shadow: var(--shadow-md);
   }
-  .sib-nav.open .nav-cta { display: flex; flex-direction: column; padding: 0 20px 16px; }
-  .sib-nav.open .nav-cta .btn { width: 100%; }
 }
 @media (max-width: 560px) {
   .tools, .steps, .grid2 { grid-template-columns: 1fr; }

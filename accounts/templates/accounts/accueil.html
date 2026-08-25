@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Santé Infantile Bénin — Suivi, vaccination et conseils pour parents{% endblock %}
+{% block title %}Santé Infantile Bénin - Suivi, vaccination et conseils pour parents{% endblock %}
 
 {% block content %}
 
@@ -11,9 +11,9 @@
     <div>
       <span class="eyebrow">🧑‍⚕️ Par un infirmier-puériculteur · Développeur web</span>
       <h1>La santé de votre enfant,<br><span class="grad">suivie simplement</span> au Bénin.</h1>
-      <p class="lead">Vaccination, nutrition, dépistage de la malnutrition et triage pédiatrique assisté par IA — tous les outils fiables dont un parent a besoin, réunis au même endroit.</p>
+      <p class="lead">Vaccination, nutrition, dépistage de la malnutrition et triage assisté par IA. J'ai regroupé ici tout ce qui sert vraiment aux parents, sans jargon médical.</p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="{% url 'accounts:register' %}">Commencer gratuitement →</a>
+        <a class="btn btn-primary" href="{% url 'accounts:register' %}">Commencer gratuitement</a>
         <a class="btn btn-ghost" href="#outils">Découvrir les outils</a>
       </div>
       <div class="hero-proof">
@@ -40,7 +40,7 @@
           <div class="gauge"><i></i></div>
           <div class="status-pill"><span class="ic">✓</span> État nutritionnel normal</div>
           <div class="row-item">💉 Prochain RDV vaccinal <b>3 sept.</b></div>
-          <div class="row-item">🥣 Conseil : diversification <b>voir →</b></div>
+          <div class="row-item">🥣 Conseil : diversification <b>voir</b></div>
         </div>
       </div>
       <div class="float-card fc1">🛡️ <span>Rappel vaccin dans 3 jours</span></div>
@@ -54,8 +54,8 @@
   <div class="container">
     <div class="sec-head">
       <span class="eyebrow">Nos outils</span>
-      <h2>Tout ce qu'un parent doit savoir, en un seul endroit</h2>
-      <p>Des outils simples, pensés par un professionnel de santé, adaptés au contexte béninois.</p>
+      <h2>Ce que vous pouvez faire ici</h2>
+      <p>Chaque outil a été pensé pour répondre à une vraie question de parent.</p>
     </div>
     <div class="tools">
       <a class="tool" href="{% url 'sante:carte' %}">
@@ -107,15 +107,15 @@
   <div class="container about-inner">
     <div class="portrait"><img src="{% static 'img/photo-darius.jpg' %}" alt="SOSSA G. M. Darius"></div>
     <div>
-      <h2>Créé par un expert qui parle aux deux mondes</h2>
-      <p>Je suis <strong>SOSSA Gninazé Mingnissê Darius</strong>, infirmier diplômé d'État, spécialisé en puériculture et pédiatrie, et développeur web. Santé Infantile Bénin est né de cette double expertise : des outils médicalement fiables, techniquement solides.</p>
+      <h2>Qui suis-je ?</h2>
+      <p>Je suis <strong>SOSSA Gninazé Mingnissê Darius</strong>, infirmier diplômé d'État et développeur web. La santé des enfants, c'est mon métier au quotidien. Ce site, je l'ai construit moi-même pour que les parents aient des réponses fiables, sans se déplacer pour rien.</p>
       <div class="skills">
         <span class="skill">🏥 Infirmier-puériculteur</span>
         <span class="skill">👶 Pédiatrie &amp; nutrition</span>
         <span class="skill">💻 Développement web</span>
         <span class="skill">🤖 Santé numérique</span>
       </div>
-      <a class="btn btn-light" href="{% url 'accounts:a_propos' %}">Travailler avec moi →</a>
+      <a class="btn btn-light" href="{% url 'accounts:a_propos' %}">En savoir plus sur moi</a>
     </div>
   </div>
 </section>
