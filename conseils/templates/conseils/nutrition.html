@@ -6,7 +6,7 @@
 <div class="page-head">
   <div class="container">
     <h1>🥣 Conseils nutritionnels par âge</h1>
-    <p>Recommandations adaptées à chaque étape de la croissance de votre enfant (0 à 10 ans).</p>
+    <p>Recommandations OMS, en français simple : allaitement, diversification, fer, vitamine A, hydratation.</p>
   </div>
 </div>
 
@@ -31,7 +31,7 @@
         <div class="grid2">
           <div class="field">
             <label>Âge de l'enfant (en mois)</label>
-            <input type="number" name="age_mois" class="form-control" min="0" max="120" placeholder="Si aucun enfant choisi" value="{{ age_mois|default:'' }}">
+            <input type="number" name="age_mois" class="form-control" min="0" max="120" placeholder="Obligatoire si aucun enfant choisi" value="{{ age_mois|default:'' }}" {% if not enfants %}required{% endif %}>
           </div>
           <div class="field">
             <label>📋 Type de conseil</label>
