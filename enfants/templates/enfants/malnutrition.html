@@ -59,8 +59,8 @@
 
           <div style="display:grid;gap:12px;">
             {% for eval in resultats.evaluations %}
-              <div style="display:flex;justify-content:space-between;align-items:center;background:var(--teal-50);border-radius:12px;padding:12px 16px;">
-                <span style="font-weight:600;">{{ eval.indicateur }}</span>
+              <div style="display:flex;justify-content:space-between;align-items:center;background:var(--teal-50);border-radius:12px;padding:12px 16px;gap:10px;flex-wrap:wrap;">
+                <span style="font-weight:600;">{{ eval.indicateur }}{% if eval.z != None %} <small>(z ≈ {{ eval.z }})</small>{% endif %}</span>
                 {% if eval.couleur == 'success' %}<span class="badge-pill badge-ok">{{ eval.statut }}</span>
                 {% elif eval.couleur == 'warning' %}<span class="badge-pill badge-warn">{{ eval.statut }}</span>
                 {% elif eval.couleur == 'info' %}<span class="badge-pill badge-info">{{ eval.statut }}</span>
@@ -68,17 +68,69 @@
               </div>
             {% endfor %}
           </div>
+
+          <h3 style="margin-top:22px;">Courbe de croissance OMS</h3>
+          <p class="sub">Poids et taille pour l'âge (0–60 mois). Lignes : −3 ET, −2 ET, médiane, +2 ET. Le point est {{ resultats.prenom }}.</p>
+          <canvas id="chartPoids" height="180"></canvas>
+          <canvas id="chartTaille" height="180" style="margin-top:18px;"></canvas>
           <div class="alert alert-info" style="margin-top:16px;">
-            <strong>⚠️ Important :</strong> ces résultats sont indicatifs. Consultez toujours un professionnel de santé pour un diagnostic complet.
+            <strong>WHO Child Growth Standards.</strong> Z-scores calculés avec les tables LMS officielles de l'OMS (poids/âge, taille/âge, poids/taille). Indicatif : le centre confirme.
           </div>
         {% endif %}
       {% else %}
         <div style="text-align:center;padding:30px;color:var(--muted);">
-          <div style="font-size:3rem;">📏</div>
-          <p>Renseignez les mesures de votre enfant pour voir le résultat ici.</p>
+          <p>Renseignez les mesures pour voir le résultat et la courbe.</p>
         </div>
       {% endif %}
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% if resultats and not resultats.erreur %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const C = {{ courbes_json|safe }};
+  const enfantAge = {{ resultats.age_mois }};
+  const enfantPoids = {{ resultats.poids }};
+  const enfantTaille = {{ resultats.taille }};
+
+  function makeChart(id, pack, yLabel, pointY) {
+    const ctx = document.getElementById(id);
+    if (!ctx || !C) return;
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: pack.ages,
+        datasets: [
+          { label: '−3 ET', data: pack.z3, borderColor: '#c62828', borderWidth: 1, pointRadius: 0, fill: false },
+          { label: '−2 ET', data: pack.z2, borderColor: '#e0a000', borderWidth: 1.5, pointRadius: 0, fill: false },
+          { label: 'Médiane OMS', data: pack.median, borderColor: '#00796b', borderWidth: 2, pointRadius: 0, fill: false },
+          { label: '+2 ET', data: pack.p2, borderColor: '#1565c0', borderWidth: 1, pointRadius: 0, fill: false },
+          {
+            label: 'Enfant',
+            data: pack.ages.map(function (a) { return a === enfantAge ? pointY : null; }),
+            showLine: false,
+            pointRadius: 7,
+            pointBackgroundColor: '#c2182b',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } },
+        scales: {
+          x: { title: { display: true, text: 'Âge (mois)' }, ticks: { maxTicksLimit: 8 } },
+          y: { title: { display: true, text: yLabel } }
+        }
+      }
+    });
+  }
+  makeChart('chartPoids', C.poids, 'Poids (kg)', enfantPoids);
+  makeChart('chartTaille', C.taille, 'Taille (cm)', enfantTaille);
+</script>
+{% endif %}
 {% endblock %}
