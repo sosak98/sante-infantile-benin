@@ -41,7 +41,8 @@
     <h3>Courbes OMS</h3>
     <p class="sub">Le point rouge est {{ resultats.prenom }}. S’il est sous la ligne ambre (−2), il faut un avis au centre. Sous la rouge (−3) : aujourd’hui.</p>
     <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:16px;">{{ svg_poids|safe }}</div>
-    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;">{{ svg_taille|safe }}</div>
+    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:16px;">{{ svg_taille|safe }}</div>
+    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;">{{ svg_poids_taille|safe }}</div>
   </div>
 
   <details class="panel">

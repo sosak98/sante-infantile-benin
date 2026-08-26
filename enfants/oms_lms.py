@@ -142,7 +142,23 @@ def serie_taille_age(sexe):
     return {"ages": ages, "z3": z3, "z2": z2, "median": med, "p2": p2}
 
 
-def svg_courbe(pack, point_age, point_y, titre, unite):
+def serie_poids_taille(sexe, age_mois):
+    """X = taille (cm), Y = poids (kg)."""
+    xs, z3, z2, med, p2 = [], [], [], [], []
+    start, end = (45, 110) if age_mois < 24 else (65, 120)
+    for cm in range(int(start), int(end) + 1, 2):
+        t = lms_poids_taille(sexe, cm, age_mois)
+        if not t:
+            continue
+        xs.append(cm)
+        z3.append(round(_x_at_z(*t, -3), 2))
+        z2.append(round(_x_at_z(*t, -2), 2))
+        med.append(round(_x_at_z(*t, 0), 2))
+        p2.append(round(_x_at_z(*t, 2), 2))
+    return {"ages": xs, "z3": z3, "z2": z2, "median": med, "p2": p2}
+
+
+def svg_courbe(pack, point_x, point_y, titre, unite_x, unite_y="kg"):
     """Petit SVG autonome (pas de Chart.js)."""
     w, h, pad_l, pad_r, pad_t, pad_b = 640, 260, 48, 16, 28, 36
     ages, med, z2, z3, p2 = pack["ages"], pack["median"], pack["z2"], pack["z3"], pack["p2"]
@@ -166,7 +182,7 @@ def svg_courbe(pack, point_age, point_y, titre, unite):
             for i, v in enumerate(vals)
         )
 
-    px = x(max(ages[0], min(ages[-1], point_age)))
+    px = x(max(ages[0], min(ages[-1], point_x)))
     py = y(point_y)
     return f'''<svg viewBox="0 0 {w} {h}" width="100%" role="img" aria-label="{titre}">
       <text x="{pad_l}" y="16" font-size="13" font-weight="700" fill="#0a3d36">{titre}</text>
@@ -175,7 +191,7 @@ def svg_courbe(pack, point_age, point_y, titre, unite):
       <path d="{path(med)}" fill="none" stroke="#00796b" stroke-width="2"/>
       <path d="{path(p2)}" fill="none" stroke="#1565c0" stroke-width="1"/>
       <circle cx="{px:.1f}" cy="{py:.1f}" r="6" fill="#c2182b" stroke="#fff" stroke-width="2"/>
-      <text x="{w/2}" y="{h-8}" font-size="11" text-anchor="middle" fill="#5b7a75">Âge (mois) · {unite}</text>
+      <text x="{w/2}" y="{h-8}" font-size="11" text-anchor="middle" fill="#5b7a75">{unite_x} · {unite_y}</text>
     </svg>'''
 
 
@@ -185,7 +201,9 @@ def courbes_pour(sexe):
 
 def courbes_svg(sexe, age_mois, poids, taille):
     c = courbes_pour(sexe)
+    wfl = serie_poids_taille(sexe, age_mois)
     return {
-        "poids": svg_courbe(c["poids"], age_mois, poids, "Poids pour l'âge (OMS)", "kg"),
-        "taille": svg_courbe(c["taille"], age_mois, taille, "Taille pour l'âge (OMS)", "cm"),
+        "poids": svg_courbe(c["poids"], age_mois, poids, "Poids pour l'âge (OMS)", "Âge (mois)", "kg"),
+        "taille": svg_courbe(c["taille"], age_mois, taille, "Taille pour l'âge (OMS)", "Âge (mois)", "cm"),
+        "poids_taille": svg_courbe(wfl, taille, poids, "Poids pour la taille (OMS)", "Taille (cm)", "kg"),
     }
