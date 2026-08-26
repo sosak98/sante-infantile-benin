@@ -5,90 +5,91 @@
 {% block content %}
 <div class="page-head">
   <div class="container">
-    <h1>📏 Vérificateur d'état nutritionnel</h1>
-    <p>Entrez les mesures de votre enfant pour détecter un éventuel risque de malnutrition (références OMS).</p>
+    <h1>État nutritionnel</h1>
+    <p>{% if resultats and not resultats.erreur %}Résultat pour {{ resultats.prenom }}{% else %}Poids, taille et bras — un calcul, puis le résultat.{% endif %}</p>
   </div>
 </div>
 
 <div class="container page-body">
-  <div class="panel">
-    <h3>📏 Guide MUAC (Périmètre brachial)</h3>
-    <div class="sub">Mesuré au milieu du bras gauche avec un ruban de mesure.</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <span class="badge-pill badge-danger">🔴 &lt; 11,5 cm - Malnutrition sévère</span>
-      <span class="badge-pill badge-warn">🟠 11,5 - 12,5 cm - Malnutrition modérée</span>
-      <span class="badge-pill badge-ok">🟢 &gt; 12,5 cm - Normal</span>
+
+{% if resultats and not resultats.erreur %}
+
+  <div class="panel" id="resultats">
+    <h3>En clair, pour les parents</h3>
+    <p style="font-size:1.05rem;margin:8px 0 14px;">{{ resultats.synthese }}</p>
+    <div class="grid3" style="margin-bottom:12px;">
+      <div class="step"><div class="num">{{ resultats.age_mois }}</div><p>mois</p></div>
+      <div class="step"><div class="num">{{ resultats.poids }}</div><p>kg</p></div>
+      <div class="step"><div class="num">{{ resultats.taille }}</div><p>cm</p></div>
     </div>
+    <p class="sub" style="margin:0 0 10px;">Rouge = aller au centre. Ambre = bientôt. Vert = zone habituelle.</p>
+    <div style="display:grid;gap:10px;">
+      {% for eval in resultats.evaluations %}
+        <div style="display:flex;justify-content:space-between;align-items:center;background:var(--teal-50);border-radius:12px;padding:12px 14px;gap:8px;flex-wrap:wrap;">
+          <span style="font-weight:600;">{{ eval.indicateur }}</span>
+          {% if eval.couleur == 'success' %}<span class="badge-pill badge-ok">{{ eval.statut }}</span>
+          {% elif eval.couleur == 'warning' %}<span class="badge-pill badge-warn">{{ eval.statut }}</span>
+          {% elif eval.couleur == 'info' %}<span class="badge-pill badge-info">{{ eval.statut }}</span>
+          {% else %}<span class="badge-pill badge-danger">{{ eval.statut }}</span>{% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    <a class="btn btn-primary btn-block" style="margin-top:16px;" href="{% url 'enfants:detection_malnutrition' %}">Nouveau calcul</a>
   </div>
 
-  <div class="grid2" style="align-items:start;">
-    <div class="panel">
-      <h3>👶 Informations de l'enfant</h3>
-      <div class="sub">Renseignez les données anthropométriques</div>
-      <form method="post">
-        {% csrf_token %}
-        <div class="grid2">
-          <div class="field"><label>👦 Prénom</label><input type="text" name="prenom" class="form-control" placeholder="Ex : Kofi" required></div>
-          <div class="field"><label>⚧ Sexe</label><select name="sexe" class="form-control" required><option value="M">👦 Masculin</option><option value="F">👧 Féminin</option></select></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>🗓️ Âge (en mois)</label><input type="number" name="age_mois" class="form-control" min="0" max="60" placeholder="Ex : 12" required></div>
-          <div class="field"><label>⚖️ Poids (kg)</label><input type="number" name="poids" class="form-control" step="0.1" min="0" placeholder="Ex : 8,5" required></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>📏 Taille (cm)</label><input type="number" name="taille" class="form-control" step="0.1" min="0" placeholder="Ex : 72" required></div>
-          <div class="field"><label>📐 MUAC - périmètre brachial (cm, optionnel)</label><input type="number" name="muac" class="form-control" step="0.1" min="0" placeholder="Ex : 13,5"></div>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">🔍 Vérifier l'état nutritionnel</button>
-      </form>
-    </div>
-
-    <div class="panel">
-      <h3>Résultat</h3>
-      <div class="sub">Évaluation basée sur les références OMS</div>
-
-      {% if resultats %}
-        {% if resultats.erreur %}
-          <div class="alert alert-danger">❌ Erreur : {{ resultats.erreur }}</div>
-        {% else %}
-          <div class="grid3" style="margin-bottom:16px;">
-            <div class="step"><div class="num">{{ resultats.age_mois }}</div><p>mois</p></div>
-            <div class="step"><div class="num">{{ resultats.poids }}</div><p>kg</p></div>
-            <div class="step"><div class="num">{{ resultats.taille }}</div><p>cm</p></div>
-          </div>
-
-          <div style="display:grid;gap:12px;">
-            {% for eval in resultats.evaluations %}
-              <div style="display:flex;justify-content:space-between;align-items:center;background:var(--teal-50);border-radius:12px;padding:12px 16px;gap:10px;flex-wrap:wrap;">
-                <span style="font-weight:600;">{{ eval.indicateur }}{% if eval.z != None %} <small>(z ≈ {{ eval.z }})</small>{% endif %}</span>
-                {% if eval.couleur == 'success' %}<span class="badge-pill badge-ok">{{ eval.statut }}</span>
-                {% elif eval.couleur == 'warning' %}<span class="badge-pill badge-warn">{{ eval.statut }}</span>
-                {% elif eval.couleur == 'info' %}<span class="badge-pill badge-info">{{ eval.statut }}</span>
-                {% else %}<span class="badge-pill badge-danger">{{ eval.statut }}</span>{% endif %}
-              </div>
-            {% endfor %}
-          </div>
-
-          <div class="alert alert-info" style="margin-top:16px;">
-            Les courbes OMS sont juste en dessous, en pleine largeur.
-          </div>
-        {% endif %}
-      {% else %}
-        <div style="text-align:center;padding:30px;color:var(--muted);">
-          <p>Un seul calcul suffit. Après « Vérifier », les courbes s'affichent sous le formulaire.</p>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  {% if resultats and not resultats.erreur %}
   <div class="panel">
-    <h3>Courbes OMS (WHO Child Growth Standards)</h3>
-    <p class="sub">Rouge −3 ET · Ambre −2 ET · Vert médiane · Bleu +2 ET · Point = {{ resultats.prenom }}</p>
+    <h3>Courbes OMS</h3>
+    <p class="sub">Le point rouge est {{ resultats.prenom }}. S’il est sous la ligne ambre (−2), il faut un avis au centre. Sous la rouge (−3) : aujourd’hui.</p>
     <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:16px;">{{ svg_poids|safe }}</div>
     <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;">{{ svg_taille|safe }}</div>
-    <p class="sub" style="margin-top:12px;">Z-scores LMS officiels. Indicatif — le centre confirme.</p>
   </div>
+
+  <details class="panel">
+    <summary style="cursor:pointer;font-weight:800;color:var(--teal-800);">Pour les professionnels (z-score LMS)</summary>
+    <p class="sub" style="margin-top:12px;">WHO Child Growth Standards. Formule LMS : Z = ((X/M)<sup>L</sup> − 1) / (L × S). Indicateurs : poids-pour-âge, taille-pour-âge, poids-pour-taille. MUAC 11,5 / 12,5 cm (OMS/UNICEF). Ce n’est pas un dossier clinique.</p>
+    <ul style="color:var(--muted);font-size:.92rem;">
+      {% for eval in resultats.evaluations %}
+        <li>{{ eval.indicateur }}{% if eval.z != None %} : z = {{ eval.z }}{% endif %} — {{ eval.statut }}</li>
+      {% endfor %}
+    </ul>
+  </details>
+
+{% else %}
+
+  {% if resultats and resultats.erreur %}
+    <div class="alert alert-danger">Erreur : {{ resultats.erreur }}</div>
   {% endif %}
+
+  <div class="panel">
+    <h3>Comment mesurer</h3>
+    <p class="sub">Périmètre du bras gauche, à mi-hauteur (MUAC), enfant de 6 à 59 mois.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span class="badge-pill badge-danger">&lt; 11,5 cm — sévère</span>
+      <span class="badge-pill badge-warn">11,5–12,5 cm — modéré</span>
+      <span class="badge-pill badge-ok">≥ 12,5 cm — habituel</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Mesures de l'enfant</h3>
+    <form method="post">
+      {% csrf_token %}
+      <div class="grid2">
+        <div class="field"><label>Prénom</label><input type="text" name="prenom" class="form-control" required></div>
+        <div class="field"><label>Sexe</label><select name="sexe" class="form-control" required><option value="M">Garçon</option><option value="F">Fille</option></select></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Âge (mois)</label><input type="number" name="age_mois" class="form-control" min="0" max="60" required></div>
+        <div class="field"><label>Poids (kg)</label><input type="number" name="poids" class="form-control" step="0.1" min="0" required></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Taille (cm)</label><input type="number" name="taille" class="form-control" step="0.1" min="0" required></div>
+        <div class="field"><label>MUAC bras (cm), optionnel</label><input type="number" name="muac" class="form-control" step="0.1" min="0"></div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Voir le résultat</button>
+    </form>
+  </div>
+
+{% endif %}
 </div>
 {% endblock %}

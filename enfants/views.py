@@ -51,6 +51,17 @@ def detection_malnutrition(request):
             taille = float(request.POST.get("taille"))
             muac_val = request.POST.get("muac")
             muac = float(muac_val) if muac_val else None
+            ev = evaluer_malnutrition(poids, taille, age_mois, sexe, muac)
+            ordre = {"danger": 0, "warning": 1, "info": 2, "success": 3}
+            pire = min((ordre.get(e["couleur"], 3) for e in ev), default=3)
+            if pire == 0:
+                synthese = "Allez dans un centre de santé aujourd'hui. Ne vous fiez pas seulement à cet écran."
+            elif pire == 1:
+                synthese = "Il faut montrer l'enfant à un soignant bientôt (aujourd'hui ou demain)."
+            elif pire == 2:
+                synthese = "Ce n'est pas une urgence d'après cet outil, mais parlez-en à la prochaine visite."
+            else:
+                synthese = "Pour l'instant, les mesures sont dans la zone habituelle. Ce n'est pas un diagnostic."
             resultats = {
                 "prenom": prenom,
                 "sexe": sexe,
@@ -58,7 +69,9 @@ def detection_malnutrition(request):
                 "poids": poids,
                 "taille": taille,
                 "muac": muac,
-                "evaluations": evaluer_malnutrition(poids, taille, age_mois, sexe, muac),
+                "evaluations": ev,
+                "synthese": synthese,
+                "niveau": ("danger", "warning", "info", "success")[pire],
             }
             courbes = courbes_pour(sexe)
         except Exception as e:
