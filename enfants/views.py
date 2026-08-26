@@ -1,7 +1,7 @@
 from django.shortcuts import render
 import json
 from .oms_lms import (
-    courbes_pour,
+    courbes_svg,
     z_poids_age,
     z_taille_age,
     z_poids_taille,
@@ -66,5 +66,7 @@ def detection_malnutrition(request):
 
     return render(request, "enfants/malnutrition.html", {
         "resultats": resultats,
-        "courbes_json": json.dumps(courbes) if courbes else "null",
+        "svg_poids": courbes["poids"] if courbes else "",
+        "svg_taille": courbes["taille"] if courbes else "",
+        "courbes_json": "null",
     })

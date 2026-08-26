@@ -142,5 +142,50 @@ def serie_taille_age(sexe):
     return {"ages": ages, "z3": z3, "z2": z2, "median": med, "p2": p2}
 
 
+def svg_courbe(pack, point_age, point_y, titre, unite):
+    """Petit SVG autonome (pas de Chart.js)."""
+    w, h, pad_l, pad_r, pad_t, pad_b = 640, 260, 48, 16, 28, 36
+    ages, med, z2, z3, p2 = pack["ages"], pack["median"], pack["z2"], pack["z3"], pack["p2"]
+    if not ages:
+        return ""
+    ys = z3 + z2 + med + p2 + ([point_y] if point_y else [])
+    ymin, ymax = min(ys), max(ys)
+    span = (ymax - ymin) or 1
+    ymin -= span * 0.08
+    ymax += span * 0.08
+
+    def x(a):
+        return pad_l + (a - ages[0]) / (ages[-1] - ages[0] or 1) * (w - pad_l - pad_r)
+
+    def y(v):
+        return pad_t + (1 - (v - ymin) / (ymax - ymin)) * (h - pad_t - pad_b)
+
+    def path(vals):
+        return " ".join(
+            ("M" if i == 0 else "L") + f"{x(ages[i]):.1f},{y(v):.1f}"
+            for i, v in enumerate(vals)
+        )
+
+    px = x(max(ages[0], min(ages[-1], point_age)))
+    py = y(point_y)
+    return f'''<svg viewBox="0 0 {w} {h}" width="100%" role="img" aria-label="{titre}">
+      <text x="{pad_l}" y="16" font-size="13" font-weight="700" fill="#0a3d36">{titre}</text>
+      <path d="{path(z3)}" fill="none" stroke="#c62828" stroke-width="1"/>
+      <path d="{path(z2)}" fill="none" stroke="#e0a000" stroke-width="1.4"/>
+      <path d="{path(med)}" fill="none" stroke="#00796b" stroke-width="2"/>
+      <path d="{path(p2)}" fill="none" stroke="#1565c0" stroke-width="1"/>
+      <circle cx="{px:.1f}" cy="{py:.1f}" r="6" fill="#c2182b" stroke="#fff" stroke-width="2"/>
+      <text x="{w/2}" y="{h-8}" font-size="11" text-anchor="middle" fill="#5b7a75">Âge (mois) · {unite}</text>
+    </svg>'''
+
+
 def courbes_pour(sexe):
     return {"poids": serie_poids_age(sexe), "taille": serie_taille_age(sexe)}
+
+
+def courbes_svg(sexe, age_mois, poids, taille):
+    c = courbes_pour(sexe)
+    return {
+        "poids": svg_courbe(c["poids"], age_mois, poids, "Poids pour l'âge (OMS)", "kg"),
+        "taille": svg_courbe(c["taille"], age_mois, taille, "Taille pour l'âge (OMS)", "cm"),
+    }
