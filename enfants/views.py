@@ -73,7 +73,7 @@ def detection_malnutrition(request):
                 "synthese": synthese,
                 "niveau": ("danger", "warning", "info", "success")[pire],
             }
-            courbes = courbes_pour(sexe)
+            courbes = courbes_svg(sexe, age_mois, poids, taille)
         except Exception as e:
             resultats = {"erreur": str(e)}
 
