@@ -2,11 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
-import random
+import hmac
+import secrets
 from datetime import timedelta, date
 
 from .forms import ParentRegisterForm, PhoneSendForm, PhoneVerifyForm
@@ -169,7 +171,16 @@ def send_phone_otp(request):
         form = PhoneSendForm(request.POST)
         if form.is_valid():
             phone = form.cleaned_data['phone']
-            code = f"{random.randint(0, 999999):06d}"
+            # Trop de codes demandes sur un numero : on coupe (anti-spam SMS)
+            cle_envoi = f"otp_envoi:{phone}"
+            nb_envois = cache.get(cle_envoi, 0)
+            if nb_envois >= 5:
+                messages.error(request, 'Trop de codes demandés. Réessayez dans 10 minutes.')
+                return render(request, 'accounts/phone_send.html', {'form': form})
+            cache.set(cle_envoi, nb_envois + 1, timeout=600)
+
+            # secrets (CSPRNG) au lieu de random : code imprevisible
+            code = f"{secrets.randbelow(1_000_000):06d}"
             user = request.user if request.user.is_authenticated else None
             PhoneOTP.objects.create(user=user, phone=phone, code=code)
 
@@ -204,7 +215,7 @@ def verify_phone_otp(request):
                 messages.error(request, 'Trop de tentatives. Demandez un nouveau code.')
                 return redirect('accounts:phone_send')
 
-            if otp.code == code:
+            if hmac.compare_digest(otp.code, code):
                 otp.verified = True
                 otp.save()
                 if request.user.is_authenticated:

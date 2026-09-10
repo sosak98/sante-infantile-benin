@@ -11,9 +11,15 @@
   <meta property="og:title" content="Santé Infantile Bénin (SIB)">
   <meta property="og:description" content="Vaccination, nutrition, dépistage de la malnutrition et triage pédiatrique pour vos enfants au Bénin.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}/">
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'sante/images/logo.png' %}">
+  <meta property="og:locale" content="fr_BJ">
+  <meta name="twitter:card" content="summary">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
 
   <!-- PWA -->
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#00695c">
   <link rel="manifest" href="{% url 'manifest' %}">
   <link rel="apple-touch-icon" href="{% static 'img/icons/apple-touch-icon.png' %}">
   <link rel="icon" type="image/png" href="{% static 'img/icons/icon-192.png' %}">

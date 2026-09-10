@@ -1,114 +1,90 @@
-import json
 import requests
+from django.core.cache import cache
+from django.http import JsonResponse
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
-from django.contrib.admin.views.decorators import staff_member_required
+
 from .models import Etablissement
+
+# Cadre geographique du Benin (limite les requetes a ce qui a du sens)
+BENIN_OUEST, BENIN_SUD, BENIN_EST, BENIN_NORD = 0.70, 6.05, 3.95, 12.55
+CACHE_TTL = 60 * 60 * 6  # 6 heures
 
 
 def carte(request):
+    # La serialisation JSON est geree cote gabarit par le filtre json_script
+    # (echappe automatiquement le contenu : pas de sortie de contexte possible).
     etablissements = list(Etablissement.objects.values(
-        'nom', 'adresse', 'telephone', 'latitude', 'longitude', 'type_etab'
+        "nom", "adresse", "telephone", "latitude", "longitude", "type_etab",
     ))
-    return render(request, 'sante/carte.html', {
-        'etablissements_json': json.dumps(etablissements)
-    })
+    return render(request, "sante/carte.html", {"etablissements": etablissements})
+
+
+def _coordonnee(valeur, defaut, mini, maxi):
+    """Force un float borne : empeche toute injection dans la requete Overpass
+    (seuls des nombres peuvent ressortir d'ici)."""
+    try:
+        v = float(valeur)
+    except (TypeError, ValueError):
+        v = float(defaut)
+    return min(max(v, mini), maxi)
+
+
+def _elements_locaux(lat, lng, delta=0.2):
+    """Convertit les etablissements de la base locale au format attendu par le JS."""
+    qs = Etablissement.objects.filter(
+        latitude__gte=lat - delta, latitude__lte=lat + delta,
+        longitude__gte=lng - delta, longitude__lte=lng + delta,
+    )[:500]
+    elements = []
+    for e in qs:
+        amenity = {"pharmacie": "pharmacy", "hopital": "hospital",
+                   "hopital_zone": "hospital"}.get(e.type_etab, "clinic")
+        elements.append({
+            "type": "node", "lat": e.latitude, "lon": e.longitude,
+            "tags": {"name": e.nom, "amenity": amenity,
+                     "phone": e.telephone or ""},
+        })
+    return elements
+
+
+def _overpass(lat, lng):
+    requete = f"""
+    [out:json][timeout:25];
+    (
+      node["amenity"~"hospital|clinic|pharmacy"](around:15000,{lat},{lng});
+      way["amenity"~"hospital|clinic|pharmacy"](around:15000,{lat},{lng});
+    );
+    out center;
+    """
+    try:
+        r = requests.post(
+            "https://overpass-api.de/api/interpreter",
+            data={"data": requete}, timeout=25,
+            headers={"User-Agent": "SanteInfantileBenin/1.1"},
+        )
+        donnees = r.json()
+        return donnees if donnees.get("elements") else None
+    except Exception:
+        return None
 
 
 def etablissements_osm(request):
-    lat = request.GET.get('lat', '6.36')
-    lng = request.GET.get('lng', '2.42')
+    """Enrichissement autour d'un point (Bénin uniquement).
 
-    query = f'''
-    [out:json][timeout:25];
-    (
-        node["amenity"="hospital"](around:15000,{lat},{lng});
-        node["amenity"="clinic"](around:15000,{lat},{lng});
-        node["amenity"="pharmacy"](around:15000,{lat},{lng});
-        way["amenity"="hospital"](around:15000,{lat},{lng});
-        way["amenity"="clinic"](around:15000,{lat},{lng});
-        way["amenity"="pharmacy"](around:15000,{lat},{lng});
-    );
-    out center;
-    '''
+    Securite : les coordonnees sont validees et bornees avant d'entrer dans la
+    requete Overpass, et la reponse est mise en cache 6 h par zone pour ne pas
+    servir de relais d'amplification vers l'API externe.
+    """
+    lat = _coordonnee(request.GET.get("lat"), 6.36, BENIN_SUD, BENIN_NORD)
+    lng = _coordonnee(request.GET.get("lng"), 2.42, BENIN_OUEST, BENIN_EST)
 
-    def local_as_overpass():
-        elements = []
-        for e in Etablissement.objects.all():
-            amenity = 'pharmacy' if e.type_etab == 'pharmacie' else 'hospital'
-            elements.append({
-                'type': 'node',
-                'lat': e.latitude,
-                'lon': e.longitude,
-                'tags': {'name': e.nom, 'amenity': amenity, 'phone': e.telephone or ''},
-            })
-        return {'elements': elements}
-
-    try:
-        response = requests.post(
-            'https://overpass-api.de/api/interpreter',
-            data={'data': query},
-            timeout=25,
-            headers={'User-Agent': 'SanteInfantileBenin/1.0'},
-        )
-        data = response.json()
-        if not data.get('elements'):
-            data = local_as_overpass()
-        return JsonResponse(data)
-    except Exception:
-        return JsonResponse(local_as_overpass())
-
-
-@staff_member_required
-def charger_seeds(request):
-    url = 'https://overpass-api.de/api/interpreter'
-    query = '[out:json][timeout:60];(node["amenity"="hospital"](6.2,2.2,6.5,2.7);node["amenity"="clinic"](6.2,2.2,6.5,2.7);node["amenity"="pharmacy"](6.2,2.2,6.5,2.7);way["amenity"="hospital"](6.2,2.2,6.5,2.7);way["amenity"="pharmacy"](6.2,2.2,6.5,2.7););out center;'
-
-    try:
-        response = requests.get(
-            url,
-            params={'data': query},
-            timeout=60,
-            headers={'User-Agent': 'SanteInfantileBenin/1.0'}
-        )
-        data = response.json()
-        elements = data.get('elements', [])
-        ajoutes = 0
-
-        for element in elements:
-            tags = element.get('tags', {})
-            nom = tags.get('name', '')
-            if not nom:
-                continue
-            amenity = tags.get('amenity', '')
-            type_etab = 'pharmacie' if amenity == 'pharmacy' else 'centre'
-
-            if element.get('type') == 'node':
-                lat = element.get('lat')
-                lng = element.get('lon')
-            else:
-                center = element.get('center', {})
-                lat = center.get('lat')
-                lng = center.get('lon')
-
-            if not lat or not lng:
-                continue
-
-            telephone = tags.get('phone', '')
-            adresse = tags.get('addr:street', 'Cotonou, Benin')
-
-            if not Etablissement.objects.filter(nom=nom).exists():
-                Etablissement.objects.create(
-                    nom=nom,
-                    type_etab=type_etab,
-                    adresse=adresse,
-                    latitude=lat,
-                    longitude=lng,
-                    telephone=telephone
-                )
-                ajoutes += 1
-
-        return HttpResponse(f"✅ {ajoutes} etablissements ajoutes ! Total elements: {len(elements)}")
-
-    except Exception as e:
-        return HttpResponse(f"❌ Erreur: {str(e)}")
+    cle_cache = f"carte_osm:{lat:.2f}:{lng:.2f}"
+    data = cache.get(cle_cache)
+    if data is None:
+        locaux = _elements_locaux(lat, lng)
+        data = {"elements": locaux}
+        # On ne sollicite Overpass que si la base locale est pauvre ici
+        if len(locaux) < 5:
+            data = _overpass(lat, lng) or data
+        cache.set(cle_cache, data, CACHE_TTL)
+    return JsonResponse(data)

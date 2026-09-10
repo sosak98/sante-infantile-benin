@@ -3,7 +3,8 @@ import json
 from datetime import date
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.core.cache import cache
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.conf import settings
 from groq import Groq
 from accounts.models import Parent
@@ -154,6 +155,7 @@ def _symptomes_from_post(post):
     }
 
 
+@ensure_csrf_cookie
 def triage(request):
     parent = None
     enfants = Enfant.objects.none()
@@ -223,12 +225,23 @@ def triage(request):
     })
 
 
-@csrf_exempt
 def chat(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            message_user = data.get('message', '')
+            message_user = data.get('message', '')[:1500]
+            # Anti-abus : 30 messages / 5 min / IP (le quota Groq coute)
+            ip_client = (request.META.get('HTTP_X_FORWARDED_FOR', '')
+                         .split(',')[0].strip() or request.META.get('REMOTE_ADDR', ''))
+            cle = f"chat_rl:{ip_client}"
+            compteur = cache.get(cle, 0)
+            if compteur >= 30:
+                return JsonResponse({
+                    'reponse': "Beaucoup de questions d'affilée. Patientez quelques "
+                               "minutes, l'assistant a besoin de souffler.",
+                    'status': 'ok',
+                }, status=429)
+            cache.set(cle, compteur + 1, timeout=300)
             contexte = data.get('contexte', {})
             symptomes = contexte.get('symptomes', {})
 
@@ -275,8 +288,8 @@ def chat(request):
             import logging
             logging.getLogger(__name__).exception('Erreur chat IA')
             return JsonResponse({
-                'reponse': f'Erreur technique de l\'assistant. Détail : {type(e).__name__}. '
-                           f'Vérifiez que la clé GROQ_API_KEY est valide et que le modèle "{GROQ_MODEL}" existe.',
+                'reponse': "L'assistant rencontre une difficulté technique. "
+                           "Réessayez dans un instant ou adressez-vous à un professionnel de santé.",
                 'status': 'error',
             }, status=500)
 

@@ -45,6 +45,7 @@
 
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{{ etablissements|json_script:"etab-data" }}
 <script>
   var map = L.map('map').setView([6.36, 2.42], 13);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
@@ -73,7 +74,7 @@
       '<a href="https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '" target="_blank" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;display:block;text-align:center;text-decoration:none;">🧭 Y aller (Google Maps)</a></div>';
   }
 
-  var etablissements = {{ etablissements_json|safe }};
+  var etablissements = JSON.parse(document.getElementById('etab-data').textContent);
   etablissements.forEach(function (e) {
     var marker = L.marker([e.latitude, e.longitude], { icon: getIcon(e.type_etab) }).addTo(map);
     marker.bindPopup(popupContent(e.nom, e.adresse, e.telephone, e.latitude, e.longitude));
