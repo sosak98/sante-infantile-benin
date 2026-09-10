@@ -4,6 +4,8 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 {% endblock %}
 
 {% block content %}
@@ -20,51 +22,62 @@
       <div id="map"></div>
     </div>
     <div style="padding:10px 14px 14px;">
-      <div class="map-legend">
-        <span>🏥 Centre</span><span>💊 Pharmacie</span><span>🏨 Hôpital</span><span>⭐ Ma position</span>
+      <div class="map-legend" style="display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);align-items:center;">
+        <span><i style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#00695c;border:2px solid #fff;box-shadow:0 0 2px rgba(0,0,0,.4);vertical-align:-1px;"></i> Centre</span>
+        <span><i style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#6a1b9a;border:2px solid #fff;box-shadow:0 0 2px rgba(0,0,0,.4);vertical-align:-1px;"></i> Clinique</span>
+        <span><i style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#c62828;border:2px solid #fff;box-shadow:0 0 2px rgba(0,0,0,.4);vertical-align:-1px;"></i> Hôpital</span>
+        <span><i style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#ef6c00;border:2px solid #fff;box-shadow:0 0 2px rgba(0,0,0,.4);vertical-align:-1px;"></i> Pharmacie</span>
+        <span style="color:#1e88e5;">● Ma position</span>
       </div>
       <div class="map-stats" style="display:flex;gap:12px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin:8px 0 10px;">
         <span><b id="countCentres">0</b> centres</span>
-        <span><b id="countPharmacies">0</b> pharmacies</span>
+        <span><b id="countCliniques">0</b> cliniques</span>
         <span><b id="countHopitaux">0</b> hôpitaux</span>
+        <span><b id="countPharmacies">0</b> pharmacies</span>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn btn-primary btn-sm" id="localiserBtn">Me localiser</button>
-        <button class="btn btn-ghost btn-sm" id="osmBtn">Centres proches</button>
+        <button class="btn btn-ghost btn-sm" id="prochesBtn">Les 10 plus proches</button>
       </div>
+      <div id="nearList" style="display:none;margin-top:12px;font-size:.85rem;"></div>
     </div>
-  </div>
-</div>
-
-<div class="loading-overlay" id="loading" style="display:none;">
-  <div style="text-align:center;color:#fff;font-size:1.2rem;">
-    <div class="spinner-border text-light mb-3" role="status"></div><br>Chargement des établissements...
   </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 {{ etablissements|json_script:"etab-data" }}
 <script>
-  var map = L.map('map').setView([6.36, 2.42], 13);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd', maxZoom: 20
+  var COULEURS = { 'centre': '#00695c', 'clinique': '#6a1b9a', 'hopital': '#c62828', 'hopital_zone': '#c62828', 'pharmacie': '#ef6c00' };
+
+  var map = L.map('map', { maxBounds: [[5, -1], [14, 5]] });
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributeurs',
+    maxZoom: 19
   }).addTo(map);
+  map.fitBounds([[6.2, 0.8], [12.4, 3.85]]);
 
-  var userMarker = null, userLat = null, userLng = null, osmMarkers = [];
-  var countCentres = 0, countPharmacies = 0, countHopitaux = 0;
+  var userMarker = null, userLat = null, userLng = null;
+  var countCentres = 0, countCliniques = 0, countHopitaux = 0, countPharmacies = 0;
 
-  function getIcon(type) {
-    var emoji = '🏥';
-    if (type === 'pharmacie') emoji = '💊';
-    else if (type === 'hopital' || type === 'hopital_zone') emoji = '🏨';
-    return L.divIcon({
-      html: '<div style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));">' + emoji + '</div>',
-      className: '', iconSize: [22, 22], iconAnchor: [11, 11], popupAnchor: [0, -12]
-    });
-  }
+  // Groupes de points : regroupes automatiquement au zoom national,
+  // se deplient au zoom local. Pastille numerotee aux couleurs du site.
+  var clusters = L.markerClusterGroup({
+    chunkedLoading: true,
+    maxClusterRadius: 45,
+    iconCreateFunction: function (cluster) {
+      var n = cluster.getChildCount();
+      var taille = n < 50 ? 34 : (n < 200 ? 40 : 46);
+      var fond = n < 50 ? '#26a69a' : (n < 200 ? '#00897b' : '#00695c');
+      return L.divIcon({
+        html: '<div style="background:' + fond + ';color:#fff;border-radius:50%;width:' + taille + 'px;height:' + taille + 'px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);">' + n + '</div>',
+        className: '', iconSize: [taille, taille]
+      });
+    }
+  });
+  map.addLayer(clusters);
 
   function popupContent(nom, adresse, telephone, lat, lng) {
     return '<div style="font-family:Segoe UI;min-width:150px;">' +
@@ -74,65 +87,73 @@
       '<a href="https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '" target="_blank" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;display:block;text-align:center;text-decoration:none;">🧭 Y aller (Google Maps)</a></div>';
   }
 
+  function distanceKm(lat1, lon1, lat2, lon2) {
+    var R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLon = (lon2 - lon1) * Math.PI / 180;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
   var etablissements = JSON.parse(document.getElementById('etab-data').textContent);
+  var marqueurs = [];
   etablissements.forEach(function (e) {
-    var marker = L.marker([e.latitude, e.longitude], { icon: getIcon(e.type_etab) }).addTo(map);
-    marker.bindPopup(popupContent(e.nom, e.adresse, e.telephone, e.latitude, e.longitude));
+    var m = L.circleMarker([e.latitude, e.longitude], {
+      radius: 7, color: '#ffffff', weight: 2,
+      fillColor: COULEURS[e.type_etab] || COULEURS.centre, fillOpacity: 0.95
+    });
+    m.bindPopup(popupContent(e.nom, e.adresse, e.telephone, e.latitude, e.longitude));
+    marqueurs.push(m);
     if (e.type_etab === 'pharmacie') countPharmacies++;
     else if (e.type_etab === 'hopital' || e.type_etab === 'hopital_zone') countHopitaux++;
+    else if (e.type_etab === 'clinique') countCliniques++;
     else countCentres++;
   });
+  clusters.addLayers(marqueurs);
   document.getElementById('countCentres').textContent = countCentres;
-  document.getElementById('countPharmacies').textContent = countPharmacies;
+  document.getElementById('countCliniques').textContent = countCliniques;
   document.getElementById('countHopitaux').textContent = countHopitaux;
+  document.getElementById('countPharmacies').textContent = countPharmacies;
 
   document.getElementById('localiserBtn').addEventListener('click', function () {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        userLat = position.coords.latitude; userLng = position.coords.longitude;
-        map.setView([userLat, userLng], 15);
-        if (userMarker) map.removeLayer(userMarker);
-        userMarker = L.marker([userLat, userLng], {
-          icon: L.divIcon({
-            html: '<div style="background:#ffd966;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:3px solid #ffaa00;box-shadow:0 3px 10px rgba(0,0,0,0.3);">⭐</div>',
-            className: '', iconSize: [36, 36]
-          })
-        }).addTo(map);
-        userMarker.bindPopup('<b>📍 Vous êtes ici</b>').openPopup();
-      }, function (error) { alert("Impossible d'obtenir votre position : " + error.message); });
-    }
+    if (!navigator.geolocation) { alert("La géolocalisation n'est pas disponible sur ce navigateur."); return; }
+    navigator.geolocation.getCurrentPosition(function (position) {
+      userLat = position.coords.latitude; userLng = position.coords.longitude;
+      map.setView([userLat, userLng], 14);
+      if (userMarker) map.removeLayer(userMarker);
+      userMarker = L.circleMarker([userLat, userLng], {
+        radius: 10, color: '#ffffff', weight: 3,
+        fillColor: '#1e88e5', fillOpacity: 1
+      }).addTo(map);
+      userMarker.bindPopup('<b>📍 Vous êtes ici</b>').openPopup();
+    }, function (error) { alert("Impossible d'obtenir votre position : " + error.message); });
   });
 
-  document.getElementById('osmBtn').addEventListener('click', function () {
-    var lat = userLat || 6.36, lng = userLng || 2.42;
-    document.getElementById('loading').style.display = 'flex';
-    fetch('/carte/osm/?lat=' + lat + '&lng=' + lng)
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        document.getElementById('loading').style.display = 'none';
-        osmMarkers.forEach(function (m) { map.removeLayer(m); });
-        osmMarkers = []; countHopitaux = 0;
-        var elements = data.elements || [];
-        if (elements.length === 0) {
-          alert("Aucun nouveau point en ligne. Les centres deja affiches restent sur la carte.");
-          return;
-        }
-        elements.forEach(function (el) {
-          var elLat = el.lat || (el.center && el.center.lat);
-          var elLng = el.lon || (el.center && el.center.lon);
-          if (!elLat || !elLng) return;
-          var nom = el.tags.name || 'Établissement de santé';
-          var type = el.tags.amenity === 'pharmacy' ? 'pharmacie' : 'hopital';
-          var m = L.marker([elLat, elLng], { icon: getIcon(type) }).addTo(map);
-          m.bindPopup(popupContent(nom, 'Source : OpenStreetMap', '', elLat, elLng));
-          osmMarkers.push(m); countHopitaux++;
-        });
-        document.getElementById('countHopitaux').textContent = countHopitaux;
-      })
-      .catch(function (error) {
-        document.getElementById('loading').style.display = 'none';
-        alert('Erreur : ' + error.message);
-      });
+  document.getElementById('prochesBtn').addEventListener('click', function () {
+    var refLat = (userLat !== null) ? userLat : map.getCenter().lat;
+    var refLng = (userLng !== null) ? userLng : map.getCenter().lng;
+    var liste = etablissements.slice().sort(function (a, b) {
+      return distanceKm(refLat, refLng, a.latitude, a.longitude) -
+             distanceKm(refLat, refLng, b.latitude, b.longitude);
+    }).slice(0, 10);
+    if (liste.length === 0) return;
+
+    var bounds = [[refLat, refLng]];
+    var html = '<b style="color:#004d40;">Les 10 structures les plus proches :</b><ol style="margin:6px 0 0;padding-left:20px;">';
+    liste.forEach(function (e) {
+      var couleur = COULEURS[e.type_etab] || COULEURS.centre;
+      var km = distanceKm(refLat, refLng, e.latitude, e.longitude);
+      var kmTxt = km < 1 ? Math.round(km * 1000) + ' m' : km.toFixed(1) + ' km';
+      html += '<li style="margin:4px 0;"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + couleur + ';margin-right:4px;"></i>' +
+        '<b>' + e.nom + '</b> · ' + kmTxt +
+        ' · <a href="https://www.google.com/maps/dir/?api=1&destination=' + e.latitude + ',' + e.longitude +
+        '" target="_blank" style="color:#00796b;text-decoration:none;">Y aller</a></li>';
+      bounds.push([e.latitude, e.longitude]);
+    });
+    html += '</ol><p style="color:#666;margin:6px 0 0;">Astuce : déplacez la carte puis recliquez pour calculer autour de la zone affichée.</p>';
+    var bloc = document.getElementById('nearList');
+    bloc.innerHTML = html; bloc.style.display = 'block';
+    map.fitBounds(bounds, { padding: [40, 40] });
   });
 </script>
 {% endblock %}
