@@ -9,6 +9,13 @@
 {% endblock %}
 
 {% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="/">Accueil</a>
+    <span class="sep">›</span>
+    <span class="current">Carte des centres & pharmacies</span>
+  </div>
+</nav>
 <div class="page-head">
   <div class="container">
     <h1>📍 Centres de santé & pharmacies</h1>
@@ -115,8 +122,17 @@
   document.getElementById('countHopitaux').textContent = countHopitaux;
   document.getElementById('countPharmacies').textContent = countPharmacies;
 
+  function messageCarte(texte) {
+    var bloc = document.getElementById('nearList');
+    bloc.style.display = 'block';
+    bloc.innerHTML = '<div class="alert alert-info" style="margin:0;">📍 ' + texte + '</div>';
+  }
+
   document.getElementById('localiserBtn').addEventListener('click', function () {
-    if (!navigator.geolocation) { alert("La géolocalisation n'est pas disponible sur ce navigateur."); return; }
+    if (!navigator.geolocation) {
+      messageCarte("La géolocalisation n'est pas disponible sur ce navigateur. Déplacez la carte sur votre quartier, puis cliquez sur « Les 10 plus proches ».");
+      return;
+    }
     navigator.geolocation.getCurrentPosition(function (position) {
       userLat = position.coords.latitude; userLng = position.coords.longitude;
       map.setView([userLat, userLng], 14);
@@ -126,7 +142,10 @@
         fillColor: '#1e88e5', fillOpacity: 1
       }).addTo(map);
       userMarker.bindPopup('<b>📍 Vous êtes ici</b>').openPopup();
-    }, function (error) { alert("Impossible d'obtenir votre position : " + error.message); });
+      document.getElementById('nearList').style.display = 'none';
+    }, function () {
+      messageCarte("L'accès à votre position est bloqué par le navigateur ou par cette fenêtre d'aperçu. Autorisez la localisation dans les réglages du navigateur, ou déplacez la carte sur votre quartier puis cliquez sur « Les 10 plus proches ».");
+    });
   });
 
   document.getElementById('prochesBtn').addEventListener('click', function () {

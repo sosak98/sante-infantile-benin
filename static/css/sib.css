@@ -38,6 +38,14 @@ img { max-width: 100%; display: block; }
 
 .container { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 20px; }
 
+/* ---------------------------------------------------- Fil d'Ariane */
+.sib-breadcrumb { background: #fff; border-bottom: 1px solid var(--line); }
+.sib-breadcrumb .container { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding-top: 10px; padding-bottom: 10px; font-size: .82rem; }
+.sib-breadcrumb a { color: var(--teal-700); font-weight: 600; }
+.sib-breadcrumb a:hover { text-decoration: underline; color: var(--teal-800); }
+.sib-breadcrumb .sep { color: #b9cfcb; }
+.sib-breadcrumb .current { color: var(--ink); font-weight: 600; }
+
 /* ------------------------------------------------------------------ Boutons */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
