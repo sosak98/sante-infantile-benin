@@ -44,7 +44,7 @@ def hors_ligne(request):
 
 SW_JS = """
 // Santé Infantile Bénin : Service Worker (PWA, mode hors-ligne)
-const CACHE = 'sib-cache-v5';
+const CACHE = 'sib-cache-v6';
 const OFFLINE = '/hors-ligne/';
 const MAX_ITEMS = 120;
 
@@ -117,16 +117,22 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Fichiers statiques du site : cache d'abord, rafraîchis en arrière-plan
+  // Fichiers statiques du site : réseau d'abord (pour voir les nouveautés),
+  // cache en secours (pour le mode hors-ligne)
   if (url.origin === self.location.origin && url.pathname.startsWith('/static/')) {
     e.respondWith((async () => {
       const cache = await caches.open(CACHE);
-      const cached = await cache.match(request);
-      const network = fetch(request).then((res) => {
-        if (res && res.ok) cache.put(request, res.clone());
+      try {
+        const res = await fetch(request);
+        if (res && res.ok) {
+          cache.put(request, res.clone());
+          trimCache(CACHE);
+        }
         return res;
-      }).catch(() => null);
-      return cached || (await network) || Response.error();
+      } catch (err) {
+        const cached = await cache.match(request);
+        return cached || Response.error();
+      }
     })());
     return;
   }
