@@ -45,7 +45,7 @@
         <img src="{% static 'img/logo.png' %}" alt="Santé Infantile Bénin">
         <span>Santé&nbsp;Infantile&nbsp;Bénin</span>
       </a>
-      <button class="nav-toggler" type="button" aria-label="Menu" onclick="document.querySelector('.sib-nav').classList.toggle('open')">☰</button>
+      <button class="nav-toggler" type="button" aria-label="Ouvrir le menu" aria-expanded="false" onclick="var n=document.querySelector('.sib-nav');n.classList.toggle('open');var o=n.classList.contains('open');this.textContent=o?'×':'☰';this.setAttribute('aria-expanded',o);this.setAttribute('aria-label',o?'Fermer le menu':'Ouvrir le menu');">☰</button>
       <div class="nav-links">
         <a href="{% url 'accounts:accueil' %}" {% if request.resolver_match.url_name == 'accueil' %}class="active"{% endif %}>Accueil</a>
         <a href="{% url 'sante:carte' %}">Carte</a>
@@ -135,6 +135,18 @@
         });
       });
     }
+
+    // Le menu mobile se referme tout seul quand on choisit une page
+    document.addEventListener('click', function (e) {
+      var nav = document.querySelector('.sib-nav');
+      var toggler = document.querySelector('.nav-toggler');
+      if (!nav || !nav.classList.contains('open')) return;
+      if (e.target.closest('.nav-links a')) {
+        nav.classList.remove('open');
+        toggler.textContent = '☰';
+        toggler.setAttribute('aria-expanded', 'false');
+      }
+    });
   </script>
   {% block extra_js %}{% endblock %}
 </body>
