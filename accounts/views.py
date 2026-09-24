@@ -32,6 +32,14 @@ def about(request):
     return render(request, 'accounts/a_propos.html')
 
 
+def politique_confidentialite(request):
+    return render(request, 'accounts/politique_confidentialite.html')
+
+
+def cgu(request):
+    return render(request, 'accounts/cgu.html')
+
+
 # ---------------------------------------------------------------------------
 # Authentification
 # ---------------------------------------------------------------------------

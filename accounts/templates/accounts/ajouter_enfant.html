@@ -3,6 +3,15 @@
 {% block title %}Ajouter un enfant - Santé Infantile Bénin{% endblock %}
 
 {% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="/">Accueil</a>
+    <span class="sep">›</span>
+    <a href="/dashboard/">Mon espace</a>
+    <span class="sep">›</span>
+    <span class="current">Ajouter un enfant</span>
+  </div>
+</nav>
 <div class="page-head">
   <div class="container">
     <h1>👶 Ajouter un enfant</h1>
@@ -30,7 +39,7 @@
         <button type="submit" class="btn btn-primary btn-block">✅ Ajouter l'enfant</button>
       </form>
     </div>
-    <p style="text-align:center;"><a href="{% url 'accounts:profil' %}" style="color:var(--muted);">← Retour au profil</a></p>
+
   </div>
 </div>
 {% endblock %}

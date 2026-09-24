@@ -3,6 +3,13 @@
 {% block title %}Conseils nutritionnels - Santé Infantile Bénin{% endblock %}
 
 {% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="/">Accueil</a>
+    <span class="sep">›</span>
+    <span class="current">Conseils nutritionnels</span>
+  </div>
+</nav>
 <div class="page-head">
   <div class="container">
     <h1>🥣 Conseils nutritionnels par âge</h1>
@@ -21,7 +28,7 @@
         <div class="field">
           <label>Enfant</label>
           <select name="enfant_id" class="form-control">
-            <option value="">— Choisir —</option>
+            <option value="">Choisir une option</option>
             {% for e in enfants %}
               <option value="{{ e.id }}">{{ e.prenom }}</option>
             {% endfor %}

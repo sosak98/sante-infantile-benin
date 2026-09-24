@@ -4,6 +4,13 @@
 {% block title %}Connexion - Santé Infantile Bénin{% endblock %}
 
 {% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="/">Accueil</a>
+    <span class="sep">›</span>
+    <span class="current">Connexion</span>
+  </div>
+</nav>
 <div class="container">
   <div class="auth-wrap">
     <div class="auth-head">
@@ -33,7 +40,7 @@
         Pas encore inscrit ? <a href="{% url 'accounts:register' %}">S'inscrire gratuitement</a>
       </p>
       <p class="auth-alt">
-        <a href="{% url 'accounts:accueil' %}" style="font-weight:400;color:var(--muted);">← Retour à l'accueil</a>
+
       </p>
     </div>
   </div>

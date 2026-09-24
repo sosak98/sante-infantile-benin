@@ -11,6 +11,9 @@ PAGES = [
     "conseils/",
     "triage/",
     "inscription/",
+    "premiers-secours/",
+    "politique-de-confidentialite/",
+    "cgu/",
 ]
 
 # Zones privees a ne PAS indexer

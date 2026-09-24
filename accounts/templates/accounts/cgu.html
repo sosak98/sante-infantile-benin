@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Conditions d'utilisation - Santé Infantile Bénin{% endblock %}
+{% block description %}Conditions générales d'utilisation de Santé Infantile Bénin.{% endblock %}
+
+{% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="/">Accueil</a>
+    <span class="sep">›</span>
+    <span class="current">Conditions d'utilisation</span>
+  </div>
+</nav>
+<div class="page-head">
+  <div class="container">
+    <h1>📜 Conditions d'utilisation</h1>
+    <p>En créant un compte ou en utilisant Santé Infantile Bénin, vous acceptez les présentes conditions.</p>
+  </div>
+</div>
+
+<div class="container page-body legal">
+  <div class="panel">
+    <p class="maj">Dernière mise à jour : septembre 2026</p>
+
+    <h2>1. Objet</h2>
+    <p>Santé Infantile Bénin (SIB) est une plateforme gratuite d'aide au suivi de la santé des enfants de 0 à 5 ans au Bénin : calendrier vaccinal (PEV), conseils nutritionnels, dépistage de la malnutrition, carte des formations sanitaires, premiers secours et triage pédiatrique assisté par intelligence artificielle.</p>
+
+    <h2>2. Accès au service</h2>
+    <p>L'accès est gratuit. Certaines fonctionnalités (suivi de vos enfants) nécessitent la création d'un compte avec votre numéro de téléphone. Vous êtes responsable de la confidentialité de vos identifiants et de l'exactitude des informations saisies (notamment la date de naissance et les mesures de vos enfants).</p>
+
+    <h2>3. Avertissement médical important</h2>
+    <p>Les contenus et outils de SIB, y compris le calendrier vaccinal, le dépistage nutritionnel et le triage par IA, sont des <strong>aides à l'information et à l'orientation</strong>. Ils ne remplacent en aucun cas une consultation médicale, un diagnostic ou un traitement prescrit par un professionnel de santé.</p>
+    <p>En cas de signe de danger, de doute ou d'urgence, <strong>appelez le 112 ou rendez-vous immédiatement au centre de santé le plus proche</strong>. Ne retardez jamais une prise en charge médicale en raison d'une information lue sur ce site.</p>
+
+    <h2>4. Comportement de l'utilisateur</h2>
+    <p>Vous vous engagez à utiliser le service de bonne foi, sans tenter de nuire à son fonctionnement, d'accéder aux données d'autres utilisateurs, ou de détourner les outils de leur finalité de santé publique.</p>
+
+    <h2>5. Disponibilité</h2>
+    <p>Nous faisons de notre mieux pour maintenir le service disponible, mais celui-ci est fourni « en l'état », sans garantie d'absence d'interruption ou d'erreur. Des opérations de maintenance peuvent avoir lieu.</p>
+
+    <h2>6. Propriété intellectuelle</h2>
+    <p>Le site, ses textes, son design et son logo sont la propriété de Santé Infantile Bénin. Les recommandations affichées s'appuient sur des références publiques (OMS, PEV Bénin, PCIME) et peuvent être partagées à des fins d'éducation sanitaire, avec mention de la source.</p>
+
+    <h2>7. Données personnelles</h2>
+    <p>L'utilisation de vos données est décrite dans notre <a href="{% url 'accounts:politique_confidentialite' %}">Politique de confidentialité</a>.</p>
+
+    <h2>8. Suppression de compte</h2>
+    <p>Vous pouvez demander à tout moment la suppression de votre compte et de vos données en écrivant à <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a>.</p>
+
+    <h2>9. Droit applicable</h2>
+    <p>Les présentes conditions sont régies par le droit béninois. Tout litige relève de la compétence des tribunaux de Cotonou, Bénin.</p>
+
+    <h2>10. Contact</h2>
+    <p>Questions sur ces conditions : <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a>.</p>
+  </div>
+</div>
+{% endblock %}

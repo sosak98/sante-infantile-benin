@@ -9,9 +9,8 @@
 <section class="hero" style="padding:0;">
   <div class="container hero-inner">
     <div>
-      <span class="eyebrow">🧑‍⚕️ Par un infirmier-puériculteur · Développeur web</span>
       <h1>La santé de votre enfant,<br><span class="grad">suivie simplement</span> au Bénin.</h1>
-      <p class="lead">Vaccination, nutrition, dépistage de la malnutrition et triage assisté par IA. J'ai regroupé ici tout ce qui sert vraiment aux parents, sans jargon médical.</p>
+      <p class="lead">Vaccination, nutrition, dépistage de la malnutrition, premiers secours et triage assisté par IA : six outils simples pour suivre votre enfant de la naissance à 5 ans, sans jargon médical.</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="{% url 'accounts:register' %}">Commencer gratuitement</a>
         <a class="btn btn-ghost" href="#outils">Découvrir les outils</a>
@@ -54,7 +53,7 @@
     <div class="sec-head">
       <span class="eyebrow">Nos outils</span>
       <h2>Ce que vous pouvez faire ici</h2>
-      <p>Chaque outil a été pensé pour répondre à une vraie question de parent.</p>
+      <p>Des outils simples, pensés pour répondre aux questions que se posent tous les parents.</p>
     </div>
     <div class="tools">
       <a class="tool" href="{% url 'sante:carte' %}">
@@ -65,13 +64,9 @@
         <div class="ico">📏</div><h3>Dépistage de la malnutrition</h3>
         <p>Vérifiez l'état nutritionnel (poids, taille, périmètre brachial).</p><span class="tag">Z-scores OMS</span>
       </a>
-      <a class="tool" href="{% url 'conseils:calculer_rdv' %}">
-        <div class="ico">💉</div><h3>Calculateur de RDV vaccinaux</h3>
-        <p>Générez le prochain rendez-vous vaccinal de votre enfant.</p><span class="tag">PEV Bénin</span>
-      </a>
       <a class="tool" href="{% url 'conseils:calendrier_vaccinal' %}">
-        <div class="ico">📅</div><h3>Calendrier vaccinal</h3>
-        <p>Le calendrier officiel, âge par âge, avec historique.</p><span class="tag">Naissance à 5 ans</span>
+        <div class="ico">💉</div><h3>Vaccination : calendrier & RDV</h3>
+        <p>Le calendrier officiel du PEV Bénin et le calculateur de rendez-vous de votre enfant.</p><span class="tag">PEV Bénin</span>
       </a>
       <a class="tool" href="{% url 'conseils:conseils_nutritionnels' %}">
         <div class="ico">🥣</div><h3>Conseils nutritionnels par âge</h3>
@@ -81,6 +76,32 @@
         <div class="ico">🤖</div><h3>IA de triage pédiatrique</h3>
         <p>Orientation rapide selon les signes d'alerte, conseils personnalisés.</p><span class="tag">Assistance intelligente</span>
       </a>
+      <a class="tool" href="{% url 'premiers_secours' %}">
+        <div class="ico">🆘</div><h3>Secours & signes de danger</h3>
+        <p>Reconnaître les signes de danger et apprendre les gestes de premiers secours, de 0 à 5 ans.</p><span class="tag">Références OMS</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- URGENCES : SIGNES DE DANGER & PREMIERS SECOURS -->
+<section id="urgence" style="padding-top:0;">
+  <div class="container">
+    <div class="urgence">
+      <div class="urgence-txt">
+        <span class="eyebrow eyebrow-danger">🚨 Urgences 0-5 ans</span>
+        <h2>Signes de danger &amp; premiers secours</h2>
+        <p>Un jeune enfant ne sait pas toujours dire ce qu'il ressent. Apprenez à reconnaître les signes qui imposent une consultation immédiate, et les gestes simples qui peuvent lui sauver la vie en attendant les soins.</p>
+        <div class="urgence-actions">
+          <a class="btn btn-light" href="{% url 'premiers_secours' %}#signes">🚨 Reconnaître les signes de danger</a>
+          <a class="btn btn-urgence-ghost" href="{% url 'premiers_secours' %}#gestes">🆘 Voir les gestes de secours</a>
+        </div>
+      </div>
+      <div class="urgence-visual">
+        <div class="urgence-num">112</div>
+        <div class="urgence-num-label">Numéro d'urgence</div>
+        <div class="urgence-hint">En cas de danger immédiat, appelez le 112 ou rendez-vous au centre de santé le plus proche.</div>
+      </div>
     </div>
   </div>
 </section>

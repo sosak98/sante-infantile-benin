@@ -4,6 +4,13 @@
 {% block title %}Inscription - Santé Infantile Bénin{% endblock %}
 
 {% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="/">Accueil</a>
+    <span class="sep">›</span>
+    <span class="current">Inscription</span>
+  </div>
+</nav>
 <div class="container">
   <div class="auth-wrap">
     <div class="auth-head">
@@ -34,6 +41,13 @@
           <label>🔒 Confirmer le mot de passe</label>
           {{ form.password2 }}
           {% if form.password2.errors %}<div class="alert alert-danger" style="margin:8px 0 0;padding:8px 12px;">{{ form.password2.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="field">
+          <label class="check-field">
+            {{ form.accepte_conditions }}
+            <span>J'ai lu et j'accepte les <a href="{% url 'accounts:cgu' %}" target="_blank" rel="noopener">Conditions d'utilisation</a> et la <a href="{% url 'accounts:politique_confidentialite' %}" target="_blank" rel="noopener">Politique de confidentialité</a> <b>*</b></span>
+          </label>
+          {% if form.accepte_conditions.errors %}<div class="alert alert-danger" style="margin:8px 0 0;padding:8px 12px;">{{ form.accepte_conditions.errors.0 }}</div>{% endif %}
         </div>
         <button type="submit" class="btn btn-primary btn-block">✅ Créer mon compte</button>
       </form>

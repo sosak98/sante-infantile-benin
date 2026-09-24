@@ -3,10 +3,17 @@
 {% block title %}Dépistage de la malnutrition - Santé Infantile Bénin{% endblock %}
 
 {% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="/">Accueil</a>
+    <span class="sep">›</span>
+    <span class="current">Dépistage de la malnutrition</span>
+  </div>
+</nav>
 <div class="page-head">
   <div class="container">
     <h1>État nutritionnel</h1>
-    <p>{% if resultats and not resultats.erreur %}Résultat pour {{ resultats.prenom }}{% else %}Poids, taille et bras — un calcul, puis le résultat.{% endif %}</p>
+    <p>{% if resultats and not resultats.erreur %}Résultat pour {{ resultats.prenom }}{% else %}Poids, taille et bras : un calcul, puis le résultat.{% endif %}</p>
   </div>
 </div>
 
@@ -50,7 +57,7 @@
     <p class="sub" style="margin-top:12px;">WHO Child Growth Standards. Formule LMS : Z = ((X/M)<sup>L</sup> − 1) / (L × S). Indicateurs : poids-pour-âge, taille-pour-âge, poids-pour-taille. MUAC 11,5 / 12,5 cm (OMS/UNICEF). Ce n’est pas un dossier clinique.</p>
     <ul style="color:var(--muted);font-size:.92rem;">
       {% for eval in resultats.evaluations %}
-        <li>{{ eval.indicateur }}{% if eval.z != None %} : z = {{ eval.z }}{% endif %} — {{ eval.statut }}</li>
+        <li>{{ eval.indicateur }}{% if eval.z != None %} : z = {{ eval.z }}{% endif %} : {{ eval.statut }}</li>
       {% endfor %}
     </ul>
   </details>
@@ -65,9 +72,9 @@
     <h3>Comment mesurer</h3>
     <p class="sub">Périmètre du bras gauche, à mi-hauteur (MUAC), enfant de 6 à 59 mois.</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <span class="badge-pill badge-danger">&lt; 11,5 cm — sévère</span>
-      <span class="badge-pill badge-warn">11,5–12,5 cm — modéré</span>
-      <span class="badge-pill badge-ok">≥ 12,5 cm — habituel</span>
+      <span class="badge-pill badge-danger">&lt; 11,5 cm : sévère</span>
+      <span class="badge-pill badge-warn">11,5 à 12,5 cm : modéré</span>
+      <span class="badge-pill badge-ok">≥ 12,5 cm : habituel</span>
     </div>
   </div>
 

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Hors ligne - Santé Infantile Bénin{% endblock %}
+
+{% block extra_head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<section style="padding:80px 0;">
+  <div class="container" style="max-width:540px;text-align:center;">
+    <div style="font-size:3.4rem;">📡</div>
+    <h1 style="font-size:1.7rem;font-weight:800;color:var(--teal-800);margin:14px 0 10px;">Vous êtes hors ligne</h1>
+    <p style="color:var(--muted);">Aucune connexion internet n'est disponible pour le moment. Bonne nouvelle : les pages que vous avez déjà consultées restent accessibles.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px;">
+      <button class="btn btn-primary" onclick="window.location.reload()">🔄 Réessayer</button>
+      <a class="btn btn-ghost" href="/">🏠 Retour à l'accueil</a>
+    </div>
+    <p style="color:var(--muted);font-size:.85rem;margin-top:26px;">💡 Astuce : sur mobile, ajoutez Santé Infantile Bénin à votre écran d'accueil pour l'utiliser comme une application, même sans réseau.</p>
+  </div>
+</section>
+{% endblock %}

@@ -37,6 +37,14 @@ class ParentRegisterForm(forms.Form):
         label="Confirmer le mot de passe",
         widget=forms.PasswordInput(attrs={'placeholder': '••••••••', 'autocomplete': 'new-password', 'class': 'form-control'}),
     )
+    accepte_conditions = forms.BooleanField(
+        required=True,
+        label="J'ai lu et j'accepte les Conditions d'utilisation et la Politique de confidentialité",
+        error_messages={
+            'required': "Vous devez accepter les conditions d'utilisation et la politique de confidentialité pour créer un compte."
+        },
+        widget=forms.CheckboxInput(),
+    )
 
     def clean_telephone(self):
         telephone = self.cleaned_data['telephone'].strip()

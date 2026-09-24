@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Santé Infantile Bénin — Design system
+   Santé Infantile Bénin : design system
    Palette teal médicale (#004d40 vers #00796b) + accent ambre (#e0a000)
    ========================================================================== */
 
@@ -27,7 +27,7 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--ink);
   background: #f6fbfa;
   line-height: 1.6;
@@ -37,6 +37,14 @@ a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 
 .container { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+
+/* ---------------------------------------------------- Fil d'Ariane */
+.sib-breadcrumb { background: #fff; border-bottom: 1px solid var(--line); }
+.sib-breadcrumb .container { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding-top: 10px; padding-bottom: 10px; font-size: .82rem; }
+.sib-breadcrumb a { color: var(--teal-700); font-weight: 600; }
+.sib-breadcrumb a:hover { text-decoration: underline; color: var(--teal-800); }
+.sib-breadcrumb .sep { color: #b9cfcb; }
+.sib-breadcrumb .current { color: var(--ink); font-weight: 600; }
 
 /* ------------------------------------------------------------------ Boutons */
 .btn {
@@ -63,15 +71,15 @@ img { max-width: 100%; display: block; }
   background: rgba(255,255,255,.92); backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
-.sib-nav .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+.sib-nav .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 76px; }
 .sib-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; color: var(--teal-800); }
-.sib-brand img { height: 56px; width: auto; max-width: 200px; object-fit: contain; }
+.sib-brand img { height: 62px; width: auto; max-width: 200px; object-fit: contain; }
 .sib-nav .nav-links { display: flex; align-items: center; gap: 20px; font-weight: 600; font-size: .93rem; color: var(--muted); }
 .sib-nav .nav-links a { padding: 4px 0; }
 .sib-nav .nav-links a:hover, .sib-nav .nav-links a.active { color: var(--teal-700); }
 .sib-nav .nav-links a.active { border-bottom: 2px solid var(--amber); }
 .sib-nav .nav-cta { display: flex; align-items: center; gap: 10px; }
-.sib-nav .nav-toggler { display: none; background: none; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 1.2rem; cursor: pointer; }
+.sib-nav .nav-toggler { display: none; background: none; border: 1px solid var(--line); border-radius: 10px; padding: 7px 11px; font-size: 1.2rem; line-height: 1; cursor: pointer; color: var(--teal-800); }
 
 /* ------------------------------------------------------------------ Hero */
 .hero {
@@ -220,7 +228,7 @@ section { padding: 60px 0; }
 
 /* ------------------------------------------------------------------ Footer */
 .site-footer { background: var(--teal-900); color: rgba(255,255,255,.75); padding: 48px 0 24px; margin-top: 20px; }
-.foot-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 32px; margin-bottom: 34px; }
+.foot-grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 32px; margin-bottom: 34px; }
 .site-footer .sib-brand { color: #fff; }
 .site-footer p { font-size: .88rem; margin: 12px 0 0; max-width: 300px; }
 .site-footer h5 { color: #fff; font-size: .92rem; margin: 0 0 14px; }
@@ -234,8 +242,97 @@ section { padding: 60px 0; }
 .alert-error, .alert-danger { background: #fdecea; color: #b71c1c; border: 1px solid #f6c6c2; }
 .alert-info { background: #e3f2fd; color: #1565c0; border: 1px solid #c5e0f7; }
 
+/* ---------------------------------------------------- Module Secours (nav) */
+.sib-nav .nav-links a.nav-secours { color: #c62828; font-weight: 700; }
+.sib-nav .nav-links a.nav-secours:hover, .sib-nav .nav-links a.nav-secours.active { color: #b71c1c; }
+
+/* ---------------------------------------------------- Bandeau urgences (accueil) */
+.urgence { display: grid; grid-template-columns: 1.25fr .75fr; gap: 36px; align-items: center; background: linear-gradient(135deg, #8e1c1c, #c62828 60%, #e53935); color: #fff; border-radius: 26px; padding: 42px 46px; box-shadow: 0 18px 48px rgba(198, 40, 40, .35); position: relative; overflow: hidden; }
+.urgence::after { content: ""; position: absolute; right: -70px; bottom: -90px; width: 280px; height: 280px; border-radius: 50%; background: rgba(255,255,255,.07); }
+.urgence::before { content: ""; position: absolute; left: -60px; top: -80px; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,255,255,.05); }
+.urgence-txt { position: relative; z-index: 1; }
+.eyebrow-danger { background: rgba(255,255,255,.16); color: #ffd9d6; }
+.urgence h2 { font-size: 1.9rem; font-weight: 800; margin: 14px 0 10px; color: #fff; }
+.urgence p { opacity: .94; margin: 0 0 22px; font-size: 1rem; max-width: 560px; }
+.urgence-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-urgence-ghost { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,.55); }
+.btn-urgence-ghost:hover { background: rgba(255,255,255,.12); color: #fff; border-color: #fff; }
+.urgence-visual { position: relative; z-index: 1; text-align: center; }
+.urgence-num { font-size: 3.6rem; font-weight: 900; line-height: 1; letter-spacing: .02em; background: rgba(255,255,255,.14); border: 2px solid rgba(255,255,255,.35); border-radius: 22px; padding: 22px 18px 16px; max-width: 230px; margin: 0 auto; }
+.urgence-num-label { font-weight: 700; margin-top: 10px; font-size: .95rem; }
+.urgence-hint { font-size: .8rem; opacity: .85; max-width: 240px; margin: 6px auto 0; }
+
+/* ---------------------------------------------------- Page premiers secours */
+.page-head-danger { background: linear-gradient(135deg, #7f1010, #c62828); }
+section[id], .panel[id] { scroll-margin-top: 90px; }
+
+.urgence-bar { display: flex; gap: 14px; align-items: center; background: #fff; border: 1px solid #f6c6c2; border-left: 5px solid var(--danger); border-radius: 14px; box-shadow: var(--shadow-sm); padding: 16px 20px; margin-bottom: 22px; font-size: .95rem; flex-wrap: wrap; }
+.urgence-bar b { color: #b71c1c; }
+
+.sec-title { display: flex; align-items: center; gap: 10px; font-size: 1.45rem; font-weight: 800; color: var(--teal-800); margin: 8px 0 6px; }
+
+.danger-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+.danger-card { background: #fff; border: 1px solid #f3d1ce; border-left: 4px solid var(--danger); border-radius: 14px; padding: 16px 18px; box-shadow: var(--shadow-sm); }
+.danger-card .ic { font-size: 1.35rem; }
+.danger-card h3 { font-size: .98rem; margin: 8px 0 6px; color: #8e1c1c; }
+.danger-card p { margin: 0; color: var(--muted); font-size: .86rem; }
+.danger-card.warn { border-color: #ffe0b2; border-left-color: var(--amber); }
+.danger-card.warn h3 { color: var(--amber-dark); }
+
+.tier-title { font-size: 1.06rem; font-weight: 800; margin: 28px 0 4px; }
+.tier-title:first-of-type { margin-top: 10px; }
+.tier-rouge { color: #b71c1c; }
+.tier-ambre { color: var(--amber-dark); }
+
+.info-note { background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: 14px; padding: 16px 20px; font-size: .9rem; color: var(--ink); margin-top: 22px; }
+.info-note b { color: var(--teal-800); }
+
+/* Accordéons gestes de secours */
+.geste { background: #fff; border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-sm); margin-bottom: 14px; overflow: hidden; }
+.geste summary { display: flex; align-items: center; gap: 12px; padding: 18px 20px; cursor: pointer; font-weight: 700; color: var(--teal-800); font-size: 1rem; list-style: none; }
+.geste summary::-webkit-details-marker { display: none; }
+.geste summary::after { content: "+"; margin-left: auto; font-size: 1.4rem; font-weight: 400; color: var(--teal-500); transition: .2s; }
+.geste[open] summary::after { transform: rotate(45deg); }
+.geste .g-body { padding: 4px 20px 20px; }
+
+.gd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.gd-col { border-radius: 14px; padding: 14px 18px; font-size: .9rem; }
+.gd-col h4 { font-size: .92rem; margin: 0 0 8px; }
+.gd-col.do { background: #eef8f0; border: 1px solid #cdeeda; }
+.gd-col.do h4 { color: #1e7b34; }
+.gd-col.dont { background: #fdf0ef; border: 1px solid #f6c6c2; }
+.gd-col.dont h4 { color: #b71c1c; }
+.gd-col ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--ink); }
+.g-note { margin-top: 10px; font-size: .85rem; color: var(--muted); }
+.g-note b { color: var(--amber-dark); }
+
+/* Numéros d'urgence */
+.nos-numeros { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-top: 16px; }
+.numero-card { text-align: center; background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: 16px; padding: 24px; }
+.numero-card .num { font-size: 2.4rem; font-weight: 900; color: #c62828; }
+.numero-card h3 { margin: 6px 0 4px; color: var(--teal-800); font-size: 1.02rem; }
+.numero-card p { margin: 0; color: var(--muted); font-size: .88rem; }
+
+/* ---------------------------------------------------- Case à cocher (inscription) */
+.field label.check-field { display: flex; gap: 10px; align-items: flex-start; font-weight: 400; font-size: .88rem; color: var(--muted); margin: 4px 0 0; cursor: pointer; }
+.check-field input { margin-top: 3px; accent-color: var(--teal-600); width: 17px; height: 17px; flex: none; }
+.check-field a { color: var(--teal-600); font-weight: 700; text-decoration: underline; }
+.check-field b { color: var(--danger); }
+
+/* ---------------------------------------------------- Pages légales */
+.legal .panel h2 { font-size: 1.08rem; color: var(--teal-800); margin: 22px 0 8px; }
+.legal .panel h2:first-of-type { margin-top: 4px; }
+.legal .panel p, .legal .panel li { font-size: .93rem; color: var(--muted); }
+.legal .panel p a { color: var(--teal-600); font-weight: 600; }
+.legal .panel ul { padding-left: 20px; display: grid; gap: 6px; margin-bottom: 10px; }
+.legal .maj { font-size: .85rem; font-style: italic; margin-bottom: 16px; }
+
 /* ------------------------------------------------------------------ Responsive */
 @media (max-width: 900px) {
+  .urgence { grid-template-columns: 1fr; text-align: center; padding: 34px 24px; }
+  .urgence-actions { justify-content: center; }
+  .urgence p { margin-left: auto; margin-right: auto; }
+  .danger-grid { grid-template-columns: 1fr 1fr; }
   .hero-inner { grid-template-columns: 1fr; text-align: center; padding-top: 36px; }
   .hero .lead { margin-left: auto; margin-right: auto; }
   .hero-actions, .hero-proof { justify-content: center; }
@@ -245,20 +342,32 @@ section { padding: 60px 0; }
   .foot-grid { grid-template-columns: 1fr; }
   .grid3 { grid-template-columns: 1fr; }
   .sib-nav .nav-links { display: none; }
-  .sib-nav .nav-toggler { display: block; }
+  .sib-nav .nav-toggler { display: block; order: 2; margin-left: 10px; }
+  .sib-brand { order: 1; }
+  .sib-nav .nav-cta { order: 3; margin-left: auto; }
   .sib-brand span { display: none; }
-  .sib-brand img { height: 52px; }
+  .sib-brand img { height: 56px; }
   .float-card { display: none; }
   .hero-visual { position: relative; }
   .sib-nav .nav-cta { gap: 6px; }
   .sib-nav .nav-cta .btn { padding: 8px 11px; font-size: .8rem; }
   .sib-nav.open .nav-links {
-    display: flex; flex-direction: column; position: absolute; top: 68px; left: 0; right: 0;
-    background: #fff; padding: 16px 20px; gap: 14px; border-bottom: 1px solid var(--line);
-    box-shadow: var(--shadow-md);
+    display: flex; flex-direction: column; position: absolute; top: 76px; left: 0; right: 0;
+    background: #fff; padding: 4px 20px 10px; gap: 0; border-bottom: 1px solid var(--line);
+    box-shadow: var(--shadow-md); max-height: calc(100vh - 68px); overflow-y: auto; text-align: left;
   }
+  .sib-nav.open .nav-links a { padding: 13px 2px; border-bottom: 1px solid var(--line); font-size: .95rem; }
+  .sib-nav.open .nav-links a:last-child { border-bottom: 0; }
+  .sib-nav.open .nav-links a.active { border-bottom: 1px solid var(--line); color: var(--teal-800); font-weight: 800; box-shadow: inset 3px 0 0 var(--amber); padding-left: 10px; }
+  .sib-nav.open .nav-links a.active:last-child { border-bottom: 0; }
+}
+@media (max-width: 700px) {
+  .gd-grid { grid-template-columns: 1fr; }
+  .nos-numeros { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
   .tools, .steps, .grid2 { grid-template-columns: 1fr; }
   .hero h1 { font-size: 2.1rem; }
+  .danger-grid { grid-template-columns: 1fr; }
+  .urgence-num { font-size: 3rem; }
 }

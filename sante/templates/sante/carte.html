@@ -9,6 +9,13 @@
 {% endblock %}
 
 {% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="/">Accueil</a>
+    <span class="sep">›</span>
+    <span class="current">Carte des centres & pharmacies</span>
+  </div>
+</nav>
 <div class="page-head">
   <div class="container">
     <h1>📍 Centres de santé & pharmacies</h1>
@@ -53,10 +60,26 @@
   var COULEURS = { 'centre': '#00695c', 'clinique': '#6a1b9a', 'hopital': '#c62828', 'hopital_zone': '#c62828', 'pharmacie': '#ef6c00' };
 
   var map = L.map('map', { maxBounds: [[5, -1], [14, 5]] });
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  var tuilesOSM = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributeurs',
     maxZoom: 19
-  }).addTo(map);
+  });
+  // Si les serveurs OSM renvoient 403 dans cet environnement, bascule automatique
+  // sur les tuiles de secours CARTO (mêmes données OpenStreetMap).
+  var tuilesSecours = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 20
+  });
+  var tuilesActives = tuilesOSM;
+  tuilesOSM.on('tileerror', function () {
+    if (tuilesActives === tuilesOSM) {
+      map.removeLayer(tuilesOSM);
+      tuilesSecours.addTo(map);
+      tuilesActives = tuilesSecours;
+    }
+  });
+  tuilesOSM.addTo(map);
   map.fitBounds([[6.2, 0.8], [12.4, 3.85]]);
 
   var userMarker = null, userLat = null, userLng = null;
@@ -115,8 +138,17 @@
   document.getElementById('countHopitaux').textContent = countHopitaux;
   document.getElementById('countPharmacies').textContent = countPharmacies;
 
+  function messageCarte(texte) {
+    var bloc = document.getElementById('nearList');
+    bloc.style.display = 'block';
+    bloc.innerHTML = '<div class="alert alert-info" style="margin:0;">📍 ' + texte + '</div>';
+  }
+
   document.getElementById('localiserBtn').addEventListener('click', function () {
-    if (!navigator.geolocation) { alert("La géolocalisation n'est pas disponible sur ce navigateur."); return; }
+    if (!navigator.geolocation) {
+      messageCarte("La géolocalisation n'est pas disponible sur ce navigateur. Déplacez la carte sur votre quartier, puis cliquez sur « Les 10 plus proches ».");
+      return;
+    }
     navigator.geolocation.getCurrentPosition(function (position) {
       userLat = position.coords.latitude; userLng = position.coords.longitude;
       map.setView([userLat, userLng], 14);
@@ -126,7 +158,10 @@
         fillColor: '#1e88e5', fillOpacity: 1
       }).addTo(map);
       userMarker.bindPopup('<b>📍 Vous êtes ici</b>').openPopup();
-    }, function (error) { alert("Impossible d'obtenir votre position : " + error.message); });
+      document.getElementById('nearList').style.display = 'none';
+    }, function () {
+      messageCarte("L'accès à votre position est bloqué par le navigateur ou par cette fenêtre d'aperçu. Autorisez la localisation dans les réglages du navigateur, ou déplacez la carte sur votre quartier puis cliquez sur « Les 10 plus proches ».");
+    });
   });
 
   document.getElementById('prochesBtn').addEventListener('click', function () {
