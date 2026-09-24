@@ -10,13 +10,13 @@
   <div class="container hero-inner">
     <div>
       <h1>La santé de votre enfant,<br><span class="grad">suivie simplement</span> au Bénin.</h1>
-      <p class="lead">Vaccination, nutrition, dépistage de la malnutrition et triage assisté par IA. J'ai regroupé ici tout ce qui sert vraiment aux parents, sans jargon médical.</p>
+      <p class="lead">Vaccination, nutrition, dépistage de la malnutrition, premiers secours et triage assisté par IA : six outils simples pour suivre votre enfant de la naissance à 5 ans, sans jargon médical.</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="{% url 'accounts:register' %}">Commencer gratuitement</a>
         <a class="btn btn-ghost" href="#outils">Découvrir les outils</a>
       </div>
       <div class="hero-proof">
-        <div><b>7</b> outils santé</div>
+        <div><b>6</b> outils santé</div>
         <div><b>100%</b> gratuit pour les parents</div>
         <div><b>PEV</b> calendrier officiel Bénin</div>
       </div>
@@ -53,7 +53,7 @@
     <div class="sec-head">
       <span class="eyebrow">Nos outils</span>
       <h2>Ce que vous pouvez faire ici</h2>
-      <p>Chaque outil a été pensé pour répondre à une vraie question de parent.</p>
+      <p>Des outils simples, pensés pour répondre aux questions que se posent tous les parents.</p>
     </div>
     <div class="tools">
       <a class="tool" href="{% url 'sante:carte' %}">
@@ -64,13 +64,9 @@
         <div class="ico">📏</div><h3>Dépistage de la malnutrition</h3>
         <p>Vérifiez l'état nutritionnel (poids, taille, périmètre brachial).</p><span class="tag">Z-scores OMS</span>
       </a>
-      <a class="tool" href="{% url 'conseils:calculer_rdv' %}">
-        <div class="ico">💉</div><h3>Calculateur de RDV vaccinaux</h3>
-        <p>Générez le prochain rendez-vous vaccinal de votre enfant.</p><span class="tag">PEV Bénin</span>
-      </a>
       <a class="tool" href="{% url 'conseils:calendrier_vaccinal' %}">
-        <div class="ico">📅</div><h3>Calendrier vaccinal</h3>
-        <p>Le calendrier officiel, âge par âge, avec historique.</p><span class="tag">Naissance à 5 ans</span>
+        <div class="ico">💉</div><h3>Vaccination : calendrier & RDV</h3>
+        <p>Le calendrier officiel du PEV Bénin et le calculateur de rendez-vous de votre enfant.</p><span class="tag">PEV Bénin</span>
       </a>
       <a class="tool" href="{% url 'conseils:conseils_nutritionnels' %}">
         <div class="ico">🥣</div><h3>Conseils nutritionnels par âge</h3>
@@ -82,7 +78,7 @@
       </a>
       <a class="tool" href="{% url 'premiers_secours' %}">
         <div class="ico">🆘</div><h3>Secours & signes de danger</h3>
-        <p>Reconnaître les signes de danger et apprendre les gestes de premiers secours, de 0 à 5 ans.</p><span class="tag">Urgences 0-5 ans</span>
+        <p>Reconnaître les signes de danger et apprendre les gestes de premiers secours, de 0 à 5 ans.</p><span class="tag">Références OMS</span>
       </a>
     </div>
   </div>

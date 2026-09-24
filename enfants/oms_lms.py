@@ -1,5 +1,5 @@
 """
-WHO Child Growth Standards — tables LMS officielles
+WHO Child Growth Standards : tables LMS officielles
 (package anthro, OMS / World Health Organization).
 
 Z = ((X/M)**L - 1) / (L*S)   si L ≠ 0

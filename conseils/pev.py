@@ -1,4 +1,4 @@
-"""Calendrier PEV Bénin — calcul partagé (RDV + tableau de bord)."""
+"""Calendrier PEV Bénin : calcul partagé (RDV + tableau de bord)."""
 from datetime import date, timedelta
 
 

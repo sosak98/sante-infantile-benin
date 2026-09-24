@@ -21,7 +21,7 @@
         <div class="field">
           <label>Enfant</label>
           <select name="enfant_id" class="form-control">
-            <option value="">— Choisir —</option>
+            <option value="">Choisir une option</option>
             {% for e in enfants %}
               <option value="{{ e.id }}">{{ e.prenom }}</option>
             {% endfor %}

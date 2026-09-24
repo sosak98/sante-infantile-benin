@@ -1,5 +1,5 @@
 """
-Santé Infantile Bénin — Configuration Django (moderne & sécurisée)
+Santé Infantile Bénin : configuration Django (moderne & sécurisée)
 
 Tous les secrets sont lus depuis les variables d'environnement (fichier `.env`
 en local, variables d'environnement Render en production). Ne committez JAMAIS
@@ -150,7 +150,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 GROQ_API_KEY = config('GROQ_API_KEY', default='')
 GROQ_MODEL = config('GROQ_MODEL', default='openai/gpt-oss-20b')
 
-# SMS / OTP (Twilio — optionnel en attendant WhatsApp Business)
+# SMS / OTP (Twilio : optionnel en attendant WhatsApp Business)
 TWILIO_ACCOUNT_SID = config('TWILIO_ACCOUNT_SID', default='')
 TWILIO_AUTH_TOKEN = config('TWILIO_AUTH_TOKEN', default='')
 TWILIO_FROM = config('TWILIO_FROM', default='')

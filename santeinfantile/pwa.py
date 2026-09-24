@@ -43,7 +43,7 @@ def hors_ligne(request):
 
 
 SW_JS = """
-// Santé Infantile Bénin — Service Worker (PWA, mode hors-ligne)
+// Santé Infantile Bénin : Service Worker (PWA, mode hors-ligne)
 const CACHE = 'sib-cache-v5';
 const OFFLINE = '/hors-ligne/';
 const MAX_ITEMS = 120;

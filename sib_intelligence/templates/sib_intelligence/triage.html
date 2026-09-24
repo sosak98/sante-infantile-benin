@@ -26,7 +26,7 @@
         <div class="field">
           <label>Enfant</label>
           <select name="enfant_id" class="form-control">
-            <option value="">— Essai sans dossier —</option>
+            <option value="">Essai sans dossier</option>
             {% for enfant in enfants %}
               <option value="{{ enfant.id }}">{{ enfant.prenom }} {{ enfant.nom }} ({{ enfant.date_naissance|date:"d/m/Y" }})</option>
             {% endfor %}

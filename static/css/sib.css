@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Santé Infantile Bénin — Design system
+   Santé Infantile Bénin : design system
    Palette teal médicale (#004d40 vers #00796b) + accent ambre (#e0a000)
    ========================================================================== */
 
@@ -27,7 +27,7 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--ink);
   background: #f6fbfa;
   line-height: 1.6;
@@ -268,6 +268,13 @@ section[id], .panel[id] { scroll-margin-top: 90px; }
 .danger-card .ic { font-size: 1.35rem; }
 .danger-card h3 { font-size: .98rem; margin: 8px 0 6px; color: #8e1c1c; }
 .danger-card p { margin: 0; color: var(--muted); font-size: .86rem; }
+.danger-card.warn { border-color: #ffe0b2; border-left-color: var(--amber); }
+.danger-card.warn h3 { color: var(--amber-dark); }
+
+.tier-title { font-size: 1.06rem; font-weight: 800; margin: 28px 0 4px; }
+.tier-title:first-of-type { margin-top: 10px; }
+.tier-rouge { color: #b71c1c; }
+.tier-ambre { color: var(--amber-dark); }
 
 .info-note { background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: 14px; padding: 16px 20px; font-size: .9rem; color: var(--ink); margin-top: 22px; }
 .info-note b { color: var(--teal-800); }
@@ -292,7 +299,7 @@ section[id], .panel[id] { scroll-margin-top: 90px; }
 .g-note b { color: var(--amber-dark); }
 
 /* Numéros d'urgence */
-.nos-numeros { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px; }
+.nos-numeros { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-top: 16px; }
 .numero-card { text-align: center; background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: 16px; padding: 24px; }
 .numero-card .num { font-size: 2.4rem; font-weight: 900; color: #c62828; }
 .numero-card h3 { margin: 6px 0 4px; color: var(--teal-800); font-size: 1.02rem; }

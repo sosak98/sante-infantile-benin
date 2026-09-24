@@ -64,6 +64,14 @@
         </div>
         <a class="btn btn-amber btn-sm" href="{% url 'conseils:calculer_rdv' %}">Calculer</a>
       </div>
+      <div style="display:flex;align-items:center;gap:14px;background:#fdf0ef;border:1px solid #f6c6c2;border-radius:14px;padding:14px 16px;margin-top:12px;">
+        <div style="font-size:1.8rem;">🆘</div>
+        <div style="flex:1;">
+          <div style="font-weight:800;color:#b71c1c;">Module SOS : signes de danger &amp; premiers secours</div>
+          <div class="sub" style="margin:0;">À lire une fois pour être prêt le jour où ça compte.</div>
+        </div>
+        <a class="btn btn-primary btn-sm" href="{% url 'premiers_secours' %}">Consulter</a>
+      </div>
     </div>
   </div>
 
@@ -73,8 +81,9 @@
     <div class="tools" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
       <a class="tool" href="{% url 'sante:carte' %}"><div class="ico">🗺️</div><h3>Carte</h3><p style="margin:0;">Centres & pharmacies proches</p></a>
       <a class="tool" href="{% url 'enfants:detection_malnutrition' %}"><div class="ico">📏</div><h3>Dépistage</h3><p style="margin:0;">État nutritionnel</p></a>
-      <a class="tool" href="{% url 'conseils:calendrier_vaccinal' %}"><div class="ico">📅</div><h3>Vaccins</h3><p style="margin:0;">Calendrier officiel</p></a>
+      <a class="tool" href="{% url 'conseils:calendrier_vaccinal' %}"><div class="ico">📅</div><h3>Vaccins</h3><p style="margin:0;">Calendrier &amp; RDV</p></a>
       <a class="tool" href="{% url 'sib:triage' %}"><div class="ico">🤖</div><h3>Triage IA</h3><p style="margin:0;">Orientation d'urgence</p></a>
+      <a class="tool" href="{% url 'premiers_secours' %}"><div class="ico">🆘</div><h3>SOS</h3><p style="margin:0;">Signes de danger</p></a>
     </div>
   </div>
 </div>

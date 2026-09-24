@@ -2,14 +2,14 @@
 {% load static %}
 
 {% block title %}Premiers secours & signes de danger de l'enfant - Santé Infantile Bénin{% endblock %}
-{% block description %}Reconnaître les signes de danger chez l'enfant de 0 à 5 ans et apprendre les gestes de premiers secours : fièvre, convulsions, étouffement, diarrhée, brûlures. Santé Infantile Bénin.{% endblock %}
+{% block description %}Reconnaître les signes de danger chez l'enfant de 0 à 5 ans et apprendre les gestes de premiers secours : fièvre, convulsions, étouffement, diarrhée, brûlures, noyade. Contenu basé sur le Mémento de soins hospitaliers pédiatriques de l'OMS.{% endblock %}
 
 {% block content %}
 <div class="page-head page-head-danger">
   <div class="container">
-    <span class="eyebrow eyebrow-danger">Module d'urgence · 0 à 5 ans</span>
+    <span class="eyebrow eyebrow-danger">Module SOS · 0 à 5 ans</span>
     <h1>🆘 Premiers secours &amp; signes de danger</h1>
-    <p>Les signes qui doivent vous amener immédiatement au centre de santé, et les gestes simples qui peuvent sauver la vie de votre enfant en attendant les soins.</p>
+    <p>Les signes qui imposent une consultation immédiate et les gestes qui peuvent sauver la vie de votre enfant en attendant les soins. Contenu basé sur le Mémento de soins hospitaliers pédiatriques de l'OMS.</p>
   </div>
 </div>
 
@@ -18,88 +18,112 @@
   <div class="urgence-bar">
     <span style="font-size:1.6rem;">🚨</span>
     <div style="flex:1;min-width:220px;">
-      <b>Urgence vitale ?</b> Gardez votre calme, appelez le <b>112</b> ou rendez-vous immédiatement au centre de santé le plus proche. Chaque minute compte.
+      <b>Urgence vitale ?</b> Gardez votre calme, appelez le <b>112 (SAMU Bénin)</b>, appel gratuit depuis tous les réseaux, ou rendez-vous immédiatement au centre de santé le plus proche.
     </div>
     <a class="btn btn-primary btn-sm" href="{% url 'sante:carte' %}">🗺️ Trouver un centre de santé</a>
   </div>
 
   <!-- ============================== SIGNES DE DANGER ============================== -->
   <div class="panel" id="signes">
-    <h2 class="sec-title">🚨 Les signes de danger chez l'enfant (0 à 5 ans)</h2>
-    <p class="sub">Si votre enfant présente <b>un seul</b> de ces signes, ne cherchez pas à le soigner à la maison : consultez immédiatement un agent de santé ou rendez-vous au centre de santé le plus proche.</p>
+    <h2 class="sec-title">🚨 Les signes de danger : quand consulter ?</h2>
+    <p class="sub">Comme au tri des hôpitaux, les signes sont classés en deux niveaux. En cas de doute, ne prenez aucun risque : consultez.</p>
+
+    <h3 class="tier-title tier-rouge">1. Signes d'urgence : partez immédiatement au centre de santé</h3>
+    <p class="sub" style="margin-bottom:0;">La vie de l'enfant peut être en jeu. Demandez de l'aide autour de vous et partez sans attendre, sans essayer de traiter à la maison.</p>
 
     <div class="danger-grid">
       <div class="danger-card">
-        <span class="ic">🍼</span>
-        <h3>Ne boit pas ou ne tète plus</h3>
-        <p>L'enfant est incapable de boire, de téter le sein ou d'avaler. C'est un signe de gravité majeure, surtout chez le nourrisson.</p>
-      </div>
-      <div class="danger-card">
-        <span class="ic">🤮</span>
-        <h3>Vomit tout ce qu'il absorbe</h3>
-        <p>L'enfant vomit systématiquement boissons, lait ou aliments : il risque une déshydratation rapide. Consultez sans attendre.</p>
+        <span class="ic">😴</span>
+        <h3>Coma, perte de conscience</h3>
+        <p>Enfant inconscient, très difficile à réveiller, mou, qui ne réagit pas et ne vous regarde pas.</p>
       </div>
       <div class="danger-card">
         <span class="ic">⚡</span>
         <h3>Convulsions</h3>
-        <p>Secousses incontrôlées du corps, yeux révulsés, perte de connaissance. Placez l'enfant sur le côté et filez au centre de santé.</p>
-      </div>
-      <div class="danger-card">
-        <span class="ic">😴</span>
-        <h3>Léthargie, inconscience</h3>
-        <p>Enfant anormalement endormi, très difficile à réveiller, mou, qui ne réagit pas ou ne vous regarde pas.</p>
+        <p>Secousses incontrôlées du corps, yeux révulsés. Placez l'enfant sur le côté et partez au centre de santé.</p>
       </div>
       <div class="danger-card">
         <span class="ic">🫁</span>
-        <h3>Difficultés respiratoires</h3>
-        <p>Respiration rapide, creusement des côtes à chaque inspiration, sifflement ou stridor, lèvres ou bouts des doigts bleutés.</p>
+        <h3>Détresse respiratoire grave</h3>
+        <p>Respiration très rapide, côtes qui se creusent, geignement à chaque expiration, narines qui battent, difficultés à parler ou à téter.</p>
       </div>
       <div class="danger-card">
-        <span class="ic">🌡️</span>
-        <h3>Fièvre inquiétante</h3>
-        <p>Toute fièvre chez un bébé de <b>moins de 3 mois</b> est une urgence. Après 3 mois : fièvre persistante, taches violacées sur la peau, nuque raide.</p>
+        <span class="ic">🟦</span>
+        <h3>Lèvres ou langue bleues</h3>
+        <p>Coloration bleutée des lèvres, de la langue ou du visage : l'oxygène manque. C'est une urgence absolue.</p>
+      </div>
+      <div class="danger-card">
+        <span class="ic">🧊</span>
+        <h3>Signes de choc</h3>
+        <p>Peau froide, pâle ou marbrée, pouls faible et rapide. Appuyez sur la peau : si elle reste blanche plus de 3 secondes, partez immédiatement.</p>
       </div>
       <div class="danger-card">
         <span class="ic">💧</span>
-        <h3>Signes de déshydratation</h3>
-        <p>Yeux enfoncés, bouche sèche, pas de larmes, pas d'urines depuis plus de 6 heures, pli de peau qui persiste, soif intense.</p>
-      </div>
-      <div class="danger-card">
-        <span class="ic">⚖️</span>
-        <h3>Malnutrition sévère</h3>
-        <p>Gonflement des deux pieds ou des jambes, amaigrissement extrême, périmètre brachial dans la zone rouge. Prise en charge urgente.</p>
-      </div>
-      <div class="danger-card">
-        <span class="ic">🥶</span>
-        <h3>Corps anormalement froid</h3>
-        <p>Enfant froid au toucher (hypothermie), surtout chez le nouveau-né : réchauffez-le contre vous (peau à peau) et consultez vite.</p>
-      </div>
-      <div class="danger-card">
-        <span class="ic">🩸</span>
-        <h3>Saignements anormaux</h3>
-        <p>Saignement qui ne s'arrête pas, sang dans les selles ou les vomissements, saignements spontanés du nez ou des gencives.</p>
-      </div>
-      <div class="danger-card">
-        <span class="ic">👶</span>
-        <h3>Fontanelle bombée</h3>
-        <p>Chez le nourrisson, le dessus du crâne (fontanelle) est tendu et bombé même quand l'enfant est calme : consultez immédiatement.</p>
-      </div>
-      <div class="danger-card">
-        <span class="ic">😟</span>
-        <h3>Comportement inhabituel</h3>
-        <p>Enfant qui pleure sans cesse ou ne pleure plus, qui refuse de s'alimenter, très irritable ou au contraire anormalement calme et indifférent.</p>
+        <h3>Déshydratation sévère</h3>
+        <p>Diarrhée avec au moins deux de ces signes : enfant léthargique, yeux enfoncés, incapable de boire, pli de peau qui s'efface très lentement.</p>
       </div>
     </div>
 
     <div class="info-note">
-      🫁 <b>Respiration rapide : comment vérifier ?</b> Comptez les respirations pendant <b>une minute complète</b>, enfant calme. C'est une respiration rapide si : <b>60 ou plus</b> par minute avant 2 mois · <b>50 ou plus</b> entre 2 et 11 mois · <b>40 ou plus</b> entre 1 et 5 ans. Une respiration rapide impose une consultation, même sans autre signe.
+      🫁 <b>Respiration rapide : comment vérifier ?</b> Comptez les respirations pendant <b>une minute complète</b>, enfant calme. C'est une respiration rapide si : <b>60 ou plus</b> par minute avant 2 mois, <b>50 ou plus</b> entre 2 et 11 mois, <b>40 ou plus</b> entre 1 et 5 ans. Une respiration rapide impose une consultation, même sans autre signe.
+    </div>
+
+    <h3 class="tier-title tier-ambre">2. Signes de priorité : consultez le jour même</h3>
+    <p class="sub" style="margin-bottom:0;">L'enfant doit être examiné rapidement par un agent de santé, sans attendre le lendemain.</p>
+
+    <div class="danger-grid">
+      <div class="danger-card warn">
+        <span class="ic">👶</span>
+        <h3>Bébé de moins de 2 mois malade</h3>
+        <p>Toute fièvre, refus du sein, somnolence ou comportement inhabituel chez un si petit bébé nécessite un examen rapide.</p>
+      </div>
+      <div class="danger-card warn">
+        <span class="ic">🌡️</span>
+        <h3>Fièvre élevée ou qui dure</h3>
+        <p>Température très élevée, fièvre depuis plus de 48 heures, ou fièvre accompagnée de taches violacées sur la peau ou de raideur du cou.</p>
+      </div>
+      <div class="danger-card warn">
+        <span class="ic">🍼</span>
+        <h3>Ne boit pas ou vomit tout</h3>
+        <p>Enfant incapable de boire ou de téter, ou qui vomit tout ce qu'il absorbe : le risque de déshydratation est rapide.</p>
+      </div>
+      <div class="danger-card warn">
+        <span class="ic">😖</span>
+        <h3>Comportement inhabituel</h3>
+        <p>Agitation et irritabilité permanentes, ou au contraire enfant trop calme, somnolent, qui ne réagit pas comme d'habitude.</p>
+      </div>
+      <div class="danger-card warn">
+        <span class="ic">🤍</span>
+        <h3>Pâleur marquée</h3>
+        <p>Paumes des mains, plantes des pieds ou intérieur des paupières très pâles : cela peut révéler une anémie à traiter vite.</p>
+      </div>
+      <div class="danger-card warn">
+        <span class="ic">🧪</span>
+        <h3>Intoxication</h3>
+        <p>Enfant qui a avalé un médicament, un produit ménager, de l'essence ou une plante : consultez avec l'emballage du produit.</p>
+      </div>
+      <div class="danger-card warn">
+        <span class="ic">⚖️</span>
+        <h3>Amaigrissement ou gonflement</h3>
+        <p>Amaigrissement visible et important, ou gonflement des deux pieds ou du visage : signes de malnutrition à prendre en charge.</p>
+      </div>
+      <div class="danger-card warn">
+        <span class="ic">🤕</span>
+        <h3>Traumatisme, brûlure étendue</h3>
+        <p>Chute importante, blessure profonde, suspicion de fracture, brûlure étendue ou profonde : un examen s'impose.</p>
+      </div>
+      <div class="danger-card warn">
+        <span class="ic">😣</span>
+        <h3>Douleurs intenses</h3>
+        <p>Douleur violente au ventre, à la tête ou à un membre, surtout si l'enfant ne se laisse pas toucher ou pleure sans s'arrêter.</p>
+      </div>
     </div>
   </div>
 
   <!-- ============================== GESTES DE SECOURS ============================== -->
   <div class="panel" id="gestes">
     <h2 class="sec-title">🆘 Les gestes de secours, situation par situation</h2>
-    <p class="sub">Les bons réflexes en attendant les soins. Cliquez sur chaque situation pour voir quoi faire — et surtout quoi ne pas faire.</p>
+    <p class="sub">Les bons réflexes en attendant les soins. Cliquez sur chaque situation pour voir quoi faire, et surtout quoi ne pas faire.</p>
 
     <details class="geste" open>
       <summary>🌡️ Fièvre</summary>
@@ -112,7 +136,7 @@
               <li>Découvrez l'enfant, habillez-le légèrement.</li>
               <li>Faites-le boire souvent (eau, lait maternel, bouillies claires).</li>
               <li>Donnez du paracétamol selon le poids, sur conseil du soignant ou du pharmacien.</li>
-              <li>Consultez rapidement : au Bénin, toute fièvre peut être un <b>paludisme</b> — un test de dépistage (TDR) est disponible dans les centres de santé.</li>
+              <li>Consultez rapidement : au Bénin, toute fièvre peut être un <b>paludisme</b>. Un test de dépistage rapide (TDR) est disponible dans les centres de santé.</li>
             </ul>
           </div>
           <div class="gd-col dont">
@@ -121,11 +145,11 @@
               <li>Ne donnez jamais d'<b>aspirine</b> à un enfant.</li>
               <li>Ne donnez pas d'antibiotiques sans ordonnance.</li>
               <li>Ne plongez pas l'enfant dans un bain glacé.</li>
-              <li>N'attendez pas si la fièvre concerne un bébé de moins de 3 mois : c'est une urgence.</li>
+              <li>N'attendez pas si la fièvre concerne un bébé de moins de 2 mois : c'est une urgence.</li>
             </ul>
           </div>
         </div>
-        <p class="g-note">⚠️ Consultez <b>le jour même</b> si : bébé de moins de 3 mois, fièvre depuis plus de 48 h, convulsions, taches sur la peau, enfant qui refuse de boire ou qui vomit tout.</p>
+        <p class="g-note">⚠️ Consultez <b>le jour même</b> si : bébé de moins de 2 mois, fièvre depuis plus de 48 h, convulsions, taches sur la peau, enfant qui refuse de boire ou qui vomit tout.</p>
       </div>
     </details>
 
@@ -136,7 +160,7 @@
           <div class="gd-col do">
             <h4>✅ À faire</h4>
             <ul>
-              <li>Restez calme et notez l'heure de début.</li>
+              <li>Restez calme et notez l'heure de début de la crise.</li>
               <li>Couchez l'enfant <b>sur le côté</b>, au sol, sur une surface dégagée.</li>
               <li>Éloignez les objets dangereux autour de lui.</li>
               <li>Déshabillez-le s'il a de la fièvre.</li>
@@ -153,7 +177,7 @@
             </ul>
           </div>
         </div>
-        <p class="g-note">⚠️ Convulsions + fièvre chez un enfant : pensez au <b>paludisme grave</b>. Direction immédiate au centre de santé, même si la crise s'arrête.</p>
+        <p class="g-note">⚠️ Convulsions avec fièvre chez un enfant : pensez au <b>paludisme grave</b>. Direction immédiate au centre de santé, même si la crise s'arrête.</p>
       </div>
     </details>
 
@@ -190,7 +214,7 @@
             <h4>✅ À faire</h4>
             <ul>
               <li>Continuez l'<b>allaitement</b> et l'alimentation habituelle.</li>
-              <li>Donnez du <b>SRO</b> (sels de réhydratation orale, sachet disponible en pharmacie/centre de santé) après chaque selle liquide.</li>
+              <li>Donnez du <b>SRO</b> (sels de réhydratation orale, sachet disponible en pharmacie et au centre de santé) après chaque selle liquide.</li>
               <li>Sans sachet : <b>1 litre d'eau propre</b> (bouillie puis refroidie) + <b>8 cuillères à café rases de sucre</b> + <b>1 cuillère à café rase de sel</b>. Mélangez bien.</li>
               <li>Lavez-vous les mains et faites boire l'enfant dans une tasse propre.</li>
             </ul>
@@ -204,7 +228,7 @@
             </ul>
           </div>
         </div>
-        <p class="g-note">⚠️ Consultez vite si : sang dans les selles, signes de déshydratation (yeux enfoncés, pas d'urines), enfant qui ne peut pas boire, vomissements répétés, ou diarrhée depuis plus de 3 jours.</p>
+        <p class="g-note">⚠️ Consultez vite si : sang dans les selles, signes de déshydratation (yeux enfoncés, pas d'urines), enfant qui ne peut pas boire, léthargie, vomissements répétés ou diarrhée depuis plus de 3 jours.</p>
       </div>
     </details>
 
@@ -258,12 +282,12 @@
             </ul>
           </div>
         </div>
-        <p class="g-note">⚠️ Consultez si le saignement ne s'arrête pas après 10 minutes de compression, si la plaie est profonde, très sale, mordue, ou située près d'un œil.</p>
+        <p class="g-note">⚠️ Consultez si le saignement ne s'arrête pas après 10 minutes de compression, si la plaie est profonde, très sale, causée par une morsure, ou située près d'un œil.</p>
       </div>
     </details>
 
     <details class="geste">
-      <summary>🐍 Morsures &amp; piqûres (serpent, chien, scorpion…)</summary>
+      <summary>🐍 Morsures &amp; piqûres (serpent, chien, scorpion)</summary>
       <div class="g-body">
         <div class="gd-grid">
           <div class="gd-col do">
@@ -271,8 +295,8 @@
             <ul>
               <li>Lavez la zone à l'eau et au savon.</li>
               <li>Immobilisez le membre touché et gardez l'enfant calme et allongé.</li>
-              <li>Rendez-vous <b>rapidement</b> au centre de santé : sérum antivenimeux, vaccin antirabique (rage) ou rappel antitétanique peuvent être nécessaires.</li>
-              <li>Si possible, mémorisez ou photographiez l'animal à distance — sans prendre de risque.</li>
+              <li>Rendez-vous <b>rapidement</b> au centre de santé : sérum antivenimeux, vaccin contre la rage ou rappel antitétanique peuvent être nécessaires.</li>
+              <li>Si possible, mémorisez ou photographiez l'animal à bonne distance, sans prendre de risque.</li>
             </ul>
           </div>
           <div class="gd-col dont">
@@ -301,7 +325,7 @@
             </ul>
           </div>
           <div class="gd-col dont">
-            <h4>🚫 Signes d'alerte → urgence immédiate</h4>
+            <h4>🚫 Signes d'alerte, urgence immédiate</h4>
             <ul>
               <li>Perte de connaissance, même brève.</li>
               <li>Vomissements répétés.</li>
@@ -365,6 +389,54 @@
     </details>
 
     <details class="geste">
+      <summary>🌊 Noyade</summary>
+      <div class="g-body">
+        <div class="gd-grid">
+          <div class="gd-col do">
+            <h4>✅ À faire</h4>
+            <ul>
+              <li>Sortez l'enfant de l'eau et posez-le sur une surface dure.</li>
+              <li>Vérifiez s'il respire : s'il ne respire pas, commencez immédiatement le <b>bouche-à-bouche et le massage cardiaque</b>, et faites appeler le <b>112</b> par quelqu'un pendant que vous agissez.</li>
+              <li>S'il respire : séchez-le, réchauffez-le contre vous et couvrez-le.</li>
+              <li>Même si l'enfant semble aller mieux, <b>consultez toujours</b> : des complications peuvent apparaître dans les heures qui suivent.</li>
+            </ul>
+          </div>
+          <div class="gd-col dont">
+            <h4>🚫 À ne pas faire</h4>
+            <ul>
+              <li>Ne retournez pas l'enfant pour lui « faire recracher l'eau » : vous perdez un temps précieux.</li>
+              <li>Ne le laissez pas dormir sans surveillance après l'accident.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="geste">
+      <summary>⚡ Électrocution</summary>
+      <div class="g-body">
+        <div class="gd-grid">
+          <div class="gd-col do">
+            <h4>✅ À faire</h4>
+            <ul>
+              <li><b>Coupez d'abord le courant</b> (disjoncteur, débranchez la prise). Tant que l'enfant est en contact avec la source, ne le touchez pas.</li>
+              <li>Si c'est impossible, écartez l'enfant avec un objet sec et non conducteur (bois, plastique).</li>
+              <li>Vérifiez la respiration : si elle est absente, commencez le bouche-à-bouche et le massage cardiaque, et appelez le <b>112</b>.</li>
+              <li>Brûlure visible : refroidissez à l'eau fraîche et consultez.</li>
+            </ul>
+          </div>
+          <div class="gd-col dont">
+            <h4>🚫 À ne pas faire</h4>
+            <ul>
+              <li>Ne touchez jamais l'enfant à mains nues tant que le courant passe : vous seriez électrocuté aussi.</li>
+              <li>Ne minimisez pas la secousse, même sans brûlure visible : consultez toujours.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="geste">
       <summary>❌ Les erreurs à ne jamais commettre</summary>
       <div class="g-body">
         <div class="gd-col dont" style="margin-bottom:4px;">
@@ -382,29 +454,39 @@
     </details>
   </div>
 
-  <!-- ============================== NUMÉROS & RÉFLEXES ============================== -->
+  <!-- ============================== NUMÉROS D'URGENCE ============================== -->
   <div class="panel" id="numeros">
-    <h2 class="sec-title">📞 Les réflexes qui sauvent</h2>
+    <h2 class="sec-title">📞 Les numéros d'urgence au Bénin</h2>
     <div class="nos-numeros">
       <div class="numero-card">
         <div class="num">112</div>
-        <h3>Numéro d'urgence national</h3>
-        <p>Gratuit, à composer depuis n'importe quel téléphone en cas d'urgence vitale.</p>
+        <h3>SAMU Bénin</h3>
+        <p>Le numéro des urgences médicales. Gratuit, disponible 24h/24, fonctionne sur tous les réseaux, même sans crédit.</p>
+      </div>
+      <div class="numero-card">
+        <div class="num">118</div>
+        <h3>Sapeurs-pompiers</h3>
+        <p>Accidents, incendies et secours aux personnes. Gratuit, 24h/24.</p>
+      </div>
+      <div class="numero-card">
+        <div class="num">117</div>
+        <h3>Police républicaine</h3>
+        <p>Numéro vert de la police, gratuit, 24h/24 et 7j/7.</p>
       </div>
       <div class="numero-card">
         <div class="num">🏥</div>
         <h3>Centre de santé le plus proche</h3>
-        <p>En cas de signe de danger, ne cherchez pas loin : le centre le plus proche peut déjà sauver votre enfant.<br><a href="{% url 'sante:carte' %}" style="color:var(--teal-600);font-weight:700;">🗺️ Ouvrir la carte des centres</a></p>
+        <p>En cas de signe de danger, ne cherchez pas loin : le centre le plus proche peut déjà sauver votre enfant. <a href="{% url 'sante:carte' %}" style="color:var(--teal-600);font-weight:700;">Ouvrir la carte</a></p>
       </div>
     </div>
     <div class="info-note" style="margin-top:18px;">
-      🎒 <b>Avant de partir au centre de santé :</b> prenez le <b>carnet de vaccination</b> de l'enfant, gardez-le contre vous pour le réchauffer s'il est petit, et continuez l'allaitement si possible. Signalez à l'agent de santé tout ce que vous avez déjà donné comme médicament.
+      🎒 <b>Avant de partir au centre de santé :</b> prenez le <b>carnet de vaccination</b> de l'enfant, gardez le nourrisson contre vous pour le réchauffer, et continuez l'allaitement si possible. Signalez à l'agent de santé tout ce que vous avez déjà donné comme médicament.
     </div>
   </div>
 
   <div class="disclaimer">
     <span class="emoji">⚠️</span>
-    <div><strong>Important :</strong> ce module est une aide éducative basée sur les recommandations de l'OMS et de la prise en charge intégrée des maladies de l'enfant (PCIME). Il ne remplace jamais l'avis d'un professionnel de santé. En cas de doute ou d'urgence, appelez le <strong>112</strong> ou rendez-vous au centre de santé le plus proche.</div>
+    <div><strong>Important :</strong> ce module est une aide éducative rédigée d'après le <strong>Mémento de soins hospitaliers pédiatriques de l'OMS</strong> (2ᵉ édition) et la prise en charge intégrée des maladies de l'enfant (PCIME). Il ne remplace jamais l'avis d'un professionnel de santé. En cas de doute ou d'urgence, appelez le <strong>112</strong> ou rendez-vous au centre de santé le plus proche.</div>
   </div>
 
 </div>
