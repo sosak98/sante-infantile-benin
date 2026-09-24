@@ -60,10 +60,26 @@
   var COULEURS = { 'centre': '#00695c', 'clinique': '#6a1b9a', 'hopital': '#c62828', 'hopital_zone': '#c62828', 'pharmacie': '#ef6c00' };
 
   var map = L.map('map', { maxBounds: [[5, -1], [14, 5]] });
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  var tuilesOSM = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributeurs',
     maxZoom: 19
-  }).addTo(map);
+  });
+  // Si les serveurs OSM renvoient 403 dans cet environnement, bascule automatique
+  // sur les tuiles de secours CARTO (mêmes données OpenStreetMap).
+  var tuilesSecours = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 20
+  });
+  var tuilesActives = tuilesOSM;
+  tuilesOSM.on('tileerror', function () {
+    if (tuilesActives === tuilesOSM) {
+      map.removeLayer(tuilesOSM);
+      tuilesSecours.addTo(map);
+      tuilesActives = tuilesSecours;
+    }
+  });
+  tuilesOSM.addTo(map);
   map.fitBounds([[6.2, 0.8], [12.4, 3.85]]);
 
   var userMarker = null, userLat = null, userLng = null;
