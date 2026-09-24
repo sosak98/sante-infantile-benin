@@ -15,6 +15,10 @@ urlpatterns = [
     path('sitemap.xml', seo.sitemap_xml, name='sitemap_xml'),
     path('manifest.json', pwa.manifest, name='manifest'),
     path('sw.js', pwa.service_worker, name='service_worker'),
+    path('hors-ligne/', pwa.hors_ligne, name='hors_ligne'),
+
+    # Module premiers secours & signes de danger (accessible depuis l'accueil)
+    path('premiers-secours/', include('sante.urls_secours')),
 
     # Pages (l'accueil vit dans l'app accounts, à la racine)
     path('', include('accounts.urls')),

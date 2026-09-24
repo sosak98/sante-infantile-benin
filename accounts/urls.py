@@ -7,6 +7,10 @@ urlpatterns = [
     path('', views.accueil, name='accueil'),
     path('a-propos/', views.about, name='a_propos'),
 
+    # Pages légales
+    path('politique-de-confidentialite/', views.politique_confidentialite, name='politique_confidentialite'),
+    path('cgu/', views.cgu, name='cgu'),
+
     # Authentification
     path('inscription/', views.register, name='register'),
     path('connexion/', views.login_view, name='login'),

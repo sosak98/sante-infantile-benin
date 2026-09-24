@@ -88,3 +88,8 @@ def etablissements_osm(request):
             data = _overpass(lat, lng) or data
         cache.set(cle_cache, data, CACHE_TTL)
     return JsonResponse(data)
+
+
+def premiers_secours(request):
+    """Module éducatif : gestes de premiers secours & signes de danger (0-5 ans)."""
+    return render(request, "sante/premiers_secours.html")
