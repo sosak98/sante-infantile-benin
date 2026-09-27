@@ -26,16 +26,16 @@
       <div class="sub">Mettez à jour vos coordonnées</div>
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="field"><label>👤 Prénom</label><input type="text" name="prenom" class="form-control" value="{{ parent.prenom }}" placeholder="Votre prénom"></div>
-        <div class="field"><label>👤 Nom</label><input type="text" name="nom" class="form-control" value="{{ parent.nom }}" placeholder="Votre nom"></div>
-        <div class="field"><label>📍 Quartier</label><input type="text" name="quartier" class="form-control" value="{{ parent.quartier }}" placeholder="Votre quartier"></div>
-        <div class="field"><label>🏙️ Ville</label><input type="text" name="ville" class="form-control" value="{{ parent.ville }}" placeholder="Votre ville"></div>
+        <div class="field"><label for="id_prenom">👤 Prénom</label><input type="text" id="id_prenom" name="prenom" class="form-control" value="{{ parent.prenom }}" placeholder="Votre prénom"></div>
+        <div class="field"><label for="id_nom">👤 Nom</label><input type="text" id="id_nom" name="nom" class="form-control" value="{{ parent.nom }}" placeholder="Votre nom"></div>
+        <div class="field"><label for="id_quartier">📍 Quartier</label><input type="text" id="id_quartier" name="quartier" class="form-control" value="{{ parent.quartier }}" placeholder="Votre quartier"></div>
+        <div class="field"><label for="id_ville">🏙️ Ville</label><input type="text" id="id_ville" name="ville" class="form-control" value="{{ parent.ville }}" placeholder="Votre ville"></div>
         <div class="field">
-          <label>📷 Photo de profil</label>
+          <label for="id_photo">📷 Photo de profil</label>
           {% if parent.photo %}
             <div style="margin-bottom:8px;"><img src="{{ parent.photo.url }}" width="80" height="80" style="border-radius:50%;object-fit:cover;"></div>
           {% endif %}
-          <input type="file" name="photo" class="form-control" accept="image/*">
+          <input type="file" id="id_photo" name="photo" class="form-control" accept="image/*">
         </div>
         <button type="submit" class="btn btn-primary btn-block">💾 Sauvegarder</button>
       </form>

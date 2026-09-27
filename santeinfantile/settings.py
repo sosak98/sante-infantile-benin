@@ -25,13 +25,13 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 # couvert pour le déploiement standard Render.
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS',
-    default='localhost,127.0.0.1,.onrender.com',
+    default='localhost,127.0.0.1,testserver,.onrender.com,.e2b.app',
     cast=Csv(),
 )
 
 CSRF_TRUSTED_ORIGINS = config(
     'CSRF_TRUSTED_ORIGINS',
-    default='https://*.onrender.com',
+    default='https://*.onrender.com,https://*.e2b.app',
     cast=Csv(),
 )
 
@@ -163,11 +163,11 @@ OTP_MAX_ATTEMPTS = config('OTP_MAX_ATTEMPTS', default=5, cast=int)
 # Actifs automatiquement quand DEBUG=False. Voir .env.example.
 # ---------------------------------------------------------------------------
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=not DEBUG, cast=bool)
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
 SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=not DEBUG, cast=bool)
 CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=not DEBUG, cast=bool)
 SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000 if not DEBUG else 0, cast=int)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = config('X_FRAME_OPTIONS', default='SAMEORIGIN')

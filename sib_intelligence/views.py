@@ -212,7 +212,7 @@ def triage(request):
             'niveau': niveau,
             'message': message,
             'score': score,
-            'contexte': json.dumps(contexte),
+            'contexte': contexte,
             'enfants': enfants,
             'age_mois': age_mois,
             'invite': not request.user.is_authenticated,

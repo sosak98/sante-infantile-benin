@@ -26,8 +26,8 @@
         {% csrf_token %}
         {% if enfants %}
         <div class="field">
-          <label>Enfant</label>
-          <select name="enfant_id" class="form-control">
+          <label for="id_enfant_id">Enfant</label>
+          <select id="id_enfant_id" name="enfant_id" class="form-control">
             <option value="">Choisir une option</option>
             {% for e in enfants %}
               <option value="{{ e.id }}">{{ e.prenom }}</option>
@@ -37,12 +37,12 @@
         {% endif %}
         <div class="grid2">
           <div class="field">
-            <label>Âge de l'enfant (en mois)</label>
-            <input type="number" name="age_mois" class="form-control" min="0" max="120" placeholder="Obligatoire si aucun enfant choisi" value="{{ age_mois|default:'' }}" {% if not enfants %}required{% endif %}>
+            <label for="id_age_mois">Âge de l'enfant (en mois)</label>
+            <input type="number" id="id_age_mois" name="age_mois" class="form-control" min="0" max="120" placeholder="Obligatoire si aucun enfant choisi" value="{{ age_mois|default:'' }}" {% if not enfants %}required{% endif %}>
           </div>
           <div class="field">
-            <label>📋 Type de conseil</label>
-            <select name="categorie" class="form-control">
+            <label for="id_categorie">📋 Type de conseil</label>
+            <select id="id_categorie" name="categorie" class="form-control">
               <option value="tous">🌟 Tous les conseils</option>
               <option value="aliment" {% if categorie == 'aliment' %}selected{% endif %}>🥗 Type d'aliment</option>
               <option value="probleme" {% if categorie == 'probleme' %}selected{% endif %}>🏥 Problème de santé</option>

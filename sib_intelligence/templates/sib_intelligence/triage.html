@@ -31,8 +31,8 @@
         {% csrf_token %}
         {% if enfants %}
         <div class="field">
-          <label>Enfant</label>
-          <select name="enfant_id" class="form-control">
+          <label for="id_enfant_id">Enfant</label>
+          <select id="id_enfant_id" name="enfant_id" class="form-control">
             <option value="">Essai sans dossier</option>
             {% for enfant in enfants %}
               <option value="{{ enfant.id }}">{{ enfant.prenom }} {{ enfant.nom }} ({{ enfant.date_naissance|date:"d/m/Y" }})</option>
@@ -42,25 +42,25 @@
         {% endif %}
         <div class="grid2">
           <div class="field">
-            <label>Prénom (si pas de dossier)</label>
-            <input type="text" name="prenom" class="form-control" placeholder="Optionnel" value="votre enfant">
+            <label for="id_prenom">Prénom (si pas de dossier)</label>
+            <input type="text" id="id_prenom" name="prenom" class="form-control" placeholder="Optionnel" value="votre enfant">
           </div>
           <div class="field">
-            <label>Âge (mois)</label>
-            <input type="number" name="age_mois" class="form-control" min="0" max="120" placeholder="ex. 18" {% if not enfants %}required{% endif %}>
+            <label for="id_age_mois">Âge (mois)</label>
+            <input type="number" id="id_age_mois" name="age_mois" class="form-control" min="0" max="120" placeholder="ex. 18" {% if not enfants %}required{% endif %}>
           </div>
         </div>
 
         <div class="grid2">
           <div class="field">
-            <label>🌡️ Fièvre</label>
-            <select name="fievre" class="form-control">
+            <label for="id_fievre">🌡️ Fièvre</label>
+            <select id="id_fievre" name="fievre" class="form-control">
               <option value="">Non</option><option value="oui_moderee">Modérée</option><option value="oui_haute">Élevée</option>
             </select>
           </div>
           <div class="field">
-            <label>💧 Diarrhée</label>
-            <select name="diarrhee" class="form-control">
+            <label for="id_diarrhee">💧 Diarrhée</label>
+            <select id="id_diarrhee" name="diarrhee" class="form-control">
               <option value="">Non</option><option value="oui_simple">Simple</option><option value="oui_sang">Avec sang</option>
             </select>
           </div>
@@ -68,14 +68,14 @@
 
         <div class="grid2">
           <div class="field">
-            <label>🫁 Respiration</label>
-            <select name="respiration" class="form-control">
+            <label for="id_respiration">🫁 Respiration</label>
+            <select id="id_respiration" name="respiration" class="form-control">
               <option value="">Normale</option><option value="rapide">Rapide</option><option value="difficile">Difficile</option>
             </select>
           </div>
           <div class="field">
-            <label>😴 Éveil</label>
-            <select name="eveil" class="form-control">
+            <label for="id_eveil">😴 Éveil</label>
+            <select id="id_eveil" name="eveil" class="form-control">
               <option value="">Normal</option><option value="difficile">Difficile</option><option value="non">Inconscient</option>
             </select>
           </div>
@@ -83,30 +83,30 @@
 
         <div class="grid2">
           <div class="field">
-            <label>🍼 Alimentation</label>
-            <select name="alimentation" class="form-control">
+            <label for="id_alimentation">🍼 Alimentation</label>
+            <select id="id_alimentation" name="alimentation" class="form-control">
               <option value="">Normale</option><option value="diminuee">Diminuée</option><option value="refuse">Refuse</option>
             </select>
           </div>
           <div class="field">
-            <label>🤮 Vomissements</label>
-            <select name="vomissement" class="form-control">
+            <label for="id_vomissement">🤮 Vomissements</label>
+            <select id="id_vomissement" name="vomissement" class="form-control">
               <option value="">Non</option><option value="oui_simple">Simple</option><option value="oui_repete">Répétés</option>
             </select>
           </div>
         </div>
 
         <div class="field">
-          <label>⚡ Convulsions</label>
-          <select name="convulsions" class="form-control">
+          <label for="id_convulsions">⚡ Convulsions</label>
+          <select id="id_convulsions" name="convulsions" class="form-control">
             <option value="">Non</option><option value="oui">Oui</option>
           </select>
         </div>
 
         <div class="grid3">
-          <div class="field"><label>⚖️ Poids (kg)</label><input type="number" name="poids" step="0.1" class="form-control" placeholder="Optionnel"></div>
-          <div class="field"><label>📏 Taille (cm)</label><input type="number" name="taille" step="0.1" class="form-control" placeholder="Optionnel"></div>
-          <div class="field"><label>📐 MUAC (cm)</label><input type="number" name="muac" step="0.1" class="form-control" placeholder="Optionnel"></div>
+          <div class="field"><label for="id_poids">⚖️ Poids (kg)</label><input type="number" id="id_poids" name="poids" step="0.1" class="form-control" placeholder="Optionnel"></div>
+          <div class="field"><label for="id_taille">📏 Taille (cm)</label><input type="number" id="id_taille" name="taille" step="0.1" class="form-control" placeholder="Optionnel"></div>
+          <div class="field"><label for="id_muac">📐 MUAC (cm)</label><input type="number" id="id_muac" name="muac" step="0.1" class="form-control" placeholder="Optionnel"></div>
         </div>
 
         <button type="submit" class="btn btn-primary btn-block">🤖 Analyser les symptômes</button>

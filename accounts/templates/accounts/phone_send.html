@@ -18,7 +18,7 @@
     <div class="sub">Un code vous sera envoyé par SMS.</div>
     <form method="post">
       {% csrf_token %}
-      <div class="field"><label>📱 Numéro de téléphone</label>{{ form.phone }}</div>
+      <div class="field"><label for="id_phone">📱 Numéro de téléphone</label>{{ form.phone }}</div>
       <button class="btn btn-primary btn-block">Envoyer le code</button>
     </form>
   </div>

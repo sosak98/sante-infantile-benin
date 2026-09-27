@@ -1,4 +1,4 @@
-# Santé Infantile Bénin — Améliorations (carte nationale + sécurité + SEO)
+# Santé Infantile Bénin - Améliorations (carte nationale + sécurité + SEO)
 
 Livraison du 10 septembre 2026. Tout a été testé avec Django : `manage.py check` = 0 erreur,
 la carte s'affiche avec 842 structures, les coordonnées pourries sont bloquées, robots.txt

@@ -26,12 +26,12 @@
       <div class="sub">Les champs marqués * sont obligatoires</div>
       <form method="post">
         {% csrf_token %}
-        <div class="field"><label>👤 Prénom *</label><input type="text" name="prenom" class="form-control" placeholder="Prénom de l'enfant" required></div>
-        <div class="field"><label>👤 Nom *</label><input type="text" name="nom" class="form-control" placeholder="Nom de l'enfant" required></div>
-        <div class="field"><label>📅 Date de naissance *</label><input type="date" name="date_naissance" class="form-control" required></div>
+        <div class="field"><label for="id_prenom">👤 Prénom *</label><input type="text" id="id_prenom" name="prenom" class="form-control" placeholder="Prénom de l'enfant" required></div>
+        <div class="field"><label for="id_nom">👤 Nom *</label><input type="text" id="id_nom" name="nom" class="form-control" placeholder="Nom de l'enfant" required></div>
+        <div class="field"><label for="id_date_naissance">📅 Date de naissance *</label><input type="date" id="id_date_naissance" name="date_naissance" class="form-control" required></div>
         <div class="field">
-          <label>⚧ Sexe *</label>
-          <select name="sexe" class="form-control" required>
+          <label for="id_sexe">⚧ Sexe *</label>
+          <select id="id_sexe" name="sexe" class="form-control" required>
             <option value="M">👦 Masculin</option>
             <option value="F">👧 Féminin</option>
           </select>
