@@ -13,6 +13,8 @@ urlpatterns = [
     # PWA
     path('robots.txt', seo.robots_txt, name='robots_txt'),
     path('sitemap.xml', seo.sitemap_xml, name='sitemap_xml'),
+    path('llms.txt', seo.llms_txt, name='llms_txt'),
+    path('llms-full.txt', seo.llms_full_txt, name='llms_full_txt'),
     path('manifest.json', pwa.manifest, name='manifest'),
     path('sw.js', pwa.service_worker, name='service_worker'),
     path('hors-ligne/', pwa.hors_ligne, name='hors_ligne'),

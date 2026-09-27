@@ -35,6 +35,61 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="{% static 'css/sib.css' %}" rel="stylesheet">
+
+  <!-- Données structurées Schema.org : organisation santé + urgence 112 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "MedicalOrganization",
+        "@id": "{{ request.scheme }}://{{ request.get_host }}/#organization",
+        "name": "Santé Infantile Bénin",
+        "alternateName": "SIB",
+        "url": "{{ request.scheme }}://{{ request.get_host }}/",
+        "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/logo.png' %}",
+        "description": "Plateforme gratuite de suivi de la santé des nourrissons et jeunes enfants au Bénin : calendrier vaccinal PEV, conseils nutritionnels, dépistage de la malnutrition (Z-scores OMS), premiers secours et carte des structures de santé.",
+        "areaServed": { "@type": "Country", "name": "Bénin" },
+        "inLanguage": "fr",
+        "availableLanguage": "fr",
+        "founder": {
+          "@type": "Person",
+          "name": "SOSSA Gninazé Mingnissê Darius",
+          "jobTitle": "Infirmier diplômé d'État"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "Assistance parents",
+          "email": "sante.infantile.benin@gmail.com",
+          "telephone": "+2290198419240",
+          "availableLanguage": "fr",
+          "areaServed": "BJ"
+        },
+        "knowsAbout": [
+          "Vaccination PEV Bénin",
+          "Nutrition infantile",
+          "Dépistage de la malnutrition",
+          "Premiers secours pédiatriques",
+          "Z-scores OMS"
+        ]
+      },
+      {
+        "@type": "EmergencyService",
+        "@id": "{{ request.scheme }}://{{ request.get_host }}/#urgence-112",
+        "name": "SAMU Bénin - Numéro d'urgence 112",
+        "telephone": "112",
+        "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'premiers_secours' %}",
+        "description": "Numéro des urgences médicales au Bénin : appel gratuit, disponible 24h/24 sur tous les réseaux. Pompiers : 118. Police : 117.",
+        "areaServed": { "@type": "Country", "name": "Bénin" },
+        "availableLanguage": "fr",
+        "potentialAction": {
+          "@type": "CommunicateAction",
+          "name": "Appeler le 112"
+        }
+      }
+    ]
+  }
+  </script>
   {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -64,7 +119,7 @@
           <a class="btn btn-primary btn-sm" href="{% url 'accounts:logout' %}">Se déconnecter</a>
         {% else %}
           <a class="btn btn-ghost btn-sm" href="{% url 'accounts:login' %}">Connexion</a>
-          <a class="btn btn-primary btn-sm" href="{% url 'accounts:register' %}">Créer un compte</a>
+          <a class="btn btn-primary btn-sm" href="{% url 'accounts:register' %}">Inscription</a>
         {% endif %}
       </div>
     </div>
@@ -112,6 +167,7 @@
           <h5>Légal &amp; urgences</h5>
           <ul>
             <li><a href="{% url 'accounts:politique_confidentialite' %}">Politique de confidentialité</a></li>
+            <li><a href="{% url 'accounts:politique_des_cookies' %}">Politique des cookies</a></li>
             <li><a href="{% url 'accounts:cgu' %}">Conditions d'utilisation</a></li>
             <li>Urgence vitale : <b style="color:#ff8a80;">112</b></li>
           </ul>
@@ -124,6 +180,25 @@
     </div>
   </footer>
 
+  <!-- Bandeau de suggestion d'installation de l'application PWA (intelligent) -->
+  <div class="sib-pwa-banner" id="pwaBanner" hidden role="dialog" aria-label="Installer l'application">
+    <img src="{% static 'img/icons/icon-192.png' %}" alt="" width="44" height="44">
+    <div class="pwa-txt">
+      <b>Installez l'application Santé Infantile Bénin</b>
+      <span id="pwaHint">Vaccination, nutrition, dépistage et secours sur votre écran d'accueil — même sans réseau.</span>
+    </div>
+    <div class="pwa-actions">
+      <button class="btn btn-primary btn-sm" type="button" id="pwaInstall">Installer</button>
+      <button class="btn btn-ghost btn-sm" type="button" id="pwaLater">Plus tard</button>
+    </div>
+  </div>
+
+  <!-- Bandeau d'information cookies (discret, non bloquant) -->
+  <div class="sib-cookie-banner" id="cookieBanner" hidden role="region" aria-label="Information cookies">
+    <span class="cookie-txt">🍪 Ce site n'utilise que des <b>cookies techniques</b> indispensables (session, sécurité) — aucun cookie publicitaire ni traceur tiers. <a href="{% url 'accounts:politique_des_cookies' %}">En savoir plus</a></span>
+    <button class="btn btn-primary btn-sm" type="button" id="cookieOk">Compris</button>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // Enregistrement du Service Worker (PWA)
@@ -134,6 +209,66 @@
         });
       });
     }
+
+    // Bandeau d'information cookies : affiché une seule fois, jamais bloquant
+    (function () {
+      var b = document.getElementById('cookieBanner');
+      if (!b) return;
+      try {
+        if (localStorage.getItem('sib_cookies') === 'ok') return;
+      } catch (err) { /* stockage indisponible : on affiche quand même */ }
+      b.hidden = false;
+      document.body.classList.add('has-cookie-banner');
+      document.getElementById('cookieOk').addEventListener('click', function () {
+        try { localStorage.setItem('sib_cookies', 'ok'); } catch (err) {}
+        b.style.display = 'none';
+        document.body.classList.remove('has-cookie-banner');
+      });
+    })();
+
+    // Bandeau intelligent d'installation de la PWA
+    (function () {
+      var b = document.getElementById('pwaBanner');
+      if (!b) return;
+
+      // Déjà installée (mode application) ? On n'embête personne.
+      var standalone = window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true;
+      if (standalone) return;
+
+      // Refusé il y a moins de 14 jours ? On attend.
+      try {
+        var vu = Number(localStorage.getItem('sib_pwa_plus_tard') || 0);
+        if (vu && (Date.now() - vu) < 14 * 24 * 3600 * 1000) return;
+      } catch (err) {}
+
+      var evenementInstall = null;
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        evenementInstall = e;
+      });
+
+      setTimeout(function () { b.hidden = false; }, 2500);
+
+      document.getElementById('pwaLater').addEventListener('click', function () {
+        b.style.display = 'none';
+        try { localStorage.setItem('sib_pwa_plus_tard', String(Date.now())); } catch (err) {}
+      });
+
+      document.getElementById('pwaInstall').addEventListener('click', function () {
+        if (evenementInstall) {
+          evenementInstall.prompt();
+          evenementInstall.userChoice.then(function () { b.style.display = 'none'; });
+          evenementInstall = null;
+        } else {
+          // Navigateur sans invite native (iPhone/Safari...) : on guide
+          var hint = document.getElementById('pwaHint');
+          if (hint) hint.innerHTML = 'Sur iPhone : bouton <b>Partager</b> puis <b>« Sur l\'écran d\'accueil »</b>. Sur Android : menu <b>⋮</b> puis <b>« Installer l\'application »</b>.';
+        }
+      });
+
+      window.addEventListener('appinstalled', function () { b.style.display = 'none'; });
+    })();
 
     // Le menu mobile se referme tout seul quand on choisit une page
     document.addEventListener('click', function (e) {

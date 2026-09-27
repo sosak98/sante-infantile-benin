@@ -9,6 +9,7 @@ urlpatterns = [
 
     # Pages légales
     path('politique-de-confidentialite/', views.politique_confidentialite, name='politique_confidentialite'),
+    path('politique-des-cookies/', views.politique_des_cookies, name='politique_des_cookies'),
     path('cgu/', views.cgu, name='cgu'),
 
     # Authentification
