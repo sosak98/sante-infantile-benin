@@ -36,6 +36,11 @@ def politique_confidentialite(request):
     return render(request, 'accounts/politique_confidentialite.html')
 
 
+def politique_des_cookies(request):
+    """Politique des cookies : conforme au Code du numérique du Bénin (loi n° 2017-20)."""
+    return render(request, 'accounts/politique_des_cookies.html')
+
+
 def cgu(request):
     return render(request, 'accounts/cgu.html')
 

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Politique des cookies - Santé Infantile Bénin{% endblock %}
+{% block description %}Politique des cookies de Santé Infantile Bénin : uniquement des cookies techniques indispensables, conformément au Code du numérique du Bénin (loi n° 2017-20).{% endblock %}
+
+{% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="/">Accueil</a>
+    <span class="sep">›</span>
+    <span class="current">Politique des cookies</span>
+  </div>
+</nav>
+<div class="page-head">
+  <div class="container">
+    <h1>🍪 Politique des cookies</h1>
+    <p>En toute transparence : quels traceurs sont déposés sur votre appareil, pourquoi, et comment vous en passer.</p>
+  </div>
+</div>
+
+<div class="container page-body legal">
+  <div class="panel">
+    <p class="maj">Dernière mise à jour : septembre 2026</p>
+
+    <p>La présente politique des cookies complète la <a href="{% url 'accounts:politique_confidentialite' %}">politique de confidentialité</a> de <strong>Santé Infantile Bénin (SIB)</strong>, plateforme éditée par M. SOSSA Gninazé Mingnissê Darius. Elle est établie conformément à la <strong>loi n° 2017-20 du 20 avril 2018 portant Code du numérique en République du Bénin</strong>, et notamment son Livre V relatif à la protection des données à caractère personnel, dont l'application est veillée par l'<strong>Autorité de Protection des Données à caractère Personnel (APDP)</strong>.</p>
+
+    <h2>1. Qu'est-ce qu'un cookie ?</h2>
+    <p>Un « cookie » est un petit fichier texte déposé sur votre appareil (téléphone, ordinateur, tablette) lorsqu'un site est consulté. Il permet notamment de mémoriser vos préférences ou de maintenir une session ouverte. Certains traceurs fonctionnent de façon équivalente via le stockage local du navigateur (<em>localStorage</em>).</p>
+
+    <h2>2. Notre engagement : des cookies techniques uniquement</h2>
+    <p><strong>Santé Infantile Bénin n'utilise aucun cookie publicitaire, aucun traceur d'audience tiers et aucun outil de profilage.</strong> Seuls des cookies <strong>strictement nécessaires</strong> au fonctionnement et à la sécurité du site sont déposés :</p>
+    <ul>
+      <li><strong>sessionid</strong> — maintient votre session ouverte lorsque vous êtes connecté à votre espace parent. Sans lui, la connexion est impossible ;</li>
+      <li><strong>csrftoken</strong> — protège les formulaires (inscription, connexion, triage) contre les attaques de type « cross-site request forgery ».</li>
+    </ul>
+    <p>Ces cookies, dits « exemptés », ne nécessitent pas de consentement préalable au sens du Code du numérique : ils sont indispensables au service que vous demandez expressément (créer un compte, se connecter).</p>
+
+    <h2>3. Stockage local sur votre appareil</h2>
+    <p>Nous utilisons également le stockage local de votre navigateur pour mémoriser, <strong>sur votre appareil uniquement</strong> (ces informations ne sont jamais transmises à nos serveurs) :</p>
+    <ul>
+      <li>la fermeture du bandeau d'information cookies (clé <code>sib_cookies</code>) ;</li>
+      <li>le report de la suggestion d'installation de l'application pendant 14 jours (clé <code>sib_pwa_plus_tard</code>) ;</li>
+      <li>le cache hors-ligne de l'application (service worker), qui enregistre les pages déjà consultées pour les rendre accessibles sans réseau.</li>
+    </ul>
+
+    <h2>4. Aucune donnée de navigation transmise à des tiers</h2>
+    <p>Le site n'intègre aucun réseau social, aucun lecteur vidéo externe, aucune régie publicitaire. Les feuilles de style et polices de caractères sont chargées depuis des réseaux de diffusion de contenu (Bootstrap, Google Fonts) sans transfert de vos données personnelles. Les données de santé saisies dans les outils restent couvertes par la <a href="{% url 'accounts:politique_confidentialite' %}">politique de confidentialité</a>.</p>
+
+    <h2>5. Comment refuser ou supprimer les cookies ?</h2>
+    <p>Les cookies techniques sont indispensables : les bloquer empêche simplement la connexion à votre espace. Vous pouvez à tout moment les supprimer depuis les réglages de votre navigateur :</p>
+    <ul>
+      <li><strong>Chrome (Android) :</strong> Réglages → Confidentialité et sécurité → Effacer les données de navigation ;</li>
+      <li><strong>Safari (iPhone) :</strong> Réglages → Safari → Effacer l'historique et les données de navigation ;</li>
+      <li><strong>Firefox :</strong> Réglages → Vie privée et sécurité → Cookies et données de sites ;</li>
+      <li><strong>Edge / Internet Explorer :</strong> Paramètres → Confidentialité → Cookies.</li>
+    </ul>
+    <p>Supprimer le stockage local réinitialise aussi la fermeture du bandeau d'information cookies et le cache hors-ligne.</p>
+
+    <h2>6. Vos droits et le rôle de l'APDP</h2>
+    <p>Conformément au Livre V du Code du numérique (loi n° 2017-20 du 20 avril 2018), vous disposez de droits d'accès, de rectification, d'effacement et d'opposition sur vos données à caractère personnel. Toute demande peut nous être adressée à <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a>. Vous pouvez également saisir l'<strong>APDP</strong>, autorité de contrôle béninoise en matière de protection des données personnelles, instituée par l'article 462 du Code du numérique.</p>
+
+    <h2>7. Évolution de cette politique</h2>
+    <p>Si cette politique venait à évoluer (nouveau service, nouveau traceur), la date de mise à jour en tête de page serait modifiée et, le cas échéant, un bandeau d'information vous serait à nouveau présenté.</p>
+
+    <p style="margin-top:18px;"><a class="btn btn-primary" href="/">← Retour à l'accueil</a></p>
+  </div>
+</div>
+{% endblock %}

@@ -43,15 +43,22 @@ def hors_ligne(request):
 
 
 SW_JS = """
-// Santé Infantile Bénin : Service Worker (PWA, mode hors-ligne)
-const CACHE = 'sib-cache-v6';
+// Santé Infantile Bénin : Service Worker (PWA, mode hors-ligne étendu)
+const CACHE = 'sib-cache-v7';
 const OFFLINE = '/hors-ligne/';
-const MAX_ITEMS = 120;
+const MAX_ITEMS = 200;
 
-// Ressources essentielles pré-mises en cache dès l'installation
+// Ressources pré-mises en cache dès l'installation : TOUS les modules
+// (accueil, vaccination PEV, nutrition, dépistage Z-scores, premiers secours,
+// carte des structures) sont disponibles hors ligne dès l'installation.
 const CORE = [
   '/',
   OFFLINE,
+  '/carte/',
+  '/depistage/',
+  '/conseils/',
+  '/conseils/nutrition/',
+  '/premiers-secours/',
   '/static/css/sib.css',
   '/static/img/logo.png',
   '/static/img/icons/icon-192.png',
@@ -60,11 +67,20 @@ const CORE = [
 
 // CDN utilisés par le site (Bootstrap, Leaflet...) : mis en cache pour le hors-ligne
 const CDN_HOSTS = ['cdn.jsdelivr.net', 'unpkg.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
+const CDN_CORE = [
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
+];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE)
-      .then((c) => c.addAll(CORE))
+      .then(async (cache) => {
+        // Chaque ressource est tentée individuellement : une indisponibilité
+        // ponctuelle ne doit pas empêcher l'installation du service worker.
+        await Promise.allSettled(CORE.map((url) => cache.add(url)));
+        await Promise.allSettled(CDN_CORE.map((url) => cache.add(url)));
+      })
       .then(() => self.skipWaiting())
   );
 });

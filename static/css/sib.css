@@ -98,6 +98,7 @@ img { max-width: 100%; display: block; }
 .sib-nav .nav-links a:hover, .sib-nav .nav-links a.active { color: var(--teal-700); }
 .sib-nav .nav-links a.active { border-bottom: 2px solid var(--amber); }
 .sib-nav .nav-cta { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.sib-nav .nav-cta .btn { white-space: nowrap; flex: none; }
 .sib-nav .nav-toggler { display: none; background: none; border: 1px solid var(--line); border-radius: 10px; padding: 7px 11px; font-size: 1.2rem; line-height: 1; cursor: pointer; color: var(--teal-800); }
 
 /* ------------------------------------------------------------------ Hero */
@@ -348,6 +349,51 @@ section[id], .panel[id] { scroll-margin-top: 90px; }
 .legal .panel ul { padding-left: 20px; display: grid; gap: 6px; margin-bottom: 10px; }
 .legal .maj { font-size: .85rem; font-style: italic; margin-bottom: 16px; }
 
+/* ---------------------------------------------------- Bandeau cookies (information) */
+.sib-cookie-banner {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+  display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap;
+  padding: 10px 16px;
+  background: rgba(6, 50, 44, .97);
+  color: rgba(255,255,255,.88);
+  font-size: .82rem;
+  box-shadow: 0 -6px 24px rgba(4, 50, 44, .25);
+}
+.sib-cookie-banner[hidden] { display: none; }
+.sib-cookie-banner .cookie-txt { max-width: 860px; }
+.sib-cookie-banner a { color: #80cbc4; font-weight: 700; text-decoration: underline; }
+.sib-cookie-banner .btn { flex: none; }
+
+/* ---------------------------------------------------- Bandeau PWA (installation) */
+.sib-pwa-banner {
+  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+  z-index: 95; width: min(560px, calc(100vw - 24px));
+  display: flex; align-items: center; gap: 14px;
+  background: #fff; border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: 0 16px 44px rgba(4, 50, 44, .28);
+  padding: 14px 16px;
+}
+.sib-pwa-banner[hidden] { display: none; }
+.sib-pwa-banner img { width: 44px; height: 44px; border-radius: 12px; flex: none; }
+.sib-pwa-banner .pwa-txt { display: grid; gap: 2px; min-width: 0; }
+.sib-pwa-banner .pwa-txt b { font-size: .88rem; color: var(--teal-800); }
+.sib-pwa-banner .pwa-txt span { font-size: .78rem; color: var(--muted); }
+.sib-pwa-banner .pwa-actions { display: flex; gap: 8px; margin-left: auto; flex: none; }
+/* le bandeau cookies ne doit jamais passer sous le bandeau PWA */
+body.has-cookie-banner .sib-pwa-banner { bottom: 64px; }
+
+/* ---------------------------------------------------- Hub hors-ligne */
+.offline-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.offline-tool {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: 14px;
+  padding: 14px 16px; transition: .2s;
+}
+.offline-tool:hover { border-color: var(--teal-500); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.offline-tool .ico { width: 40px; height: 40px; flex: none; border-radius: 12px; display: grid; place-items: center; font-size: 1.25rem; background: #fff; border: 1px solid var(--teal-100); }
+.offline-tool b { display: block; font-size: .92rem; color: var(--teal-800); margin-bottom: 2px; }
+.offline-tool span { font-size: .8rem; color: var(--muted); }
+
 /* ------------------------------------------------------------------ Responsive */
 @media (max-width: 1180px) {
   .sib-nav .nav-links { gap: 10px; font-size: .84rem; }
@@ -393,6 +439,16 @@ section[id], .panel[id] { scroll-margin-top: 90px; }
 @media (max-width: 700px) {
   .gd-grid { grid-template-columns: 1fr; }
   .nos-numeros { grid-template-columns: 1fr; }
+  .offline-grid { grid-template-columns: 1fr; }
+  /* En-tête : « Connexion » / « Inscription » nets, jamais coupés */
+  .sib-nav .nav-cta .btn { padding: 8px 10px; font-size: .78rem; white-space: nowrap; flex: none; }
+  .sib-nav .nav-cta { gap: 6px; }
+  .sib-pwa-banner { flex-wrap: wrap; padding: 12px 14px; gap: 10px; }
+  .sib-pwa-banner .pwa-actions { margin-left: 0; width: 100%; }
+  .sib-pwa-banner .pwa-actions .btn { flex: 1; }
+  body.has-cookie-banner .sib-pwa-banner { bottom: 88px; }
+  .sib-cookie-banner { padding: 8px 12px; font-size: .76rem; gap: 8px; }
+  .sib-cookie-banner .cookie-txt { min-width: 100%; text-align: center; }
 }
 @media (max-width: 560px) {
   .tools, .steps, .grid2 { grid-template-columns: 1fr; }
