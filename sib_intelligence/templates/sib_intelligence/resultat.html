@@ -74,9 +74,9 @@
             <div class="message-bubble">
               <p>Bonjour ! J'ai analysé les symptômes de <strong>{{ enfant.prenom }}</strong> ({{ age_mois }} mois).</p>
               {% if niveau == 'rouge' %}
-                <p>Le résultat indique une <strong>urgence médicale</strong>. Consultez un médecin immédiatement. Je suis là pour vous aider en attendant.</p>
+                <p>Le résultat indique une <strong>urgence médicale immédiate</strong>. Rendez-vous au centre de santé le plus proche ou appelez le <strong>112</strong> sans attendre. En attendant les soins, restez calme et suivez les gestes de premiers secours.</p>
               {% elif niveau == 'jaune' %}
-                <p>Je recommande une <strong>consultation dans les 24-48h</strong>. Posez-moi vos questions en attendant.</p>
+                <p>Je recommande une <strong>consultation médicale dans les 24-48h</strong>. Posez-moi vos questions pour le suivi en attendant.</p>
               {% else %}
                 <p>L'état de votre enfant semble <strong>stable</strong>. Je peux vous donner des conseils pour le suivi à domicile.</p>
               {% endif %}
