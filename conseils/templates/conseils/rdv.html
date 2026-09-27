@@ -28,8 +28,8 @@
         {% csrf_token %}
         {% if enfants %}
         <div class="field">
-          <label>Enfant</label>
-          <select name="enfant_id" class="form-control" required>
+          <label for="id_enfant_id">Enfant</label>
+          <select id="id_enfant_id" name="enfant_id" class="form-control" required>
             {% for e in enfants %}
               <option value="{{ e.id }}">{{ e.prenom }} ({{ e.date_naissance|date:"d/m/Y" }})</option>
             {% endfor %}
@@ -38,8 +38,8 @@
         <p class="sub">La date de naissance est celle enregistrée pour cet enfant.</p>
         {% else %}
         <div class="field">
-          <label>Date de naissance</label>
-          <input type="date" name="date_naissance" class="form-control" required value="{{ request.POST.date_naissance|default:'' }}">
+          <label for="id_date_naissance">Date de naissance</label>
+          <input type="date" id="id_date_naissance" name="date_naissance" class="form-control" required value="{{ request.POST.date_naissance|default:'' }}">
         </div>
         {% endif %}
 

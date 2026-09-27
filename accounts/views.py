@@ -61,12 +61,37 @@ def register(request):
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('accounts:dashboard')
+
+    ip_client = (
+        request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip()
+        or request.META.get('REMOTE_ADDR', '')
+    )
+    cle_tentatives = f"login_failed:{ip_client}"
+    tentatives = cache.get(cle_tentatives, 0)
+
+    if tentatives >= 10:
+        messages.error(
+            request,
+            'Compte temporairement bloqué suite à 10 tentatives infructueuses. '
+            'Veuillez patienter 15 minutes avant de réessayer.'
+        )
+        return render(request, 'accounts/login.html', {'form': AuthenticationForm(request)})
+
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
+            cache.delete(cle_tentatives)
             auth_login(request, form.get_user())
             next_url = request.POST.get('next') or request.GET.get('next')
             return redirect(next_url or 'accounts:dashboard')
+        else:
+            nouvelles_tentatives = tentatives + 1
+            cache.set(cle_tentatives, nouvelles_tentatives, timeout=900)  # 15 min = 900s
+            if nouvelles_tentatives >= 10:
+                messages.error(
+                    request,
+                    'Trop de tentatives échouées. Votre accès est bloqué pendant 15 minutes.'
+                )
     else:
         form = AuthenticationForm(request)
     return render(request, 'accounts/login.html', {'form': form})

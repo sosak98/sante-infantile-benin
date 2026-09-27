@@ -28,22 +28,22 @@
       <form method="post">
         {% csrf_token %}
         <div class="field">
-          <label>📱 Numéro de téléphone</label>
+          <label for="id_telephone">📱 Numéro de téléphone</label>
           {{ form.telephone }}
           {% if form.telephone.errors %}<div class="alert alert-danger" style="margin:8px 0 0;padding:8px 12px;">{{ form.telephone.errors.0 }}</div>{% endif %}
         </div>
         <div class="field">
-          <label>🔒 Mot de passe</label>
+          <label for="id_password1">🔒 Mot de passe</label>
           {{ form.password1 }}
           {% if form.password1.errors %}<div class="alert alert-danger" style="margin:8px 0 0;padding:8px 12px;">{{ form.password1.errors.0 }}</div>{% endif %}
         </div>
         <div class="field">
-          <label>🔒 Confirmer le mot de passe</label>
+          <label for="id_password2">🔒 Confirmer le mot de passe</label>
           {{ form.password2 }}
           {% if form.password2.errors %}<div class="alert alert-danger" style="margin:8px 0 0;padding:8px 12px;">{{ form.password2.errors.0 }}</div>{% endif %}
         </div>
         <div class="field">
-          <label class="check-field">
+          <label class="check-field" for="id_accepte_conditions">
             {{ form.accepte_conditions }}
             <span>J'ai lu et j'accepte les <a href="{% url 'accounts:cgu' %}" target="_blank" rel="noopener">Conditions d'utilisation</a> et la <a href="{% url 'accounts:politique_confidentialite' %}" target="_blank" rel="noopener">Politique de confidentialité</a> <b>*</b></span>
           </label>

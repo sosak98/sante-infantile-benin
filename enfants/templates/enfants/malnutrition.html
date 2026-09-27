@@ -83,16 +83,16 @@
     <form method="post">
       {% csrf_token %}
       <div class="grid2">
-        <div class="field"><label>Prénom</label><input type="text" name="prenom" class="form-control" required></div>
-        <div class="field"><label>Sexe</label><select name="sexe" class="form-control" required><option value="M">Garçon</option><option value="F">Fille</option></select></div>
+        <div class="field"><label for="id_prenom">Prénom</label><input type="text" id="id_prenom" name="prenom" class="form-control" required></div>
+        <div class="field"><label for="id_sexe">Sexe</label><select id="id_sexe" name="sexe" class="form-control" required><option value="M">Garçon</option><option value="F">Fille</option></select></div>
       </div>
       <div class="grid2">
-        <div class="field"><label>Âge (mois)</label><input type="number" name="age_mois" class="form-control" min="0" max="60" required></div>
-        <div class="field"><label>Poids (kg)</label><input type="number" name="poids" class="form-control" step="0.1" min="0" required></div>
+        <div class="field"><label for="id_age_mois">Âge (mois)</label><input type="number" id="id_age_mois" name="age_mois" class="form-control" min="0" max="60" required></div>
+        <div class="field"><label for="id_poids">Poids (kg)</label><input type="number" id="id_poids" name="poids" class="form-control" step="0.1" min="0" required></div>
       </div>
       <div class="grid2">
-        <div class="field"><label>Taille (cm)</label><input type="number" name="taille" class="form-control" step="0.1" min="0" required></div>
-        <div class="field"><label>MUAC bras (cm), optionnel</label><input type="number" name="muac" class="form-control" step="0.1" min="0"></div>
+        <div class="field"><label for="id_taille">Taille (cm)</label><input type="number" id="id_taille" name="taille" class="form-control" step="0.1" min="0" required></div>
+        <div class="field"><label for="id_muac">MUAC bras (cm), optionnel</label><input type="number" id="id_muac" name="muac" class="form-control" step="0.1" min="0"></div>
       </div>
       <button type="submit" class="btn btn-primary btn-block">Voir le résultat</button>
     </form>

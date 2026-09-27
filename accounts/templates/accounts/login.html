@@ -26,12 +26,12 @@
       <form method="post">
         {% csrf_token %}
         <div class="field">
-          <label>📱 Numéro de téléphone</label>
-          <input type="tel" name="username" class="form-control" placeholder="Votre numéro de téléphone" autocomplete="username" required>
+          <label for="id_username">📱 Numéro de téléphone</label>
+          <input type="tel" id="id_username" name="username" class="form-control" placeholder="Votre numéro de téléphone" autocomplete="username" required>
         </div>
         <div class="field">
-          <label>🔒 Mot de passe</label>
-          <input type="password" name="password" class="form-control" placeholder="Votre mot de passe" autocomplete="current-password" required>
+          <label for="id_password">🔒 Mot de passe</label>
+          <input type="password" id="id_password" name="password" class="form-control" placeholder="Votre mot de passe" autocomplete="current-password" required>
         </div>
         <button type="submit" class="btn btn-primary btn-block">🔓 Se connecter</button>
       </form>

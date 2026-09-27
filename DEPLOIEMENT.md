@@ -1,4 +1,4 @@
-# 🚀 Étape 1 — Mise à niveau & déploiement
+# 🚀 Étape 1 - Mise à niveau & déploiement
 
 ## Ce qui a été fait
 

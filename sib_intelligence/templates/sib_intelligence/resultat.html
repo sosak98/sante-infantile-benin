@@ -12,6 +12,10 @@
   .message.bot { align-items: flex-start; }
   .message.user { align-items: flex-end; }
   .message-bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: .9rem; line-height: 1.6; }
+  .message-bubble p { margin: 0 0 8px; }
+  .message-bubble p:last-child { margin-bottom: 0; }
+  .message-bubble ul { margin: 4px 0 8px 18px; padding: 0; }
+  .message-bubble li { margin-bottom: 4px; }
   .message.bot .message-bubble { background: #fff; color: #333; border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
   .message.user .message-bubble { background: linear-gradient(135deg, var(--teal-800), var(--teal-600)); color: #fff; border-bottom-right-radius: 4px; }
   .message-name { font-size: .75rem; color: #888; margin-bottom: 4px; font-weight: 700; }
@@ -68,13 +72,13 @@
           <div class="message bot">
             <div class="message-name">SIB Intelligence</div>
             <div class="message-bubble">
-              Bonjour ! J'ai analysé les symptômes de <strong>{{ enfant.prenom }}</strong> ({{ age_mois }} mois).
+              <p>Bonjour ! J'ai analysé les symptômes de <strong>{{ enfant.prenom }}</strong> ({{ age_mois }} mois).</p>
               {% if niveau == 'rouge' %}
-                Le résultat indique une <strong>urgence médicale</strong>. Consultez un médecin immédiatement. Je suis là pour vous aider en attendant.
+                <p>Le résultat indique une <strong>urgence médicale immédiate</strong>. Rendez-vous au centre de santé le plus proche ou appelez le <strong>112</strong> sans attendre. En attendant les soins, restez calme et suivez les gestes de premiers secours.</p>
               {% elif niveau == 'jaune' %}
-                Je recommande une <strong>consultation dans les 24-48h</strong>. Posez-moi vos questions en attendant.
+                <p>Je recommande une <strong>consultation médicale dans les 24-48h</strong>. Posez-moi vos questions pour le suivi en attendant.</p>
               {% else %}
-                L'état de votre enfant semble <strong>stable</strong>. Je peux vous donner des conseils pour le suivi à domicile.
+                <p>L'état de votre enfant semble <strong>stable</strong>. Je peux vous donner des conseils pour le suivi à domicile.</p>
               {% endif %}
             </div>
           </div>
@@ -82,7 +86,7 @@
         </div>
         <div class="chat-input-area">
           <div style="display:flex;gap:10px;">
-            <input type="text" id="chatInput" class="chat-input" placeholder="Posez votre question...">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Posez votre question..." aria-label="Posez votre question à l'assistant">
             <button class="btn-send" onclick="envoyerMessage()">Envoyer</button>
           </div>
         </div>
@@ -92,6 +96,9 @@
     <div class="panel">
       <h3>🎯 Actions recommandées</h3>
       <div class="sub">Selon le niveau de gravité</div>
+      {% if niveau == 'rouge' %}
+        <a class="btn btn-block" style="background:#c62828;color:#fff;margin-bottom:10px;font-weight:800;" href="tel:112">📞 Appeler le 112</a>
+      {% endif %}
       {% if niveau == 'rouge' or niveau == 'jaune' %}
         <a class="btn btn-amber btn-block" style="margin-bottom:10px;" href="{% url 'sante:carte' %}">🗺️ Voir les centres de santé proches</a>
       {% endif %}
@@ -116,18 +123,71 @@
 {% endblock %}
 
 {% block extra_js %}
+{{ contexte|json_script:"contexte-data" }}
 <script>
-  const contexte = {{ contexte|safe }};
+  const contexteElement = document.getElementById('contexte-data');
+  const contexte = contexteElement ? JSON.parse(contexteElement.textContent) : {};
   const chatMessages = document.getElementById('chatMessages');
   const chatInput = document.getElementById('chatInput');
   const typing = document.getElementById('typing');
 
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function formaterTexteBot(texte) {
+    if (!texte) return '';
+    const safe = escapeHtml(texte);
+    const blocs = safe.split(/\n\s*\n/);
+    let html = '';
+
+    for (let i = 0; i < blocs.length; i++) {
+      const bloc = blocs[i].trim();
+      if (!bloc) continue;
+      const lignes = bloc.split(/\n/);
+      let inList = false;
+      let blocHtml = '';
+
+      for (let j = 0; j < lignes.length; j++) {
+        const ligne = lignes[j].trim();
+        if (/^[-*•]\s+/.test(ligne)) {
+          if (!inList) {
+            blocHtml += '<ul>';
+            inList = true;
+          }
+          const item = ligne.replace(/^[-*•]\s+/, '');
+          blocHtml += '<li>' + item + '</li>';
+        } else {
+          if (inList) {
+            blocHtml += '</ul>';
+            inList = false;
+          }
+          if (blocHtml.length > 0 && !blocHtml.endsWith('</ul>')) {
+            blocHtml += '<br>';
+          }
+          blocHtml += ligne;
+        }
+      }
+      if (inList) {
+        blocHtml += '</ul>';
+      }
+      if (!blocHtml.startsWith('<ul>')) {
+        blocHtml = '<p>' + blocHtml + '</p>';
+      }
+      html += blocHtml;
+    }
+    return html || '<p>' + safe + '</p>';
+  }
+
   function ajouterMessage(texte, type) {
     const div = document.createElement('div');
     div.className = 'message ' + type;
+    const bubbleHtml = (type === 'bot') ? formaterTexteBot(texte) : '<p>' + escapeHtml(texte) + '</p>';
     div.innerHTML =
       '<div class="message-name">' + (type === 'bot' ? 'SIB Intelligence' : 'Vous') + '</div>' +
-      '<div class="message-bubble">' + texte + '</div>';
+      '<div class="message-bubble">' + bubbleHtml + '</div>';
     chatMessages.insertBefore(div, typing);
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
