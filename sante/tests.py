@@ -128,6 +128,13 @@ class PageJoursVaccinationTests(TestCase):
         self.assertContains(reponse, 'Aucun centre ne vaccine le')
         self.assertNotContains(reponse, '0 centre')
 
+    def test_message_vide_sans_espace_avant_le_point(self):
+        """« de séance . » : le libellé du jour est absent en vue semaine."""
+        Etablissement.objects.all().update(jours_vaccination='')
+        reponse = self.client.get('/carte/vaccination/', {'jour': 'tous'})
+        self.assertContains(reponse, "publié de séance.")
+        self.assertNotContains(reponse, "de séance .")
+
     def test_pharmacies_exclues(self):
         reponse = self.client.get('/carte/vaccination/', {'jour': 'tous'})
         self.assertNotContains(reponse, 'Pharmacie du Port')
