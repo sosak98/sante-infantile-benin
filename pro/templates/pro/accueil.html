@@ -58,7 +58,13 @@
 
   <div class="panel" style="text-align:center;">
     <h2 style="margin-top:0;font-size:1.2rem;">
-      {{ centres_publies }} centre{{ centres_publies|pluralize }} publie{{ centres_publies|pluralize:"nt" }} déjà ses jours de vaccination
+      {% if centres_publies == 0 %}
+        Soyez le premier centre à publier ses jours de vaccination
+      {% elif centres_publies == 1 %}
+        1 centre publie déjà ses jours de vaccination
+      {% else %}
+        {{ centres_publies }} centres publient déjà leurs jours de vaccination
+      {% endif %}
     </h2>
     <p class="sub">La création de compte est gratuite. Chaque demande est vérifiée avant activation.</p>
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
