@@ -1,3 +1,274 @@
+"""Tests du calendrier vaccinal PEV Bénin (conseils/pev.py) et de ses pages."""
+
+from datetime import date, timedelta
+
 from django.test import TestCase
 
-# Create your tests here.
+from conseils.pev import (
+    CALENDRIER_PEV,
+    ajouter_mois,
+    calendrier_affichable,
+    normaliser_cle,
+    planifier,
+    prochain_rdv,
+    resume_couverture,
+)
+from conseils.seed_data import VACCINS
+
+NAISSANCE = date(2025, 1, 15)
+
+
+def _par_cle(planning):
+    return {ligne['cle']: ligne for ligne in planning}
+
+
+class CalendrierReferenceTests(TestCase):
+    """Le calendrier doit refléter le PEV béninois en vigueur."""
+
+    def test_les_cles_sont_uniques(self):
+        cles = [entree['cle'] for entree in CALENDRIER_PEV]
+        self.assertEqual(len(cles), len(set(cles)))
+
+    def test_chaque_entree_a_un_age_unique_semaines_ou_mois(self):
+        for entree in CALENDRIER_PEV:
+            with self.subTest(cle=entree['cle']):
+                self.assertNotEqual(
+                    'semaines' in entree, 'mois' in entree,
+                    "Une dose doit avoir soit un âge en semaines, soit en mois.",
+                )
+
+    def test_doses_de_naissance(self):
+        naissance = [e['cle'] for e in CALENDRIER_PEV if e.get('semaines') == 0]
+        self.assertCountEqual(naissance, ['bcg', 'vpo_0', 'hepb_0'])
+
+    def test_series_6_10_14_semaines(self):
+        """Pentavalent, VPO, PCV et rotavirus suivent bien 6/10/14 semaines."""
+        attendus = {'penta': [6, 10, 14], 'vpo': [6, 10, 14],
+                    'pcv': [6, 10, 14], 'rota': [6, 10, 14]}
+        for serie, semaines in attendus.items():
+            obtenues = [e['semaines'] for e in CALENDRIER_PEV if e['serie'] == serie]
+            with self.subTest(serie=serie):
+                self.assertEqual(obtenues, semaines)
+
+    def test_vpi_present_a_14_semaines(self):
+        """Le VPI (polio injectable) manquait complètement au calendrier."""
+        vpi = [e for e in CALENDRIER_PEV if e['cle'] == 'vpi']
+        self.assertEqual(len(vpi), 1)
+        self.assertEqual(vpi[0]['semaines'], 14)
+
+    def test_rotavirus_present_trois_doses(self):
+        """Le rotavirus (introduit au Bénin en 2019) manquait au calendrier."""
+        rota = [e for e in CALENDRIER_PEV if e['serie'] == 'rota']
+        self.assertEqual(len(rota), 3)
+
+    def test_antipaludique_aux_ages_beninois(self):
+        """RTS,S : 6, 7, 9 et 18 mois — et non 22/26/39/65 semaines."""
+        rtss = [e for e in CALENDRIER_PEV if e['serie'] == 'rtss']
+        self.assertEqual([e['mois'] for e in rtss], [6, 7, 9, 18])
+
+    def test_neuf_mois_exprime_en_mois_pas_en_semaines(self):
+        """VAR/VAA/MenA étaient calés sur 39 semaines, soit un jour trop tôt."""
+        for cle in ('var_1', 'vaa', 'mena'):
+            entree = next(e for e in CALENDRIER_PEV if e['cle'] == cle)
+            with self.subTest(cle=cle):
+                self.assertEqual(entree.get('mois'), 9)
+                self.assertNotIn('semaines', entree)
+
+    def test_seconde_dose_rougeole_a_18_mois(self):
+        var2 = next(e for e in CALENDRIER_PEV if e['cle'] == 'var_2')
+        self.assertEqual(var2['mois'], 18)
+
+    def test_seed_derive_du_calendrier(self):
+        """Le seed ne doit plus diverger du calendrier de référence."""
+        self.assertEqual(len(VACCINS), len(CALENDRIER_PEV))
+        self.assertEqual(
+            [v['nom'] for v in VACCINS],
+            [e['nom'] for e in CALENDRIER_PEV],
+        )
+
+    def test_calendrier_affichable_complet(self):
+        lignes = calendrier_affichable()
+        self.assertEqual(len(lignes), len(CALENDRIER_PEV))
+        for ligne in lignes:
+            with self.subTest(cle=ligne['cle']):
+                self.assertTrue(ligne['maladies'])
+                self.assertTrue(ligne['voie'])
+
+
+class AjouterMoisTests(TestCase):
+    """Arithmétique de dates : les mois ne valent pas 4 semaines."""
+
+    def test_ajout_simple(self):
+        self.assertEqual(ajouter_mois(date(2025, 1, 15), 9), date(2025, 10, 15))
+
+    def test_fin_de_mois_ramenee_au_dernier_jour(self):
+        self.assertEqual(ajouter_mois(date(2025, 1, 31), 1), date(2025, 2, 28))
+
+    def test_annee_bissextile(self):
+        self.assertEqual(ajouter_mois(date(2024, 1, 31), 1), date(2024, 2, 29))
+
+    def test_changement_d_annee(self):
+        self.assertEqual(ajouter_mois(date(2025, 11, 10), 3), date(2026, 2, 10))
+
+    def test_neuf_mois_differe_de_39_semaines(self):
+        """La correction de fond : 39 semaines n'est pas 9 mois.
+
+        L'ancien calendrier plaçait VAR/VAA/MenA à 39 semaines. Pour un enfant
+        né le 31 mars, cela avance le rendez-vous de deux jours.
+        """
+        naissance = date(2025, 3, 31)
+        self.assertEqual(ajouter_mois(naissance, 9), date(2025, 12, 31))
+        self.assertEqual(naissance + timedelta(weeks=39), date(2025, 12, 29))
+
+
+class NormalisationTests(TestCase):
+    """Les anciens libellés doivent être reconnus, sinon les doses sont perdues."""
+
+    def test_anciennes_cles_reconnues(self):
+        cas = {
+            'Pentavalent_1': 'penta_1',
+            'VPO_2': 'vpo_2',
+            'PCV_3': 'pcv_3',
+            'RTSS_4': 'rtss_4',
+            'VAR': 'var_1',
+            'Hépatite B': 'hepb_0',
+            'Hepatite B': 'hepb_0',
+            'VPO 0 (Polio oral)': 'vpo_0',
+            'Vaccin Antipaludique 1 (RTS,S)': 'rtss_1',
+        }
+        for ancien, attendu in cas.items():
+            with self.subTest(ancien=ancien):
+                self.assertEqual(normaliser_cle(ancien), attendu)
+
+    def test_cles_nouvelles_inchangees(self):
+        for entree in CALENDRIER_PEV:
+            with self.subTest(cle=entree['cle']):
+                self.assertEqual(normaliser_cle(entree['cle']), entree['cle'])
+
+    def test_libelle_inconnu_renvoie_none(self):
+        """Mieux vaut ignorer une saisie inconnue que l'affecter au mauvais vaccin."""
+        self.assertIsNone(normaliser_cle('Vaccin fantaisiste'))
+        self.assertIsNone(normaliser_cle(''))
+        self.assertIsNone(normaliser_cle(None))
+
+    def test_casse_et_espaces_ignores(self):
+        self.assertEqual(normaliser_cle('  bcg  '), 'bcg')
+        self.assertEqual(normaliser_cle('BCG'), 'bcg')
+
+
+class PlanificationTests(TestCase):
+
+    def test_planning_couvre_toutes_les_doses(self):
+        planning = planifier(NAISSANCE, {}, date(2025, 1, 15))
+        self.assertEqual(len(planning), len(CALENDRIER_PEV))
+
+    def test_planning_trie_par_date(self):
+        planning = planifier(NAISSANCE, {}, date(2025, 6, 1))
+        dates = [ligne['date_prevue'] for ligne in planning]
+        self.assertEqual(dates, sorted(dates))
+
+    def test_dates_theoriques_exactes(self):
+        planning = _par_cle(planifier(NAISSANCE, {}, NAISSANCE))
+        self.assertEqual(planning['bcg']['date_prevue'], date(2025, 1, 15))
+        self.assertEqual(planning['penta_1']['date_prevue'], date(2025, 2, 26))
+        self.assertEqual(planning['penta_3']['date_prevue'], date(2025, 4, 23))
+        self.assertEqual(planning['var_1']['date_prevue'], date(2025, 10, 15))
+        self.assertEqual(planning['rtss_4']['date_prevue'], date(2026, 7, 15))
+
+    def test_statuts_selon_la_date_du_jour(self):
+        planning = _par_cle(planifier(NAISSANCE, {}, date(2025, 2, 26)))
+        self.assertEqual(planning['bcg']['statut'], 'En retard')
+        self.assertEqual(planning['penta_1']['statut'], "Aujourd'hui")
+        self.assertEqual(planning['penta_2']['statut'], 'À venir')
+
+    def test_dose_recue_est_marquee(self):
+        planning = _par_cle(planifier(
+            NAISSANCE, {'bcg': date(2025, 1, 16)}, date(2025, 3, 1),
+        ))
+        self.assertEqual(planning['bcg']['statut'], 'Reçu')
+        self.assertEqual(planning['bcg']['date_prevue'], date(2025, 1, 16))
+
+    def test_dose_recue_sous_ancien_libelle(self):
+        """Le bug de fond : « Pentavalent_1 » n'était jamais reconnu."""
+        planning = _par_cle(planifier(
+            NAISSANCE, {'Pentavalent_1': date(2025, 3, 1)}, date(2025, 4, 1),
+        ))
+        self.assertEqual(planning['penta_1']['statut'], 'Reçu')
+
+    def test_intervalle_minimal_repousse_la_dose_suivante(self):
+        """Penta 1 reçu en retard décale Penta 2 d'au moins 4 semaines."""
+        planning = _par_cle(planifier(
+            NAISSANCE, {'penta_1': date(2025, 5, 1)}, date(2025, 5, 2),
+        ))
+        self.assertGreaterEqual(
+            planning['penta_2']['date_prevue'], date(2025, 5, 29),
+        )
+
+    def test_retard_calcule_en_jours(self):
+        planning = _par_cle(planifier(NAISSANCE, {}, date(2025, 1, 25)))
+        self.assertEqual(planning['bcg']['retard_jours'], 10)
+
+    def test_date_future_sans_retard(self):
+        planning = _par_cle(planifier(NAISSANCE, {}, NAISSANCE))
+        self.assertEqual(planning['var_1']['retard_jours'], 0)
+
+    def test_prochain_rdv_priorise_le_retard(self):
+        suivant = prochain_rdv(NAISSANCE, {}, date(2025, 3, 1))
+        self.assertEqual(suivant['statut'], 'En retard')
+
+    def test_prochain_rdv_sans_retard(self):
+        suivant = prochain_rdv(NAISSANCE, {}, NAISSANCE)
+        self.assertEqual(suivant['statut'], "Aujourd'hui")
+
+    def test_prochain_rdv_none_si_tout_recu(self):
+        tout = {e['cle']: NAISSANCE for e in CALENDRIER_PEV}
+        self.assertIsNone(prochain_rdv(NAISSANCE, tout, date(2027, 1, 1)))
+
+    def test_resume_couverture(self):
+        resume = resume_couverture(NAISSANCE, {'bcg': NAISSANCE}, date(2025, 1, 15))
+        self.assertEqual(resume['total'], len(CALENDRIER_PEV))
+        self.assertEqual(resume['recus'], 1)
+        self.assertEqual(
+            resume['recus'] + resume['en_retard'] + resume['aujourd_hui']
+            + resume['a_venir'],
+            resume['total'],
+        )
+
+
+class PagesVaccinationTests(TestCase):
+    """Les pages publiques du module vaccination."""
+
+    def test_calendrier_affiche_sans_seed(self):
+        """La page était vide si `manage.py seed` n'avait pas tourné."""
+        reponse = self.client.get('/conseils/')
+        self.assertEqual(reponse.status_code, 200)
+        html = reponse.content.decode('utf-8')
+        self.assertNotIn('Aucun vaccin enregistré', html)
+        for attendu in ['BCG', 'Pentavalent 1', 'Rotavirus 1',
+                        'VPI (polio injectable)', 'Antipaludique 1 (RTS,S)',
+                        'VAR 2 (rappel rougeole-rubéole)']:
+            with self.subTest(attendu=attendu):
+                self.assertIn(attendu, html)
+
+    def test_calendrier_mentionne_les_supplementations(self):
+        reponse = self.client.get('/conseils/')
+        self.assertContains(reponse, 'Vitamine A')
+
+    def test_rdv_calcule_un_planning(self):
+        reponse = self.client.post('/conseils/rdv/', {
+            'date_naissance': '2025-01-15',
+        })
+        self.assertEqual(reponse.status_code, 200)
+        self.assertContains(reponse, 'BCG')
+
+    def test_rdv_refuse_une_date_invalide_sans_erreur_500(self):
+        """Une saisie invalide renvoyait une erreur 500."""
+        reponse = self.client.post('/conseils/rdv/', {'date_naissance': 'n-importe-quoi'})
+        self.assertEqual(reponse.status_code, 200)
+        self.assertContains(reponse, 'date de naissance valide')
+
+    def test_rdv_refuse_une_naissance_future(self):
+        futur = (date.today() + timedelta(days=30)).isoformat()
+        reponse = self.client.post('/conseils/rdv/', {'date_naissance': futur})
+        self.assertEqual(reponse.status_code, 200)
+        self.assertContains(reponse, 'ne peut pas être dans le futur')

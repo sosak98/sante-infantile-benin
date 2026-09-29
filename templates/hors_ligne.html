@@ -64,6 +64,20 @@
           <span>Signes de danger et gestes qui sauvent, de 0 à 5 ans.</span>
         </div>
       </a>
+      <a class="offline-tool" href="{% url 'sante:jours_vaccination' %}">
+        <div class="ico">🗓️</div>
+        <div>
+          <b>Jours de vaccination</b>
+          <span>Les jours de séance déclarés par les centres, consultés lors de votre dernière connexion.</span>
+        </div>
+      </a>
+      <a class="offline-tool" href="{% url 'conseils:calculer_rdv' %}">
+        <div class="ico">📅</div>
+        <div>
+          <b>Calculateur de RDV vaccinaux</b>
+          <span>Générez le planning des doses à partir de la date de naissance.</span>
+        </div>
+      </a>
       <a class="offline-tool" href="{% url 'sante:carte' %}">
         <div class="ico">🗺️</div>
         <div>

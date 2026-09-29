@@ -9,12 +9,15 @@ PAGES = [
     "",
     "a-propos/",
     "carte/",
+    "carte/vaccination/",
     "depistage/",
     "conseils/",
     "conseils/nutrition/",
     "triage/",
     "inscription/",
     "premiers-secours/",
+    "pro/",
+    "pro/inscription/",
     "politique-de-confidentialite/",
     "politique-des-cookies/",
     "cgu/",
@@ -29,6 +32,10 @@ PRIVES = [
     "/carte/osm/",
     "/phone/",
     "/hors-ligne/",
+    "/pro/tableau-de-bord/",
+    "/pro/mon-centre/",
+    "/pro/outil-pev/",
+    "/pro/en-attente/",
 ]
 
 # Assistants IA et moteurs de recherche : explicitement les bienvenus sur les

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Jours de vaccination de mon centre - Santé Infantile Bénin{% endblock %}
+
+{% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="{% url 'pro:tableau_de_bord' %}">Espace professionnel</a>
+    <span class="sep">›</span>
+    <span class="current">Mon centre</span>
+  </div>
+</nav>
+
+<div class="page-head">
+  <div class="container">
+    <h1>🏥 {{ etablissement.nom }}</h1>
+    <p>Déclarez les jours de séance de vaccination : ils sont publiés immédiatement pour les parents.</p>
+  </div>
+</div>
+
+<div class="container page-body">
+  <div class="panel" style="max-width:740px;">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for champ in form %}
+        <div class="field">
+          <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+          {{ champ }}
+          {% if champ.help_text %}<div class="sub" style="margin:2px 0 0;font-size:.8rem;">{{ champ.help_text }}</div>{% endif %}
+          {% if champ.errors %}<div class="sub" style="color:#c62828;margin:2px 0 0;">{{ champ.errors|striptags }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary btn-block">Publier ces informations</button>
+    </form>
+    <p class="sub" style="margin-top:14px;font-size:.82rem;">
+      Si vous ne connaissez pas encore les jours exacts, laissez vide : le site affichera
+      « jours non communiqués » plutôt qu'une information incertaine.
+    </p>
+  </div>
+
+  <div class="panel" style="background:var(--teal-50);max-width:740px;">
+    <h3 style="margin-top:0;font-size:1rem;">Aperçu côté parent</h3>
+    <p class="sub" style="margin:0;">
+      <strong>{{ etablissement.nom }}</strong> — {{ etablissement.jours_affichage }}
+      {% if etablissement.horaire_vaccination %} · {{ etablissement.horaire_vaccination }}{% endif %}
+    </p>
+    <a class="btn btn-ghost btn-sm" style="margin-top:10px;" href="{% url 'sante:jours_vaccination' %}">Voir la page publique</a>
+  </div>
+</div>
+{% endblock %}

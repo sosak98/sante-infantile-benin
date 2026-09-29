@@ -37,6 +37,45 @@
     </div>
   </div>
 
+  {% if vaccins_en_retard_count %}
+    <div class="panel" style="border-left:4px solid #c62828;background:#fff5f5;">
+      <h3 style="margin:0 0 4px;color:#c62828;">⚠️ {{ vaccins_en_retard_count }} dose{{ vaccins_en_retard_count|pluralize }} en retard</h3>
+      <p class="sub" style="margin:0;">
+        Le PEV vaccine gratuitement jusqu'à 59 mois : un retard se rattrape.
+        Présentez-vous au centre de santé le plus proche avec le carnet de vaccination.
+        <a href="{% url 'sante:jours_vaccination' %}">Voir les jours de vaccination près de chez vous</a>.
+      </p>
+    </div>
+  {% endif %}
+
+  {% if prochains_rdv %}
+    <div class="panel">
+      <h3 style="margin-top:0;">📅 Prochains rendez-vous vaccinaux</h3>
+      <div class="sub">Calculés d'après le calendrier PEV Bénin et les doses déjà enregistrées.</div>
+      <table class="sib-table" style="margin-top:8px;">
+        <thead><tr><th>Enfant</th><th>Dose</th><th>Date</th><th>Statut</th></tr></thead>
+        <tbody>
+          {% for item in prochains_rdv %}
+            <tr>
+              <td><strong>{{ item.enfant.prenom }}</strong></td>
+              <td>{{ item.rdv.nom }} <span class="tag" style="font-size:.7rem;">{{ item.rdv.age_affichage }}</span></td>
+              <td>{{ item.rdv.date_prevue|date:"d/m/Y" }}</td>
+              <td>
+                {% if item.rdv.statut == 'En retard' %}
+                  <span class="badge-pill badge-danger" style="font-size:.72rem;">En retard de {{ item.rdv.retard_jours }} j</span>
+                {% elif item.rdv.statut == "Aujourd'hui" %}
+                  <span class="badge-pill badge-warn" style="font-size:.72rem;">Aujourd'hui</span>
+                {% else %}
+                  <span class="badge-pill badge-info" style="font-size:.72rem;">À venir</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
   <div class="grid2">
     <div class="panel">
       <h3>Mes enfants</h3>

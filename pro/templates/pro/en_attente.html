@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Compte en attente de validation - Santé Infantile Bénin{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div class="container">
+    <h1>⏳ Compte en attente de validation</h1>
+  </div>
+</div>
+
+<div class="container page-body">
+  <div class="panel" style="max-width:680px;margin:0 auto;text-align:center;">
+    <div style="font-size:3rem;">👩‍⚕️</div>
+    <h2 style="font-size:1.2rem;">Bonjour {{ pro.user.first_name|default:pro.user.username }}</h2>
+    <p class="sub">
+      Votre demande de compte professionnel a bien été enregistrée
+      {% if pro.date_demande %}le {{ pro.date_demande|date:"d/m/Y" }}{% endif %}.
+    </p>
+    <table class="sib-table" style="margin:16px 0;text-align:left;">
+      <tbody>
+        <tr><th style="width:40%;">Fonction</th><td>{{ pro.get_fonction_display }}</td></tr>
+        <tr><th>Structure</th><td>{{ pro.structure_affichee }}</td></tr>
+        <tr><th>Statut</th>
+          <td>
+            {% if pro.statut == 'refuse' %}
+              <span class="badge-pill badge-danger" style="font-size:.72rem;">Refusé</span>
+            {% else %}
+              <span class="badge-pill badge-warn" style="font-size:.72rem;">En attente</span>
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    {% if pro.statut == 'refuse' %}
+      <p class="sub">Votre demande n'a pas pu être validée. Contactez l'équipe pour en connaître la raison.</p>
+    {% else %}
+      <p class="sub">
+        Tant que votre compte n'est pas validé, vous ne pouvez pas modifier les informations
+        d'un centre. Vous gardez bien sûr accès à toutes les pages publiques du site.
+      </p>
+    {% endif %}
+    <a class="btn btn-ghost btn-sm" href="{% url 'conseils:calendrier_vaccinal' %}">Consulter le calendrier PEV</a>
+  </div>
+</div>
+{% endblock %}
