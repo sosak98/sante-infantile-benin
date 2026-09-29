@@ -6,40 +6,22 @@ Le seed est idempotent : il n'ajoute les données que si les tables sont vides,
 donc il peut être relancé à chaque déploiement sans écraser les données.
 """
 
+from .pev import CALENDRIER_PEV
+
+# Les vaccins ne sont plus recopiés ici : ils sont dérivés du calendrier de
+# référence `conseils/pev.py`, seule source de vérité du projet. Les deux
+# listes divergeaient auparavant (notamment sur le vaccin antipaludique), ce
+# qui donnait un calendrier affiché différent du planning calculé.
 VACCINS = [
-    # Naissance
-    {"nom": "BCG", "age_affichage": "Naissance", "age_min_mois": 0, "age_max_mois": None, "description": "Protection contre la tuberculose", "obligatoire": True},
-    {"nom": "VPO 0 (Polio oral)", "age_affichage": "Naissance", "age_min_mois": 0, "age_max_mois": None, "description": "1ère dose vaccin contre la poliomyélite", "obligatoire": True},
-    {"nom": "Hépatite B", "age_affichage": "Naissance", "age_min_mois": 0, "age_max_mois": None, "description": "1ère dose protection contre l'hépatite B", "obligatoire": True},
-
-    # 6 semaines
-    {"nom": "Pentavalent 1", "age_affichage": "6 semaines", "age_min_mois": 2, "age_max_mois": None, "description": "Diphtérie, Tétanos, Coqueluche, Hépatite B, Hib - 1ère dose", "obligatoire": True},
-    {"nom": "VPO 1", "age_affichage": "6 semaines", "age_min_mois": 2, "age_max_mois": None, "description": "2ème dose vaccin polio oral", "obligatoire": True},
-    {"nom": "Pneumocoque 1 (PCV)", "age_affichage": "6 semaines", "age_min_mois": 2, "age_max_mois": None, "description": "Protection contre les pneumonies et méningites - 1ère dose", "obligatoire": True},
-
-    # 10 semaines
-    {"nom": "Pentavalent 2", "age_affichage": "10 semaines", "age_min_mois": 3, "age_max_mois": None, "description": "Diphtérie, Tétanos, Coqueluche, Hépatite B, Hib - 2ème dose", "obligatoire": True},
-    {"nom": "VPO 2", "age_affichage": "10 semaines", "age_min_mois": 3, "age_max_mois": None, "description": "3ème dose vaccin polio oral", "obligatoire": True},
-    {"nom": "Pneumocoque 2 (PCV)", "age_affichage": "10 semaines", "age_min_mois": 3, "age_max_mois": None, "description": "Protection contre les pneumonies - 2ème dose", "obligatoire": True},
-
-    # 14 semaines
-    {"nom": "Pentavalent 3", "age_affichage": "14 semaines", "age_min_mois": 4, "age_max_mois": None, "description": "Diphtérie, Tétanos, Coqueluche, Hépatite B, Hib - 3ème dose", "obligatoire": True},
-    {"nom": "VPO 3", "age_affichage": "14 semaines", "age_min_mois": 4, "age_max_mois": None, "description": "4ème dose vaccin polio oral", "obligatoire": True},
-    {"nom": "Pneumocoque 3 (PCV)", "age_affichage": "14 semaines", "age_min_mois": 4, "age_max_mois": None, "description": "Protection contre les pneumonies - 3ème dose", "obligatoire": True},
-
-    # 6-7 mois
-    {"nom": "Vaccin Antipaludique 1 (RTS,S)", "age_affichage": "6 mois", "age_min_mois": 6, "age_max_mois": None, "description": "1ère dose vaccin contre le paludisme - introduit au Bénin en 2024", "obligatoire": True},
-    {"nom": "Vaccin Antipaludique 2 (RTS,S)", "age_affichage": "7 mois", "age_min_mois": 7, "age_max_mois": None, "description": "2ème dose vaccin contre le paludisme", "obligatoire": True},
-
-    # 9 mois
-    {"nom": "VAR (Rougeole-Rubéole)", "age_affichage": "9 mois", "age_min_mois": 9, "age_max_mois": None, "description": "Protection contre la rougeole et la rubéole", "obligatoire": True},
-    {"nom": "VAA (Fièvre jaune)", "age_affichage": "9 mois", "age_min_mois": 9, "age_max_mois": None, "description": "Protection contre la fièvre jaune - obligatoire au Bénin", "obligatoire": True},
-    {"nom": "MenA (Méningite A)", "age_affichage": "9 mois", "age_min_mois": 9, "age_max_mois": None, "description": "Protection contre la méningite à méningocoque A", "obligatoire": True},
-    {"nom": "Vaccin Antipaludique 3 (RTS,S)", "age_affichage": "9 mois", "age_min_mois": 9, "age_max_mois": None, "description": "3ème dose vaccin contre le paludisme", "obligatoire": True},
-
-    # 18 mois et plus
-    {"nom": "Vaccin Antipaludique 4 (RTS,S)", "age_affichage": "18-23 mois", "age_min_mois": 18, "age_max_mois": 23, "description": "4ème et dernière dose vaccin contre le paludisme", "obligatoire": True},
-    {"nom": "VAR 2 (Rappel Rougeole)", "age_affichage": "18 mois", "age_min_mois": 18, "age_max_mois": None, "description": "Rappel vaccin rougeole-rubéole", "obligatoire": True},
+    {
+        "nom": entree["nom"],
+        "age_affichage": entree["affichage"],
+        "age_min_mois": entree.get("mois", entree.get("semaines", 0) // 4),
+        "age_max_mois": None,
+        "description": entree["description"],
+        "obligatoire": entree["obligatoire"],
+    }
+    for entree in CALENDRIER_PEV
 ]
 
 

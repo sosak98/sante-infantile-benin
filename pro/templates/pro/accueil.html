@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Espace professionnels de santé - Santé Infantile Bénin{% endblock %}
+{% block description %}Espace réservé aux agents de santé du Bénin : publiez les jours de vaccination de votre centre et utilisez le planificateur PEV en consultation.{% endblock %}
+
+{% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="/">Accueil</a>
+    <span class="sep">›</span>
+    <span class="current">Espace professionnels</span>
+  </div>
+</nav>
+
+<div class="page-head">
+  <div class="container">
+    <h1>👩‍⚕️ Espace professionnels de santé</h1>
+    <p>Réservé aux infirmiers, sages-femmes, médecins et agents du PEV exerçant au Bénin.</p>
+  </div>
+</div>
+
+<div class="container page-body">
+  {% if pro and not pro.est_valide %}
+    <div class="panel" style="border-left:4px solid var(--amber-dark);">
+      <h3 style="margin-top:0;">Votre demande est en cours d'examen</h3>
+      <p class="sub" style="margin:0;">
+        <a href="{% url 'pro:en_attente' %}">Voir l'état de ma demande</a>
+      </p>
+    </div>
+  {% endif %}
+
+  <div class="grid3">
+    <div class="panel">
+      <div style="font-size:2.2rem;">🗓️</div>
+      <h3 style="margin:6px 0 4px;">Publier vos jours de séance</h3>
+      <p class="sub" style="margin:0;">
+        Déclarez les jours et horaires de vaccination de votre centre. Les parents
+        de votre zone les voient immédiatement sur la carte et dans la recherche.
+      </p>
+    </div>
+    <div class="panel">
+      <div style="font-size:2.2rem;">💉</div>
+      <h3 style="margin:6px 0 4px;">Planificateur PEV</h3>
+      <p class="sub" style="margin:0;">
+        Une date de naissance, et vous obtenez les {{ nb_doses }} doses du calendrier
+        béninois avec les dates exactes et les retards — utile en pleine consultation.
+      </p>
+    </div>
+    <div class="panel">
+      <div style="font-size:2.2rem;">📋</div>
+      <h3 style="margin:6px 0 4px;">Calendrier de référence</h3>
+      <p class="sub" style="margin:0;">
+        Le calendrier PEV à jour : rotavirus, VPI, antipaludique RTS,S
+        et 2ᵉ dose rougeole-rubéole inclus.
+      </p>
+    </div>
+  </div>
+
+  <div class="panel" style="text-align:center;">
+    <h2 style="margin-top:0;font-size:1.2rem;">
+      {{ centres_publies }} centre{{ centres_publies|pluralize }} publie{{ centres_publies|pluralize:"nt" }} déjà ses jours de vaccination
+    </h2>
+    <p class="sub">La création de compte est gratuite. Chaque demande est vérifiée avant activation.</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      {% if not user.is_authenticated %}
+        <a class="btn btn-primary" href="{% url 'pro:inscription' %}">Demander un compte professionnel</a>
+        <a class="btn btn-ghost" href="{% url 'accounts:login' %}">J'ai déjà un compte</a>
+      {% elif not pro %}
+        <a class="btn btn-primary" href="{% url 'pro:inscription' %}">Demander un compte professionnel</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="panel" style="background:var(--teal-50);">
+    <h3 style="margin-top:0;">Pourquoi une validation ?</h3>
+    <p class="sub" style="margin:0;">
+      Un compte professionnel peut modifier les informations publiques d'un centre de santé.
+      Sans vérification, n'importe qui pourrait publier de faux jours de vaccination et
+      envoyer des parents devant une porte close. Tant qu'un compte n'est pas validé,
+      il ne peut rien modifier.
+    </p>
+  </div>
+</div>
+{% endblock %}

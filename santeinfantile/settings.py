@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'enfants',
     'conseils',
     'sib_intelligence',
+    'pro',
 ]
 
 MIDDLEWARE = [
@@ -66,6 +67,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # CSP + Permissions-Policy (voir santeinfantile/middleware.py)
+    'santeinfantile.middleware.SecurityHeadersMiddleware',
 ]
 
 ROOT_URLCONF = 'santeinfantile.urls'
@@ -171,3 +175,23 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 X_FRAME_OPTIONS = config('X_FRAME_OPTIONS', default='SAMEORIGIN')
+SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=not DEBUG, cast=bool)
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+
+# Origines autorisées à afficher le site dans une iframe. `'self'` en
+# production ; à élargir uniquement pour un environnement d'aperçu.
+CSP_FRAME_ANCESTORS = config('CSP_FRAME_ANCESTORS', default="'self'")
+
+# Les cookies ne doivent jamais être lisibles en JavaScript ni partir vers un
+# site tiers (protection CSRF de fond).
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+# Le formulaire de triage et le chat sont postés en AJAX depuis le site :
+# le token doit rester lisible par le JS, d'où HttpOnly à False côté CSRF.
+CSRF_COOKIE_HTTPONLY = False
+
+# Taille maximale d'un corps de requête (limite les envois abusifs).
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024   # 5 Mio
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 500

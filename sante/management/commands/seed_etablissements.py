@@ -48,6 +48,11 @@ TYPES_OSM = {
 BBOX_BENIN = "6.05,0.70,12.55,3.95"
 
 
+# Structures susceptibles d'organiser des seances de vaccination du PEV.
+# Les pharmacies, laboratoires et cabinets medicaux prives n'en font pas.
+TYPES_VACCINATEURS = {"centre", "hopital", "hopital_zone"}
+
+
 def _cle(nom, lat, lng):
     return (nom.strip().lower(), round(float(lat), 3), round(float(lng), 3))
 
@@ -84,13 +89,21 @@ class Command(BaseCommand):
             if cle in existants:
                 continue
             existants.add(cle)
+            ville = (lieu.get("v") or "").strip()
             a_creer.append(Etablissement(
                 nom=lieu["n"][:200],
                 type_etab=type_etab,
-                adresse="Bénin",
+                adresse=f"{ville}, Bénin" if ville else "Bénin",
+                commune=ville[:100],
                 latitude=lieu["lat"],
                 longitude=lieu["lon"],
                 telephone=(lieu.get("tel") or "")[:20],
+                # On marque les structures qui PEUVENT vacciner. Les jours
+                # eux-memes restent vides : ils sont declares par le centre
+                # via l'espace professionnels. On n'invente pas d'horaire.
+                fait_vaccination=(
+                    type_etab in TYPES_VACCINATEURS or bool(lieu.get("vac"))
+                ),
             ))
         Etablissement.objects.bulk_create(a_creer, batch_size=500)
         self.stdout.write(f"  fichier embarque : +{len(a_creer)}")
@@ -144,9 +157,11 @@ class Command(BaseCommand):
                 nom=nom[:200],
                 type_etab=type_etab,
                 adresse=adresse[:300],
+                commune=ville[:100],
                 latitude=lat,
                 longitude=lng,
                 telephone=(tags.get("phone") or tags.get("contact:phone") or "")[:20],
+                fait_vaccination=type_etab in TYPES_VACCINATEURS,
             ))
             ajoutes += 1
         Etablissement.objects.bulk_create(a_creer, batch_size=500)

@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Jours de vaccination par centre - Santé Infantile Bénin{% endblock %}
+{% block description %}Trouvez les jours et horaires des séances de vaccination du PEV dans les centres de santé du Bénin, jour par jour.{% endblock %}
+
+{% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="/">Accueil</a>
+    <span class="sep">›</span>
+    <a href="{% url 'sante:carte' %}">Carte des centres</a>
+    <span class="sep">›</span>
+    <span class="current">Jours de vaccination</span>
+  </div>
+</nav>
+
+<div class="page-head">
+  <div class="container">
+    <h1>💉 Jours de vaccination par centre</h1>
+    <p>Les séances du PEV n'ont pas lieu tous les jours. Vérifiez le jour avant de vous déplacer avec votre enfant.</p>
+  </div>
+</div>
+
+<div class="container page-body">
+
+  <div class="panel">
+    <form method="get" role="search">
+      <div class="field">
+        <label for="q">Rechercher un centre ou une commune</label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <input type="search" id="q" name="q" class="form-control" style="flex:1;min-width:200px;"
+                 value="{{ recherche }}" placeholder="Ex. Cotonou, Parakou, CS Gbégamey…">
+          <input type="hidden" name="jour" value="{{ jour }}">
+          <button class="btn btn-primary" type="submit">Rechercher</button>
+        </div>
+      </div>
+    </form>
+
+    <div style="margin-top:14px;">
+      <div class="sub" style="margin-bottom:6px;">Filtrer par jour</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        {% for code, libelle in jours_semaine %}
+          <a class="btn btn-sm {% if jour == code %}btn-primary{% else %}btn-ghost{% endif %}"
+             href="?jour={{ code }}{% if recherche %}&q={{ recherche|urlencode }}{% endif %}">
+            {{ libelle }}{% if code == jour_actuel %} •{% endif %}
+          </a>
+        {% endfor %}
+        <a class="btn btn-sm {% if jour == 'tous' %}btn-primary{% else %}btn-ghost{% endif %}"
+           href="?jour=tous{% if recherche %}&q={{ recherche|urlencode }}{% endif %}">Toute la semaine</a>
+      </div>
+      <p class="sub" style="margin:8px 0 0;font-size:.8rem;">Le point • signale le jour d'aujourd'hui.</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 style="margin-top:0;font-size:1.15rem;">
+      {% if jour == 'tous' %}
+        {{ nb_publies }} centre{{ nb_publies|pluralize }} avec des jours publiés
+      {% else %}
+        {{ nb_publies }} centre{{ nb_publies|pluralize }} vaccine{{ nb_publies|pluralize:"nt" }} le {{ jour_libelle|lower }}
+      {% endif %}
+    </h2>
+
+    {% if centres %}
+      <div style="overflow-x:auto;">
+        <table class="sib-table">
+          <thead>
+            <tr>
+              <th>Centre</th><th>Commune</th><th>Jours de séance</th>
+              <th>Horaire</th><th>Contact</th><th>Itinéraire</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in centres %}
+              <tr>
+                <td>
+                  <strong>{{ c.nom }}</strong>
+                  <div class="sub" style="margin:0;font-size:.78rem;">{{ c.get_type_etab_display }}</div>
+                  {% if c.precision_vaccination %}
+                    <div class="sub" style="margin:2px 0 0;font-size:.78rem;">ℹ️ {{ c.precision_vaccination }}</div>
+                  {% endif %}
+                </td>
+                <td>{{ c.commune|default:"—" }}</td>
+                <td>
+                  {% for j in c.jours_libelles %}
+                    <span class="tag" style="font-size:.72rem;">{{ j }}</span>
+                  {% endfor %}
+                </td>
+                <td>{{ c.horaire_vaccination|default:"—" }}</td>
+                <td>
+                  {% if c.telephone %}
+                    <a href="tel:{{ c.telephone }}">{{ c.telephone }}</a>
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener"
+                     href="https://www.google.com/maps/dir/?api=1&destination={{ c.latitude }},{{ c.longitude }}">🧭 Y aller</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align:center;padding:26px;color:var(--muted);">
+        <div style="font-size:2.4rem;">🗓️</div>
+        <p style="margin:6px 0 0;">
+          Aucun centre n'a encore publié de séance
+          {% if jour != 'tous' %}le {{ jour_libelle|lower }}{% endif %}
+          {% if recherche %}pour « {{ recherche }} »{% endif %}.
+        </p>
+        <p class="sub">Essayez un autre jour, ou consultez la liste des centres ci-dessous.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if sans_jours %}
+    <div class="panel" style="background:var(--teal-50);">
+      <h2 style="margin-top:0;font-size:1.05rem;">
+        🏥 {{ nb_sans_jours }} centre{{ nb_sans_jours|pluralize }} vaccine{{ nb_sans_jours|pluralize:"nt" }} sans jours communiqués
+      </h2>
+      <p class="sub">
+        Ces structures font partie du PEV mais n'ont pas encore déclaré leurs jours de séance.
+        <strong>Appelez avant de vous déplacer.</strong>
+      </p>
+      <ul style="columns:2;column-gap:24px;margin:8px 0 0;padding-left:18px;font-size:.88rem;">
+        {% for c in sans_jours %}
+          <li style="break-inside:avoid;margin:3px 0;">
+            {{ c.nom }}{% if c.telephone %} — <a href="tel:{{ c.telephone }}">{{ c.telephone }}</a>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="panel">
+    <h2 style="margin-top:0;font-size:1.05rem;">👩‍⚕️ Vous travaillez dans un centre de santé ?</h2>
+    <p class="sub">
+      Publiez les jours de séance de votre centre : les parents de votre zone les verront
+      immédiatement, et vous réduirez les déplacements inutiles.
+    </p>
+    <a class="btn btn-primary btn-sm" href="{% url 'pro:accueil' %}">Accéder à l'espace professionnels</a>
+  </div>
+
+  <div class="panel" style="border-left:4px solid var(--teal-500);">
+    <p class="sub" style="margin:0;">
+      <strong>D'où viennent ces informations ?</strong> Les jours affichés sont déclarés par
+      les agents des centres eux-mêmes, après validation de leur compte. Tant qu'un centre
+      n'a rien déclaré, nous affichons « jours non communiqués » plutôt qu'une estimation :
+      un horaire inventé ferait déplacer un parent pour rien.
+    </p>
+  </div>
+</div>
+{% endblock %}

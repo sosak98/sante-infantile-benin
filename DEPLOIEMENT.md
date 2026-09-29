@@ -1,3 +1,9 @@
+> **Document historique.** Ce fichier décrit l'étape 1 du projet (fondations,
+> design system, première version de la PWA). Pour la procédure de déploiement
+> à jour, avec la liste des pages à vérifier et les commandes de contrôle,
+> voir **[`docs/DEPLOIEMENT.md`](docs/DEPLOIEMENT.md)**.
+> L'audit de sécurité est dans **[`docs/AUDIT_SECURITE.md`](docs/AUDIT_SECURITE.md)**.
+
 # 🚀 Étape 1 - Mise à niveau & déploiement
 
 ## Ce qui a été fait

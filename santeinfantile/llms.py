@@ -3,7 +3,24 @@
 Format proposé par llmstxt.org : le premier fichier est un sommaire hiérarchique,
 le second contient l'intégralité du contenu public utile du site en Markdown.
 """
+from conseils.pev import CALENDRIER_PEV, SUPPLEMENTATIONS
 from sante.models import Etablissement
+
+
+def tableau_pev():
+    """Le calendrier PEV en Markdown, généré depuis `conseils/pev.py`.
+
+    Généré et non recopié : les assistants IA lisent ainsi exactement le même
+    calendrier que celui affiché aux parents.
+    """
+    lignes = ['| Âge | Vaccin | Protège contre | Voie |',
+              '| --- | --- | --- | --- |']
+    for entree in CALENDRIER_PEV:
+        lignes.append(
+            f"| {entree['affichage']} | {entree['nom']} | "
+            f"{entree['maladies']} | {entree['voie']} |"
+        )
+    return '\n'.join(lignes)
 
 
 def nb_structures():
@@ -37,6 +54,7 @@ Informations essentielles :
 - [Conseils nutritionnels par âge]({base}/conseils/nutrition/): allaitement, diversification, aliments locaux du Bénin, prévention de l'anémie et de la malnutrition, de 0 à 10 ans.
 - [Dépistage de la malnutrition (Z-scores OMS)]({base}/depistage/): évaluation du poids, de la taille et du périmètre brachial selon les standards de croissance OMS (indicateurs poids-pour-âge, taille-pour-âge, poids-pour-taille, MUAC 11,5/12,5 cm).
 - [Premiers secours & signes de danger]({base}/premiers-secours/): signes d'urgence et gestes de secours de 0 à 5 ans (fièvre, convulsions, étouffement, diarrhée, brûlures, plaies, morsures, noyade...), d'après le mémento pédiatrique OMS et la PCIME.
+- [Jours de vaccination par centre]({base}/carte/vaccination/): jours et horaires des séances de vaccination du PEV déclarés par les centres de santé, filtrables par jour de la semaine.
 - [Carte des structures de santé]({base}/carte/): {nb} centres de santé, hôpitaux, cliniques et pharmacies du Bénin géolocalisés, avec itinéraire.
 - [Triage pédiatrique assisté par IA]({base}/triage/): orientation rapide selon les symptômes saisis (nécessite une connexion internet).
 
@@ -46,6 +64,7 @@ Informations essentielles :
 - [À propos]({base}/a-propos/): l'éditeur, la mission et les références du projet.
 - [Inscription]({base}/inscription/): création d'un compte parent gratuit (numéro de téléphone).
 - [Connexion]({base}/connexion/): accès à l'espace parent.
+- [Espace professionnels de santé]({base}/pro/): espace réservé aux agents de santé du Bénin (infirmiers, sages-femmes, médecins, agents PEV) pour publier les jours de vaccination de leur centre et utiliser le planificateur PEV.
 
 ## Pages légales
 
@@ -67,6 +86,7 @@ Informations essentielles :
 def llms_full_txt(request):
     base = f"https://{request.get_host()}"
     nb = nb_structures()
+    tableau = tableau_pev()
     return f"""# Santé Infantile Bénin — contenu intégral
 
 > Plateforme web gratuite (PWA) de suivi de la santé des nourrissons et jeunes enfants de 0 à 5 ans au Bénin. Contenu en français. URL : {base}/
@@ -82,33 +102,23 @@ def llms_full_txt(request):
 
 ## 1. Vaccination — calendrier officiel PEV Bénin
 
-Page : {base}/conseils/ · Calculateur de rendez-vous : {base}/conseils/rdv/
+Page : {base}/conseils/ · Calculateur de rendez-vous : {base}/conseils/rdv/ · Jours de séance par centre : {base}/carte/vaccination/
 
-Le Programme Élargi de Vaccination (PEV) du Bénin recommande, selon l'âge de l'enfant (compter en semaines à partir de la date de naissance) :
+Calendrier de routine du Programme Élargi de Vaccination (PEV) du Bénin, tel
+qu'appliqué depuis décembre 2024. Les âges en semaines se comptent à partir de
+la date de naissance ; l'intervalle minimal entre deux doses d'une même série
+est de 4 semaines.
 
-**À la naissance (semaine 0) :**
-- BCG (tuberculose), dose unique
-- VPO 0 (poliomyélite orale, dose de naissance)
-- Vaccin contre l'hépatite B (dose de naissance)
+{tableau}
 
-**À partir de 6 semaines :**
-- Pentavalent (DTC-HepB-Hib) doses 1, 2 et 3 — âges minimaux 6, 10 et 14 semaines, intervalle minimal de 4 semaines entre deux doses
-- VPO (polio orale) doses 1, 2 et 3 — 6, 10 et 14 semaines
-- PCV (pneumocoque) doses 1, 2 et 3 — 6, 10 et 14 semaines
+**Supplémentation associée :** vitamine A de 6 à 59 mois, tous les 6 mois, couplée au déparasitage à l'albendazole à partir de 12 mois.
 
-**À partir de 22 semaines (environ 5 mois et demi) :**
-- RTSS (rotavirus) doses 1 et 2 — 22 et 26 semaines
+**Évolutions récentes du calendrier béninois :**
+- Vaccin antirotavirus : introduit nationalement en décembre 2019 (3 doses, calées sur le pentavalent).
+- Vaccin antipaludique RTS,S/AS01 : introduit dans le PEV en avril 2024 — 3 doses à 6, 7 et 9 mois, puis un rappel à 18 mois.
+- 2e dose rougeole-rubéole (VAR 2) : introduite en décembre 2024, à 18 mois.
 
-**À 39 semaines (environ 9 mois) :**
-- VAR (rougeole), dose unique
-- VAA (fièvre jaune), dose unique
-- MenA (méningite à méningocoque A), dose unique
-- RTSS dose 3
-
-**À 65 semaines (environ 15 mois) :**
-- RTSS dose 4
-
-Le site calcule automatiquement les dates prévues à partir de la date de naissance saisie et signale les rappels en retard. Le carnet de vaccination reste le document de référence.
+Le PEV vaccine gratuitement les enfants jusqu'à 59 mois : un retard peut toujours être rattrapé en se présentant au centre de santé avec le carnet. Le site calcule les dates prévues à partir de la date de naissance et signale les doses en retard. Le carnet de vaccination reste le document de référence.
 
 ## 2. Nutrition infantile par âge
 
@@ -210,7 +220,18 @@ Page : {base}/triage/
 ## 8. Application mobile & mode hors-ligne (PWA)
 
 - Le site est une application web progressive : elle s'installe sur l'écran d'accueil (Android : menu « Installer » ; iPhone : Partager → « Sur l'écran d'accueil »).
-- Une fois installée, tous les outils (vaccination, nutrition, dépistage, premiers secours, carte) restent consultables sans réseau grâce au cache hors-ligne. Le triage IA nécessite une connexion.
+- Une fois installée, tous les outils (vaccination, nutrition, dépistage, premiers secours, carte, jours de vaccination) restent consultables sans réseau grâce au cache hors-ligne. Le triage IA nécessite une connexion.
+- Le service worker pré-enregistre les pages principales dès l'installation et sert une page de repli ({base}/hors-ligne/) quand une page jamais visitée est demandée sans réseau.
+
+## 8 bis. Espace professionnels de santé
+
+Page : {base}/pro/
+
+- Espace réservé aux agents de santé exerçant au Bénin : infirmiers, sages-femmes, médecins, agents PEV, aides-soignants.
+- Chaque demande de compte est vérifiée avant activation : un compte non validé ne peut modifier aucune information publique.
+- Une fois validé, l'agent publie les jours et horaires des séances de vaccination de son centre ; ils apparaissent aussitôt pour les parents sur {base}/carte/vaccination/ et sur la carte.
+- L'espace fournit aussi un planificateur PEV : à partir d'une date de naissance et des doses déjà portées au carnet, il produit le planning complet avec les retards.
+- Les jours de vaccination affichés sur le site proviennent uniquement de ces déclarations. Quand un centre n'a rien déclaré, le site indique « jours non communiqués » plutôt qu'une estimation.
 
 ## 9. Cadre légal et données personnelles
 

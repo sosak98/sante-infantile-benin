@@ -42,10 +42,18 @@
         <span><b id="countHopitaux">0</b> hôpitaux</span>
         <span><b id="countPharmacies">0</b> pharmacies</span>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
         <button class="btn btn-primary btn-sm" id="localiserBtn">Me localiser</button>
         <button class="btn btn-ghost btn-sm" id="prochesBtn">Les 10 plus proches</button>
+        <label style="display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:600;color:var(--teal-800);">
+          <input type="checkbox" id="filtreVaccination"> 💉 Vaccination aujourd'hui
+        </label>
+        <a class="btn btn-ghost btn-sm" href="{% url 'sante:jours_vaccination' %}">🗓️ Jours de vaccination</a>
       </div>
+      <p class="sub" id="infoVaccination" style="margin:8px 0 0;font-size:.8rem;display:none;">
+        Seuls les centres ayant déclaré une séance le <b>{{ jour_actuel }}</b> sont affichés.
+        Les centres qui n'ont pas communiqué leurs jours sont masqués : appelez-les avant de vous déplacer.
+      </p>
       <div id="nearList" style="display:none;margin-top:12px;font-size:.85rem;"></div>
     </div>
   </div>
@@ -56,6 +64,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 {{ etablissements|json_script:"etab-data" }}
+{{ jour_actuel|json_script:"jour-actuel-data" }}
 <script>
   var COULEURS = { 'centre': '#00695c', 'clinique': '#6a1b9a', 'hopital': '#c62828', 'hopital_zone': '#c62828', 'pharmacie': '#ef6c00' };
 
@@ -102,12 +111,35 @@
   });
   map.addLayer(clusters);
 
-  function popupContent(nom, adresse, telephone, lat, lng) {
-    return '<div style="font-family:Segoe UI;min-width:150px;">' +
-      '<h6 style="color:#004d40;margin-bottom:5px;">' + nom + '</h6>' +
-      '<p style="margin:0;font-size:0.85rem;color:#666;">' + adresse + '</p>' +
-      (telephone ? '<p style="margin:5px 0 0;font-size:0.85rem;">📞 ' + telephone + '</p>' : '') +
-      '<a href="https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '" target="_blank" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;display:block;text-align:center;text-decoration:none;">🧭 Y aller (Google Maps)</a></div>';
+  // Les noms viennent d'OpenStreetMap et de saisies libres : on echappe
+  // systematiquement avant toute insertion HTML (pas de XSS via un nom piege).
+  function echapper(valeur) {
+    return String(valeur === null || valeur === undefined ? '' : valeur)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  var JOUR_ACTUEL = JSON.parse(document.getElementById('jour-actuel-data').textContent);
+
+  function blocVaccination(e) {
+    if (!e.vaccination) return '';
+    var txt = echapper(e.jours_txt || 'Jours non communiqués');
+    var horaire = e.horaire ? ' · ' + echapper(e.horaire) : '';
+    var aujourdhui = (e.jours || []).indexOf(JOUR_ACTUEL) !== -1;
+    var pastille = aujourdhui
+      ? '<span style="background:#00695c;color:#fff;border-radius:8px;padding:1px 7px;font-size:.72rem;">Séance aujourd\'hui</span> '
+      : '';
+    return '<p style="margin:6px 0 0;font-size:0.82rem;color:#00695c;">💉 ' + pastille + txt + horaire + '</p>';
+  }
+
+  function popupContent(e) {
+    var lat = Number(e.latitude), lng = Number(e.longitude);
+    return '<div style="font-family:Segoe UI;min-width:160px;">' +
+      '<h6 style="color:#004d40;margin-bottom:5px;">' + echapper(e.nom) + '</h6>' +
+      '<p style="margin:0;font-size:0.85rem;color:#666;">' + echapper(e.adresse) + '</p>' +
+      (e.telephone ? '<p style="margin:5px 0 0;font-size:0.85rem;">📞 ' + echapper(e.telephone) + '</p>' : '') +
+      blocVaccination(e) +
+      '<a href="https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '" target="_blank" rel="noopener" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;display:block;text-align:center;text-decoration:none;">🧭 Y aller (Google Maps)</a></div>';
   }
 
   function distanceKm(lat1, lon1, lat2, lon2) {
@@ -120,19 +152,37 @@
 
   var etablissements = JSON.parse(document.getElementById('etab-data').textContent);
   var marqueurs = [];
+  var marqueursVaccinationJour = [];
   etablissements.forEach(function (e) {
     var m = L.circleMarker([e.latitude, e.longitude], {
       radius: 7, color: '#ffffff', weight: 2,
       fillColor: COULEURS[e.type_etab] || COULEURS.centre, fillOpacity: 0.95
     });
-    m.bindPopup(popupContent(e.nom, e.adresse, e.telephone, e.latitude, e.longitude));
+    m.bindPopup(popupContent(e));
     marqueurs.push(m);
+    if (e.vaccination && (e.jours || []).indexOf(JOUR_ACTUEL) !== -1) {
+      marqueursVaccinationJour.push(m);
+    }
     if (e.type_etab === 'pharmacie') countPharmacies++;
     else if (e.type_etab === 'hopital' || e.type_etab === 'hopital_zone') countHopitaux++;
     else if (e.type_etab === 'clinique') countCliniques++;
     else countCentres++;
   });
   clusters.addLayers(marqueurs);
+
+  // Filtre « vaccination aujourd'hui » : on ne garde que les centres ayant
+  // declare une seance ce jour-la.
+  var filtreVaccination = document.getElementById('filtreVaccination');
+  if (filtreVaccination) {
+    filtreVaccination.addEventListener('change', function () {
+      clusters.clearLayers();
+      clusters.addLayers(this.checked ? marqueursVaccinationJour : marqueurs);
+      document.getElementById('infoVaccination').style.display = this.checked ? 'block' : 'none';
+      if (this.checked && marqueursVaccinationJour.length === 0) {
+        messageCarte("Aucun centre n'a encore declare de seance de vaccination pour aujourd'hui. Consultez la page « Jours de vaccination » ou appelez le centre le plus proche.");
+      }
+    });
+  }
   document.getElementById('countCentres').textContent = countCentres;
   document.getElementById('countCliniques').textContent = countCliniques;
   document.getElementById('countHopitaux').textContent = countHopitaux;
@@ -180,7 +230,8 @@
       var km = distanceKm(refLat, refLng, e.latitude, e.longitude);
       var kmTxt = km < 1 ? Math.round(km * 1000) + ' m' : km.toFixed(1) + ' km';
       html += '<li style="margin:4px 0;"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + couleur + ';margin-right:4px;"></i>' +
-        '<b>' + e.nom + '</b> · ' + kmTxt +
+        '<b>' + echapper(e.nom) + '</b> · ' + kmTxt +
+        (e.vaccination && (e.jours || []).indexOf(JOUR_ACTUEL) !== -1 ? ' · <span style="color:#00695c;font-weight:700;">💉 séance aujourd\'hui</span>' : '') +
         ' · <a href="https://www.google.com/maps/dir/?api=1&destination=' + e.latitude + ',' + e.longitude +
         '" target="_blank" style="color:#00796b;text-decoration:none;">Y aller</a></li>';
       bounds.push([e.latitude, e.longitude]);

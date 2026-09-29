@@ -31,15 +31,19 @@
       <table class="sib-table">
         <thead>
           <tr>
-            <th>Âge</th><th>Vaccin</th><th>Description</th><th>Statut</th>
+            <th>Âge</th><th>Vaccin</th><th>Protège contre</th><th>Voie</th><th>Statut</th>
           </tr>
         </thead>
         <tbody>
           {% for vaccin in vaccins %}
             <tr>
               <td><span class="tag">{{ vaccin.age_affichage }}</span></td>
-              <td><strong>{{ vaccin.nom }}</strong></td>
-              <td>{{ vaccin.description|default:"-" }}</td>
+              <td>
+                <strong>{{ vaccin.nom }}</strong>
+                <div class="sub" style="margin:2px 0 0;font-size:.8rem;">{{ vaccin.description }}</div>
+              </td>
+              <td style="font-size:.85rem;">{{ vaccin.maladies }}</td>
+              <td style="font-size:.85rem;color:var(--muted);">{{ vaccin.voie }}</td>
               <td>
                 {% if vaccin.obligatoire %}
                   <span class="badge-pill badge-ok" style="font-size:.72rem;">Obligatoire</span>
@@ -48,12 +52,33 @@
                 {% endif %}
               </td>
             </tr>
-          {% empty %}
-            <tr><td colspan="4" style="text-align:center;padding:24px;">Aucun vaccin enregistré.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0;">🥄 Supplémentations associées</h3>
+    <div class="sub">Administrées lors des séances de vaccination, ce ne sont pas des vaccins.</div>
+    <ul style="margin:10px 0 0;padding-left:20px;">
+      {% for s in supplementations %}
+        <li style="margin:6px 0;"><strong>{{ s.nom }}</strong> — <span class="tag">{{ s.affichage }}</span><br>
+          <span class="sub" style="font-size:.85rem;">{{ s.description }}</span></li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="panel" style="background:var(--teal-50);">
+    <h3 style="margin-top:0;">ℹ️ Sources du calendrier</h3>
+    <p class="sub" style="margin:0;">
+      Calendrier de routine du Programme Élargi de Vaccination (PEV) du Bénin —
+      {{ nb_doses }} doses de la naissance à 18 mois. Intègre le vaccin
+      antirotavirus (introduit en décembre 2019), le vaccin antipaludique RTS,S
+      (avril 2024) et la 2ᵉ dose rougeole-rubéole (décembre 2024).
+      Le PEV vaccine gratuitement les enfants jusqu'à 59 mois : un retard peut
+      toujours être rattrapé, présentez-vous au centre de santé avec le carnet.
+    </p>
   </div>
 </div>
 {% endblock %}

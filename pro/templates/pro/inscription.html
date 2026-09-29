@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Demande de compte professionnel - Santé Infantile Bénin{% endblock %}
+
+{% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="/">Accueil</a>
+    <span class="sep">›</span>
+    <a href="{% url 'pro:accueil' %}">Espace professionnels</a>
+    <span class="sep">›</span>
+    <span class="current">Demande de compte</span>
+  </div>
+</nav>
+
+<div class="page-head">
+  <div class="container">
+    <h1>👩‍⚕️ Demande de compte professionnel</h1>
+    <p>Votre compte sera activé après vérification de votre qualité d'agent de santé.</p>
+  </div>
+</div>
+
+<div class="container page-body">
+  <div class="panel" style="max-width:720px;margin:0 auto;">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+      {% for champ in form %}
+        <div class="field">
+          <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+          {{ champ }}
+          {% if champ.help_text %}<div class="sub" style="margin:2px 0 0;font-size:.8rem;">{{ champ.help_text }}</div>{% endif %}
+          {% if champ.errors %}<div class="sub" style="color:#c62828;margin:2px 0 0;">{{ champ.errors|striptags }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary btn-block">Envoyer ma demande</button>
+    </form>
+    <p class="sub" style="margin-top:14px;font-size:.82rem;">
+      Les données transmises servent uniquement à vérifier votre qualité d'agent de santé
+      et à rattacher votre compte à un centre. Voir la
+      <a href="{% url 'accounts:politique_confidentialite' %}">politique de confidentialité</a>.
+    </p>
+  </div>
+</div>
+{% endblock %}

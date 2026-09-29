@@ -26,6 +26,7 @@
       <div class="sub">Date de naissance et vaccins déjà reçus</div>
       <form method="post" id="formRdv">
         {% csrf_token %}
+        {% if erreur %}<div class="alert alert-danger">{{ erreur }}</div>{% endif %}
         {% if enfants %}
         <div class="field">
           <label for="id_enfant_id">Enfant</label>
@@ -67,9 +68,10 @@
         </div>
         <div class="timeline">
           {% for rdv in resultats %}
-            <div class="tl-item {% if rdv.statut == 'Recu' %}ok{% elif rdv.statut == 'En retard' %}late{% elif rdv.statut == 'Aujourd_hui' %}next{% endif %}">
-              <div class="t">{{ rdv.nom }}</div>
-              <div class="d">📅 {{ rdv.date_prevue|date:"d/m/Y" }} - {{ rdv.statut }}</div>
+            <div class="tl-item {% if rdv.statut == 'Reçu' %}ok{% elif rdv.statut == 'En retard' %}late{% elif rdv.statut == "Aujourd'hui" %}next{% endif %}">
+              <div class="t">{{ rdv.nom }} <span class="tag" style="font-size:.7rem;">{{ rdv.age_affichage }}</span></div>
+              <div class="d">📅 {{ rdv.date_prevue|date:"d/m/Y" }} — {{ rdv.statut }}{% if rdv.statut == 'En retard' %} depuis {{ rdv.retard_jours }} jour{{ rdv.retard_jours|pluralize }}{% endif %}</div>
+              <div class="d" style="font-size:.78rem;color:var(--muted);">Protège contre : {{ rdv.maladies }}</div>
             </div>
           {% endfor %}
         </div>
@@ -86,13 +88,11 @@
 
 {% block extra_js %}
 <script>
+  // La liste vient du calendrier de référence (conseils/pev.py) : les valeurs
+  // envoyées sont les clés stables, donc une dose saisie est toujours reconnue.
   var VACCINS_LIST = [
-    'BCG', 'VPO 0', 'Hépatite B',
-    'Pentavalent_1', 'Pentavalent_2', 'Pentavalent_3',
-    'VPO_1', 'VPO_2', 'VPO_3',
-    'PCV_1', 'PCV_2', 'PCV_3',
-    'RTS,S_1', 'RTS,S_2', 'RTS,S_3', 'RTS,S_4',
-    'VAR', 'VAA', 'MenA'
+    {% for v in calendrier %}{ cle: '{{ v.cle|escapejs }}', nom: '{{ v.nom|escapejs }} — {{ v.affichage|escapejs }}' }{% if not forloop.last %},{% endif %}
+    {% endfor %}
   ];
 
   function ajouterVaccin() {
@@ -104,7 +104,7 @@
       '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">' +
         '<select name="nom_vaccin[]" class="form-control" style="flex:1;min-width:150px;">' +
           '<option value="">-- Choisir vaccin --</option>' +
-          VACCINS_LIST.map(function(v){return '<option value="'+v+'">'+v+'</option>';}).join('') +
+          VACCINS_LIST.map(function(v){return '<option value="'+v.cle+'">'+v.nom+'</option>';}).join('') +
         '</select>' +
         '<input type="date" name="date_vaccin[]" class="form-control" style="flex:1;min-width:140px;">' +
         '<button type="button" class="btn btn-ghost btn-sm" onclick="this.parentElement.parentElement.remove()">✕</button>' +

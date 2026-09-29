@@ -15,7 +15,7 @@ from .forms import ParentRegisterForm, PhoneSendForm, PhoneVerifyForm
 from .models import Parent, Profile, PhoneOTP
 from .utils import send_sms
 from enfants.models import Enfant, VaccinRecu
-from conseils.pev import planifier
+from conseils.pev import planifier, prochain_rdv, resume_couverture
 
 OTP_EXPIRY_MINUTES = getattr(settings, 'OTP_EXPIRY_MINUTES', 10)
 OTP_MAX_ATTEMPTS = getattr(settings, 'OTP_MAX_ATTEMPTS', 5)
@@ -124,15 +124,22 @@ def dashboard(request):
 
     recus = VaccinRecu.objects.filter(enfant__in=children).count()
     a_venir = 0
+    en_retard = 0
     today = date.today()
+    prochains = []
     for enfant in children:
         recus_map = {
             v.nom_vaccin: v.date_reelle
             for v in VaccinRecu.objects.filter(enfant=enfant)
         }
-        for ligne in planifier(enfant.date_naissance, recus_map, today):
-            if ligne['statut'] in ('A venir', "Aujourd_hui", 'En retard'):
-                a_venir += 1
+        resume = resume_couverture(enfant.date_naissance, recus_map, today)
+        a_venir += resume['a_venir'] + resume['aujourd_hui']
+        en_retard += resume['en_retard']
+        suivant = prochain_rdv(enfant.date_naissance, recus_map, today)
+        if suivant:
+            prochains.append({'enfant': enfant, 'rdv': suivant})
+
+    prochains.sort(key=lambda item: item['rdv']['date_prevue'])
 
     context = {
         'greeting': greeting,
@@ -141,6 +148,8 @@ def dashboard(request):
         'children_sample': list(children[:3]),
         'vaccins_recus_count': recus,
         'vaccins_a_venir_count': a_venir,
+        'vaccins_en_retard_count': en_retard,
+        'prochains_rdv': prochains[:3],
     }
     return render(request, 'accounts/dashboard.html', context)
 

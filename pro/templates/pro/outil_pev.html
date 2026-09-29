@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Planificateur PEV - Espace professionnels{% endblock %}
+
+{% block content %}
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
+  <div class="container">
+    <a href="{% url 'pro:tableau_de_bord' %}">Espace professionnel</a>
+    <span class="sep">›</span>
+    <span class="current">Planificateur PEV</span>
+  </div>
+</nav>
+
+<div class="page-head">
+  <div class="container">
+    <h1>💉 Planificateur PEV</h1>
+    <p>Saisissez la date de naissance et cochez les doses déjà portées au carnet.</p>
+  </div>
+</div>
+
+<div class="container page-body">
+  <div class="grid2" style="align-items:start;">
+    <div class="panel">
+      <form method="post">
+        {% csrf_token %}
+        <div class="field">
+          <label for="date_naissance">Date de naissance de l'enfant</label>
+          <input type="date" id="date_naissance" name="date_naissance" class="form-control" required
+                 value="{% if naissance %}{{ naissance|date:'Y-m-d' }}{% endif %}">
+        </div>
+        {% if erreur %}<div class="alert alert-danger">{{ erreur }}</div>{% endif %}
+
+        <div class="field">
+          <label>Doses déjà reçues (carnet)</label>
+          <div style="max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:10px;">
+            {% for v in calendrier %}
+              <label style="display:block;font-weight:400;font-size:.85rem;margin:3px 0;">
+                <input type="checkbox" name="recu" value="{{ v.cle }}"> {{ v.nom }} <span class="sub">({{ v.affichage }})</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Calculer le planning</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin-top:0;">Planning</h3>
+      {% if planning %}
+        <p class="sub">Âge de l'enfant : <strong>{{ age_mois }} mois</strong></p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          <span class="badge-pill badge-ok" style="font-size:.72rem;">{{ resume.recus }} reçus</span>
+          <span class="badge-pill badge-danger" style="font-size:.72rem;">{{ resume.en_retard }} en retard</span>
+          <span class="badge-pill badge-info" style="font-size:.72rem;">{{ resume.a_venir }} à venir</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="sib-table">
+            <thead><tr><th>Date</th><th>Dose</th><th>Statut</th></tr></thead>
+            <tbody>
+              {% for ligne in planning %}
+                <tr>
+                  <td>{{ ligne.date_prevue|date:"d/m/Y" }}</td>
+                  <td>{{ ligne.nom }} <span class="tag" style="font-size:.7rem;">{{ ligne.age_affichage }}</span></td>
+                  <td>
+                    {% if ligne.statut == 'Reçu' %}
+                      <span class="badge-pill badge-ok" style="font-size:.72rem;">Reçu</span>
+                    {% elif ligne.statut == 'En retard' %}
+                      <span class="badge-pill badge-danger" style="font-size:.72rem;">Retard {{ ligne.retard_jours }} j</span>
+                    {% elif ligne.statut == "Aujourd'hui" %}
+                      <span class="badge-pill badge-warn" style="font-size:.72rem;">Aujourd'hui</span>
+                    {% else %}
+                      <span class="badge-pill badge-info" style="font-size:.72rem;">À venir</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div style="text-align:center;padding:30px;color:var(--muted);">
+          <div style="font-size:3rem;">📅</div>
+          <p>Le planning s'affichera ici.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -8,6 +8,9 @@ ROUTES_PUBLIQUES = [
     '/',
     '/a-propos/',
     '/carte/',
+    '/carte/vaccination/',
+    '/pro/',
+    '/pro/inscription/',
     '/depistage/',
     '/conseils/',
     '/conseils/rdv/',
@@ -172,3 +175,149 @@ class EnTeteTests(TestCase):
                 reponse = self.client.get(route)
                 html = reponse.content.decode('utf-8')
                 self.assertIn('/politique-des-cookies/', html)
+
+
+class EnTetesSecuriteTests(TestCase):
+    """Audit sécurité : en-têtes présents sur toutes les réponses."""
+
+    def test_csp_presente_et_verrouillee(self):
+        reponse = self.client.get('/')
+        csp = reponse.headers.get('Content-Security-Policy', '')
+        self.assertIn("default-src 'self'", csp)
+        self.assertIn("object-src 'none'", csp)
+        self.assertIn("base-uri 'self'", csp)
+        self.assertIn("form-action 'self'", csp)
+        self.assertIn("frame-ancestors 'self'", csp)
+
+    def test_csp_autorise_les_cdn_reellement_utilises(self):
+        csp = self.client.get('/').headers.get('Content-Security-Policy', '')
+        for origine in ['https://cdn.jsdelivr.net', 'https://unpkg.com',
+                        'https://fonts.googleapis.com', 'https://fonts.gstatic.com']:
+            with self.subTest(origine=origine):
+                self.assertIn(origine, csp)
+
+    def test_csp_autorise_les_tuiles_de_carte(self):
+        csp = self.client.get('/carte/').headers.get('Content-Security-Policy', '')
+        self.assertIn('tile.openstreetmap.org', csp)
+        self.assertIn('basemaps.cartocdn.com', csp)
+
+    def test_permissions_policy_restrictive(self):
+        entete = self.client.get('/').headers.get('Permissions-Policy', '')
+        self.assertIn('geolocation=(self)', entete)
+        for interdit in ['camera=()', 'microphone=()', 'payment=()']:
+            with self.subTest(interdit=interdit):
+                self.assertIn(interdit, entete)
+
+    def test_entetes_django_standards(self):
+        reponse = self.client.get('/')
+        self.assertEqual(reponse.headers.get('X-Content-Type-Options'), 'nosniff')
+        self.assertEqual(reponse.headers.get('Referrer-Policy'),
+                         'strict-origin-when-cross-origin')
+        self.assertEqual(reponse.headers.get('X-Frame-Options'), 'SAMEORIGIN')
+
+    def test_entetes_sur_toutes_les_pages_publiques(self):
+        for route in ['/', '/carte/', '/conseils/', '/carte/vaccination/', '/pro/']:
+            with self.subTest(route=route):
+                reponse = self.client.get(route)
+                self.assertIn('Content-Security-Policy', reponse.headers)
+                self.assertIn('Permissions-Policy', reponse.headers)
+
+    def test_cookies_securises_en_configuration(self):
+        from django.conf import settings
+        self.assertTrue(settings.SESSION_COOKIE_HTTPONLY)
+        self.assertEqual(settings.SESSION_COOKIE_SAMESITE, 'Lax')
+        self.assertEqual(settings.CSRF_COOKIE_SAMESITE, 'Lax')
+        self.assertTrue(settings.SECURE_CONTENT_TYPE_NOSNIFF)
+
+    def test_module_ia_optionnel_ne_casse_pas_le_site(self):
+        """Sans clé Groq, le triage doit répondre, pas planter."""
+        self.assertEqual(self.client.get('/triage/').status_code, 200)
+
+
+class ServiceWorkerV9Tests(TestCase):
+    """Mode hors-ligne étendu : version du cache et pages pré-enregistrées."""
+
+    def test_version_v9(self):
+        sw = self.client.get('/sw.js').content.decode('utf-8')
+        self.assertIn("const VERSION = 'v9'", sw)
+        self.assertIn("'sib-cache-' + VERSION", sw)
+
+    def test_nouvelles_pages_precachees(self):
+        sw = self.client.get('/sw.js').content.decode('utf-8')
+        for page in ["'/carte/vaccination/'", "'/conseils/rdv/'", "'/pro/'",
+                     "'/premiers-secours/'", "'/hors-ligne/'"]:
+            with self.subTest(page=page):
+                self.assertIn(page, sw)
+
+    def test_zones_jamais_mises_en_cache(self):
+        sw = self.client.get('/sw.js').content.decode('utf-8')
+        for zone in ["'/admin/'", "'/triage/chat'", "'/carte/osm'"]:
+            with self.subTest(zone=zone):
+                self.assertIn(zone, sw)
+
+    def test_service_worker_non_cachable_par_le_navigateur(self):
+        reponse = self.client.get('/sw.js')
+        self.assertIn('no-cache', reponse.headers.get('Cache-Control', ''))
+        self.assertEqual(reponse.headers.get('Service-Worker-Allowed'), '/')
+
+    def test_purge_des_anciennes_versions(self):
+        sw = self.client.get('/sw.js').content.decode('utf-8')
+        self.assertIn('caches.delete', sw)
+        self.assertIn('navigationPreload', sw)
+
+    def test_page_hors_ligne_liste_les_nouveaux_outils(self):
+        html = self.client.get('/hors-ligne/').content.decode('utf-8')
+        self.assertIn('/carte/vaccination/', html)
+        self.assertIn('/conseils/rdv/', html)
+
+
+class PagesErreurTests(TestCase):
+    """Page 404 en français, utile plutôt que nue."""
+
+    def test_404_est_en_francais_et_orientee(self):
+        reponse = self.client.get('/cette-page-nexiste-pas/')
+        self.assertEqual(reponse.status_code, 404)
+        html = reponse.content.decode('utf-8')
+        self.assertIn('Page introuvable', html)
+        self.assertIn('112', html)
+
+    def test_404_propose_les_outils_principaux(self):
+        html = self.client.get('/url-inconnue/').content.decode('utf-8')
+        for lien in ['/conseils/', '/carte/vaccination/', '/depistage/',
+                     '/premiers-secours/']:
+            with self.subTest(lien=lien):
+                self.assertIn(lien, html)
+
+    def test_404_utilise_bien_le_gabarit_du_site(self):
+        html = self.client.get('/autre-url-inconnue/').content.decode('utf-8')
+        self.assertIn('Santé Infantile Bénin', html)
+
+
+class NavigationTests(TestCase):
+    """Les nouvelles pages sont atteignables depuis toutes les pages."""
+
+    def test_menu_expose_les_jours_de_vaccination(self):
+        self.assertContains(self.client.get('/'), '/carte/vaccination/')
+
+    def test_pied_de_page_expose_l_espace_pro(self):
+        self.assertContains(self.client.get('/'), '/pro/')
+
+    def test_sitemap_inclut_les_nouvelles_pages(self):
+        xml = self.client.get('/sitemap.xml').content.decode('utf-8')
+        self.assertIn('/carte/vaccination/', xml)
+        self.assertIn('/pro/', xml)
+
+    def test_robots_protege_les_zones_pro(self):
+        txt = self.client.get('/robots.txt').content.decode('utf-8')
+        for zone in ['/pro/tableau-de-bord/', '/pro/mon-centre/']:
+            with self.subTest(zone=zone):
+                self.assertIn(f'Disallow: {zone}', txt)
+
+    def test_llms_full_contient_le_calendrier_corrige(self):
+        txt = self.client.get('/llms-full.txt').content.decode('utf-8')
+        self.assertIn('Rotavirus 1', txt)
+        self.assertIn('VPI (polio injectable)', txt)
+        self.assertIn('Antipaludique 1 (RTS,S)', txt)
+        # L'ancien texte annonçait à tort « RTSS (rotavirus) » à 22 semaines.
+        self.assertNotIn('RTSS (rotavirus)', txt)
+        self.assertNotIn('À partir de 22 semaines', txt)

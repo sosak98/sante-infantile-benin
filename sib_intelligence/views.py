@@ -6,7 +6,6 @@ from django.http import JsonResponse
 from django.core.cache import cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.conf import settings
-from groq import Groq
 from accounts.models import Parent
 from enfants.models import Enfant
 
@@ -15,7 +14,26 @@ from types import SimpleNamespace
 # Initialisation du client Groq (optionnelle : l'IA est désactivée si la clé est absente)
 GROQ_API_KEY = os.getenv('GROQ_API_KEY') or getattr(settings, 'GROQ_API_KEY', '')
 GROQ_MODEL = os.getenv('GROQ_MODEL') or getattr(settings, 'GROQ_MODEL', 'openai/gpt-oss-20b')
-client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
+
+
+def _client_groq():
+    """Client Groq, construit à la demande.
+
+    L'import était fait au chargement du module : si le paquet `groq` manquait
+    (ou cassait), TOUT le site tombait en erreur 500, y compris la vaccination
+    et les premiers secours, alors que l'IA n'est qu'un module secondaire.
+    Ici, l'absence de la librairie ou de la clé désactive seulement le chat.
+    """
+    if not GROQ_API_KEY:
+        return None
+    try:
+        from groq import Groq
+    except Exception:  # librairie absente ou incompatible
+        return None
+    try:
+        return Groq(api_key=GROQ_API_KEY)
+    except Exception:
+        return None
 
 
 def calculer_score_triage(symptomes, poids=None, taille=None, muac=None):
@@ -269,6 +287,7 @@ def chat(request):
             contexte = data.get('contexte', {})
             symptomes = contexte.get('symptomes', {})
 
+            client = _client_groq()
             if client is None:
                 return JsonResponse({
                     'reponse': "L'assistant IA est temporairement indisponible (clé API non configurée). "

@@ -31,6 +31,9 @@ urlpatterns = [
     path('conseils/', include('conseils.urls')),
     path('triage/', include('sib_intelligence.urls')),
 
+    # Espace professionnels de santé
+    path('pro/', include('pro.urls')),
+
     # Photos profil (Render n'a pas DEBUG=True)
     path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
