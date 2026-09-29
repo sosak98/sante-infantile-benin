@@ -54,7 +54,13 @@
 
   <div class="panel">
     <h2 style="margin-top:0;font-size:1.15rem;">
-      {% if jour == 'tous' %}
+      {% if nb_publies == 0 %}
+        {% if jour == 'tous' %}
+          Aucun centre n'a encore publié ses jours
+        {% else %}
+          Aucun centre ne vaccine le {{ jour_libelle|lower }}
+        {% endif %}
+      {% elif jour == 'tous' %}
         {{ nb_publies }} centre{{ nb_publies|pluralize }} avec des jours publiés
       {% else %}
         {{ nb_publies }} centre{{ nb_publies|pluralize }} vaccine{{ nb_publies|pluralize:"nt" }} le {{ jour_libelle|lower }}
@@ -117,7 +123,7 @@
   {% if sans_jours %}
     <div class="panel" style="background:var(--teal-50);">
       <h2 style="margin-top:0;font-size:1.05rem;">
-        🏥 {{ nb_sans_jours }} centre{{ nb_sans_jours|pluralize }} vaccine{{ nb_sans_jours|pluralize:"nt" }} sans jours communiqués
+        🏥 {{ nb_sans_jours }} centre{{ nb_sans_jours|pluralize }} du PEV sans jours communiqués
       </h2>
       <p class="sub">
         Ces structures font partie du PEV mais n'ont pas encore déclaré leurs jours de séance.

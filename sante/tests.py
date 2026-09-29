@@ -119,6 +119,15 @@ class PageJoursVaccinationTests(TestCase):
         self.assertContains(reponse, 'CS Sans Jours')
         self.assertContains(reponse, 'sans jours communiqués')
 
+    def test_zero_centre_le_jour_choisi_formule_correctement(self):
+        """« 0 centres vaccinent le mardi » est du mauvais français."""
+        jour_vide = next(j for j in CODES_JOURS
+                         if j not in (self.aujourdhui, self.autre))
+        reponse = self.client.get('/carte/vaccination/', {'jour': jour_vide})
+        self.assertEqual(reponse.context['nb_publies'], 0)
+        self.assertContains(reponse, 'Aucun centre ne vaccine le')
+        self.assertNotContains(reponse, '0 centre')
+
     def test_pharmacies_exclues(self):
         reponse = self.client.get('/carte/vaccination/', {'jour': 'tous'})
         self.assertNotContains(reponse, 'Pharmacie du Port')

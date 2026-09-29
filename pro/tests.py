@@ -37,6 +37,13 @@ class AccesEspaceProTests(TestCase):
         self.assertEqual(reponse.status_code, 200)
         self.assertContains(reponse, 'professionnels de santé')
 
+    def test_accueil_pro_sans_centre_publie_evite_le_zero(self):
+        """« 0 centres publient déjà ses jours » est du mauvais français."""
+        reponse = self.client.get('/pro/')
+        self.assertEqual(reponse.context['centres_publies'], 0)
+        self.assertContains(reponse, 'Soyez le premier centre')
+        self.assertNotContains(reponse, '0 centre')
+
     def test_inscription_accessible(self):
         self.assertEqual(self.client.get('/pro/inscription/').status_code, 200)
 
