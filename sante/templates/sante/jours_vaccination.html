@@ -111,9 +111,7 @@
       <div style="text-align:center;padding:26px;color:var(--muted);">
         <div style="font-size:2.4rem;">🗓️</div>
         <p style="margin:6px 0 0;">
-          Aucun centre n'a encore publié de séance
-          {% if jour != 'tous' %}le {{ jour_libelle|lower }}{% endif %}
-          {% if recherche %}pour « {{ recherche }} »{% endif %}.
+          Aucun centre n'a encore publié de séance{% if jour != 'tous' %} le {{ jour_libelle|lower }}{% endif %}{% if recherche %} pour « {{ recherche }} »{% endif %}.
         </p>
         <p class="sub">Essayez un autre jour, ou consultez la liste des centres ci-dessous.</p>
       </div>
