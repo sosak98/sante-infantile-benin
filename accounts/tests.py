@@ -102,10 +102,11 @@ class CreatesuperuserAutoTests(TestCase):
             call_command('createsuperuser_auto', stdout=sortie)
         return sortie.getvalue()
 
-    def test_echec_explicite_sans_mot_de_passe(self):
-        from django.core.management.base import CommandError
-        with self.assertRaises(CommandError):
-            self._lancer()
+    def test_sans_mot_de_passe_ne_touche_a_rien_et_ne_bloque_pas(self):
+        """Variable absente = compte géré à la main : avertissement, aucune
+        création, et surtout pas d'échec qui bloquerait le déploiement."""
+        sortie = self._lancer()
+        self.assertIn('DJANGO_SUPERUSER_PASSWORD absente', sortie)
         self.assertFalse(User.objects.filter(is_superuser=True).exists())
 
     def test_creation_depuis_l_environnement(self):

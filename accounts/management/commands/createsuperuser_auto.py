@@ -5,7 +5,12 @@ l'historique Git. Variables lues :
 
 - ``DJANGO_SUPERUSER_USERNAME``  (défaut : ``admin_sib``)
 - ``DJANGO_SUPERUSER_EMAIL``     (défaut : vide)
-- ``DJANGO_SUPERUSER_PASSWORD``  (obligatoire : la commande échoue sans elle)
+- ``DJANGO_SUPERUSER_PASSWORD``  (sans elle, la commande ne fait rien)
+
+Si ``DJANGO_SUPERUSER_PASSWORD`` est absente, la commande se contente d'un
+avertissement et rend la main sans erreur : les comptes existants restent
+intacts et le démarrage du déploiement n'est pas bloqué. C'est le mode de
+fonctionnement choisi quand l'administrateur gère son compte à la main.
 
 La commande est idempotente : premier lancement → création du compte ;
 lancements suivants → simple synchronisation du mot de passe et des drapeaux
@@ -24,7 +29,7 @@ class Command(BaseCommand):
     help = (
         "Crée ou met à jour le superutilisateur à partir des variables "
         "d'environnement DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL "
-        "et DJANGO_SUPERUSER_PASSWORD (obligatoire)."
+        "et DJANGO_SUPERUSER_PASSWORD (sans elle, la commande ne fait rien)."
     )
 
     def handle(self, *args, **options):
@@ -33,11 +38,14 @@ class Command(BaseCommand):
         password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', '')
 
         if not password:
-            raise CommandError(
-                "DJANGO_SUPERUSER_PASSWORD est absente de l'environnement : "
-                "aucun compte administrateur ne peut être créé sans mot de "
-                "passe. Définissez la variable puis relancez la commande."
-            )
+            # Choix assumé : l'absence de la variable signifie que le compte
+            # administrateur est géré à la main. On ne touche à rien et on ne
+            # bloque surtout pas le démarrage du déploiement.
+            self.stdout.write(self.style.WARNING(
+                "DJANGO_SUPERUSER_PASSWORD absente : aucun compte créé ni "
+                "modifié, les comptes existants restent intacts."
+            ))
+            return
 
         User = get_user_model()
         try:

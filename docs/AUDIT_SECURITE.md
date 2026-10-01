@@ -176,16 +176,19 @@ les paquets implicites de Python 3.
 
 - la commande lit désormais `DJANGO_SUPERUSER_USERNAME`,
   `DJANGO_SUPERUSER_EMAIL` et `DJANGO_SUPERUSER_PASSWORD` dans
-  l'environnement ; elle **échoue explicitement** si la variable de mot de
-  passe est absente, et le mot de passe fourni passe par `validate_password` ;
+  l'environnement ; si la variable de mot de passe est absente, elle
+  n'effectue **aucune action** (avertissement, pas d'échec : le compte est
+  alors géré à la main et le déploiement n'est pas bloqué), et tout mot de
+  passe fourni passe par `validate_password` ;
 - la commande est idempotente (création au premier lancement, simple
   synchronisation ensuite) et est déclarée dans `render.yaml` et le
   `Procfile` ;
 - les fichiers `_init_.py` sont renommés en `__init__.py` ;
 - l'ancien mot de passe étant compromis par l'historique Git, il doit être
-  **changé en production** : définir `DJANGO_SUPERUSER_PASSWORD` dans Render
-  (déclarée en `sync: false` dans `render.yaml`) avec une nouvelle valeur
-  forte, puis redéployer.
+  **changé en production** : soit directement dans l'administration Django
+  (si le compte est géré à la main), soit en définissant
+  `DJANGO_SUPERUSER_PASSWORD` dans Render (déclarée en `sync: false` dans
+  `render.yaml`) avec une nouvelle valeur forte, puis en redéployant.
 
 ---
 
