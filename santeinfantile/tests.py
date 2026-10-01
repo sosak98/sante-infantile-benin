@@ -191,10 +191,12 @@ class EnTetesSecuriteTests(TestCase):
 
     def test_csp_autorise_les_cdn_reellement_utilises(self):
         csp = self.client.get('/').headers.get('Content-Security-Policy', '')
-        for origine in ['https://cdn.jsdelivr.net', 'https://unpkg.com',
+        for origine in ['https://cdn.jsdelivr.net',
                         'https://fonts.googleapis.com', 'https://fonts.gstatic.com']:
             with self.subTest(origine=origine):
                 self.assertIn(origine, csp)
+        # Leaflet est auto-hébergé : unpkg.com ne doit plus être autorisé.
+        self.assertNotIn('unpkg.com', csp)
 
     def test_csp_autorise_les_tuiles_de_carte(self):
         csp = self.client.get('/carte/').headers.get('Content-Security-Policy', '')
@@ -234,12 +236,12 @@ class EnTetesSecuriteTests(TestCase):
         self.assertEqual(self.client.get('/triage/').status_code, 200)
 
 
-class ServiceWorkerV9Tests(TestCase):
+class ServiceWorkerV10Tests(TestCase):
     """Mode hors-ligne étendu : version du cache et pages pré-enregistrées."""
 
-    def test_version_v9(self):
+    def test_version_v10(self):
         sw = self.client.get('/sw.js').content.decode('utf-8')
-        self.assertIn("const VERSION = 'v9'", sw)
+        self.assertIn("const VERSION = 'v10'", sw)
         self.assertIn("'sib-cache-' + VERSION", sw)
 
     def test_nouvelles_pages_precachees(self):
@@ -271,6 +273,50 @@ class ServiceWorkerV9Tests(TestCase):
         self.assertIn('/conseils/rdv/', html)
 
 
+class LeafletAutoHeberge(TestCase):
+    """Leaflet et MarkerCluster servis depuis /static/vendor/, plus aucun CDN.
+
+    Cause : unpkg.com est injoignable depuis certaines connexions béninoises ;
+    la carte restait blanche et les compteurs affichaient zéro.
+    """
+
+    CHEMINS_VENDOR = [
+        'vendor/leaflet/leaflet.css',
+        'vendor/leaflet/leaflet.js',
+        'vendor/markercluster/MarkerCluster.css',
+        'vendor/markercluster/MarkerCluster.Default.css',
+        'vendor/markercluster/leaflet.markercluster.js',
+    ]
+
+    def test_carte_sans_aucun_cdn(self):
+        html = self.client.get('/carte/').content.decode('utf-8')
+        self.assertNotIn('unpkg.com', html)
+        self.assertNotIn('unpkg', html)
+
+    def test_carte_reference_les_fichiers_locaux(self):
+        html = self.client.get('/carte/').content.decode('utf-8')
+        for chemin in self.CHEMINS_VENDOR:
+            with self.subTest(chemin=chemin):
+                self.assertIn('/static/' + chemin, html)
+
+    def test_fichiers_vendor_reellement_presents_sur_le_disque(self):
+        """Un chemin correct dans le HTML ne prouve rien si le fichier manque."""
+        from django.contrib.staticfiles import finders
+        fichiers = self.CHEMINS_VENDOR + ['vendor/leaflet/images/marker-icon.png',
+                                          'vendor/leaflet/images/marker-shadow.png']
+        for chemin in fichiers:
+            with self.subTest(chemin=chemin):
+                self.assertIsNotNone(finders.find(chemin),
+                                     'Fichier introuvable : %s' % chemin)
+
+    def test_service_worker_precache_leaflet_sans_unpkg(self):
+        sw = self.client.get('/sw.js').content.decode('utf-8')
+        for chemin in self.CHEMINS_VENDOR:
+            with self.subTest(chemin=chemin):
+                self.assertIn("'/static/" + chemin + "'", sw)
+        self.assertNotIn('unpkg', sw)
+
+
 class PagesErreurTests(TestCase):
     """Page 404 en français, utile plutôt que nue."""
 
@@ -295,6 +341,17 @@ class PagesErreurTests(TestCase):
 
 class NavigationTests(TestCase):
     """Les nouvelles pages sont atteignables depuis toutes les pages."""
+
+    def test_barre_de_navigation_sans_jours_de_vaccin(self):
+        """L'entrée « Jours de vaccin » quittait la barre (8 entrées débordaient
+        sur téléphone) ; le lien reste dans le calendrier et le pied de page."""
+        html = self.client.get('/').content.decode('utf-8')
+        self.assertNotIn('>Jours de vaccin</a>', html)
+
+    def test_calendrier_relaie_les_jours_de_vaccination(self):
+        reponse = self.client.get('/conseils/')
+        self.assertContains(reponse, 'Jours de vaccination par centre')
+        self.assertContains(reponse, '/carte/vaccination/')
 
     def test_menu_expose_les_jours_de_vaccination(self):
         self.assertContains(self.client.get('/'), '/carte/vaccination/')

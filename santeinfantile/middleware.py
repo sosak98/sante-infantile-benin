@@ -14,12 +14,13 @@ tierce (`frame-ancestors`) et restreint les destinations de formulaire.
 """
 
 # Origines externes réellement utilisées par le site.
-CDN_SCRIPTS = "https://cdn.jsdelivr.net https://unpkg.com"
-CDN_STYLES = "https://cdn.jsdelivr.net https://unpkg.com https://fonts.googleapis.com"
+# Leaflet est auto-hébergé dans /static/vendor/ : unpkg.com n'est plus autorisé.
+CDN_SCRIPTS = "https://cdn.jsdelivr.net"
+CDN_STYLES = "https://cdn.jsdelivr.net https://fonts.googleapis.com"
 CDN_POLICES = "https://fonts.gstatic.com"
 TUILES_CARTE = (
     "https://tile.openstreetmap.org https://*.tile.openstreetmap.org "
-    "https://*.basemaps.cartocdn.com https://unpkg.com"
+    "https://*.basemaps.cartocdn.com"
 )
 
 def _frame_ancestors():

@@ -45,7 +45,7 @@ def hors_ligne(request):
 # Version du cache. À incrémenter à CHAQUE changement du service worker ou de
 # la liste CORE : c'est ce qui déclenche la purge des anciens caches chez les
 # visiteurs qui ont déjà installé l'application.
-SW_VERSION = 'v9'
+SW_VERSION = 'v10'
 
 # Pages pré-mises en cache dès l'installation : tous les modules utiles hors
 # ligne, y compris les nouvelles pages « jours de vaccination » et l'espace
@@ -73,6 +73,11 @@ STATIQUES_HORS_LIGNE = [
     '/static/img/icons/icon-192.png',
     '/static/img/icons/icon-512.png',
     '/static/img/icons/apple-touch-icon.png',
+    '/static/vendor/leaflet/leaflet.css',
+    '/static/vendor/leaflet/leaflet.js',
+    '/static/vendor/markercluster/MarkerCluster.css',
+    '/static/vendor/markercluster/MarkerCluster.Default.css',
+    '/static/vendor/markercluster/leaflet.markercluster.js',
     '/manifest.json',
 ]
 
@@ -103,14 +108,13 @@ const STATIQUES = [
   %(statiques)s
 ];
 
-// CDN utilisés par le site (Bootstrap, Leaflet, polices) : mis en cache aussi.
-const CDN_HOSTS = ['cdn.jsdelivr.net', 'unpkg.com', 'fonts.googleapis.com',
+// CDN utilisés par le site (Bootstrap, polices) : mis en cache aussi.
+// Leaflet est désormais auto-hébergé dans /static/vendor/ (voir STATIQUES).
+const CDN_HOSTS = ['cdn.jsdelivr.net', 'fonts.googleapis.com',
                    'fonts.gstatic.com'];
 const CDN_CORE = [
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'
 ];
 
 self.addEventListener('install', (e) => {

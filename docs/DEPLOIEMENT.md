@@ -65,8 +65,20 @@ Fichiers techniques servis à la racine : `/manifest.json`, `/sw.js`,
 | `CSRF_TRUSTED_ORIGINS` | `https://*.onrender.com` | **oui** |
 | `DATABASE_URL` | fournie par la base PostgreSQL Render | **oui** |
 | `GROQ_API_KEY` | clé Groq | non (désactive le triage IA) |
+| `DJANGO_SUPERUSER_PASSWORD` | mot de passe du compte administrateur | non (sans elle, `createsuperuser_auto` ne fait rien) |
+| `DJANGO_SUPERUSER_USERNAME` | identifiant administrateur (`admin_sib` par défaut) | non |
+| `DJANGO_SUPERUSER_EMAIL` | courriel administrateur | non |
 | `SECURE_SSL_REDIRECT` | `True` pour forcer HTTPS côté serveur | non |
 | `CSP_FRAME_ANCESTORS` | `'self'` par défaut | non |
+
+Le compte administrateur est créé/synchronisé au démarrage par
+`python manage.py createsuperuser_auto` : le mot de passe ne vit **que** dans
+l'environnement (jamais dans le code), il est validé par `validate_password`
+et la commande est idempotente. Si `DJANGO_SUPERUSER_PASSWORD` est absente,
+la commande n'effectue aucune action (avertissement seulement) : les comptes
+existants restent intacts et le déploiement démarre normalement — c'est le
+mode à retenir quand le compte est géré à la main. Voir
+`docs/AUDIT_SECURITE.md` §1.7.
 
 `render.yaml` déclare déjà tout cela (`SECRET_KEY` en `generateValue`).
 
@@ -159,14 +171,14 @@ Attendu :
 - `Referrer-Policy: strict-origin-when-cross-origin`
 - `X-Frame-Options: SAMEORIGIN`
 
-### 4.4 Service worker en v9
+### 4.4 Service worker en v10
 
 ```bash
 curl -s "$URL/sw.js" | grep -E "const VERSION|'/carte/vaccination/'"
 curl -sI "$URL/sw.js" | grep -i cache-control
 ```
 
-Attendu : `const VERSION = 'v9';`, la présence de `/carte/vaccination/` dans la
+Attendu : `const VERSION = 'v10';`, la présence de `/carte/vaccination/` dans la
 liste `CORE`, et `Cache-Control: no-cache, no-store, must-revalidate`.
 
 Incrémenter `SW_VERSION` dans `santeinfantile/pwa.py` à **chaque** modification

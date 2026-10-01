@@ -26,12 +26,20 @@
     <a class="btn btn-primary" href="{% url 'conseils:calculer_rdv' %}">📅 Calculer mes RDV</a>
   </div>
 
+  <div class="panel" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;">
+    <div>
+      <h3 style="margin:0;">💉 Jours de vaccination par centre</h3>
+      <div class="sub" style="margin:0;">Les séances n'ont pas lieu tous les jours : vérifiez avant de vous déplacer.</div>
+    </div>
+    <a class="btn btn-ghost" href="{% url 'sante:jours_vaccination' %}">Voir les jours par centre</a>
+  </div>
+
   <div class="panel" style="padding:0;">
     <div style="overflow-x:auto;">
       <table class="sib-table">
         <thead>
           <tr>
-            <th>Âge</th><th>Vaccin</th><th>Protège contre</th><th>Voie</th><th>Statut</th>
+            <th>Âge</th><th>Vaccin</th><th>Protège contre</th><th>Statut</th>
           </tr>
         </thead>
         <tbody>
@@ -43,7 +51,6 @@
                 <div class="sub" style="margin:2px 0 0;font-size:.8rem;">{{ vaccin.description }}</div>
               </td>
               <td style="font-size:.85rem;">{{ vaccin.maladies }}</td>
-              <td style="font-size:.85rem;color:var(--muted);">{{ vaccin.voie }}</td>
               <td>
                 {% if vaccin.obligatoire %}
                   <span class="badge-pill badge-ok" style="font-size:.72rem;">Obligatoire</span>
