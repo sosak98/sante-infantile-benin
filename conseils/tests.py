@@ -254,6 +254,12 @@ class PagesVaccinationTests(TestCase):
         reponse = self.client.get('/conseils/')
         self.assertContains(reponse, 'Vitamine A')
 
+    def test_calendrier_sans_colonne_voie(self):
+        """La voie d'administration est une information de soignant, pas de
+        parent : elle reste en base mais quitte l'affichage public."""
+        html = self.client.get('/conseils/').content.decode('utf-8')
+        self.assertNotIn('<th>Voie</th>', html)
+
     def test_rdv_calcule_un_planning(self):
         reponse = self.client.post('/conseils/rdv/', {
             'date_naissance': '2025-01-15',

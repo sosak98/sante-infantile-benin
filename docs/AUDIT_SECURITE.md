@@ -160,6 +160,35 @@ Garde-fous mis en place :
 
 ---
 
+### 1.7 Mot de passe administrateur en clair dans le code — corrigé
+
+**Où :** `accounts/management/commands/createsuperuser_auto.py`.
+
+**Problème :** la commande créait le compte `admin_sib` avec un mot de passe
+écrit en dur dans le fichier source — donc visible dans le dépôt et dans tout
+l'historique Git. Quiconque lit le code obtenait l'accès complet à
+l'administration. Par ailleurs, les paquets `accounts/management/` et
+`accounts/management/commands/` contenaient un fichier `_init_.py` (un seul
+tiret bas de chaque côté) : la commande n'était trouvée que par chance, via
+les paquets implicites de Python 3.
+
+**Correction :**
+
+- la commande lit désormais `DJANGO_SUPERUSER_USERNAME`,
+  `DJANGO_SUPERUSER_EMAIL` et `DJANGO_SUPERUSER_PASSWORD` dans
+  l'environnement ; elle **échoue explicitement** si la variable de mot de
+  passe est absente, et le mot de passe fourni passe par `validate_password` ;
+- la commande est idempotente (création au premier lancement, simple
+  synchronisation ensuite) et est déclarée dans `render.yaml` et le
+  `Procfile` ;
+- les fichiers `_init_.py` sont renommés en `__init__.py` ;
+- l'ancien mot de passe étant compromis par l'historique Git, il doit être
+  **changé en production** : définir `DJANGO_SUPERUSER_PASSWORD` dans Render
+  (déclarée en `sync: false` dans `render.yaml`) avec une nouvelle valeur
+  forte, puis redéployer.
+
+---
+
 ## 2. Points vérifiés et jugés corrects
 
 | Point | Constat |

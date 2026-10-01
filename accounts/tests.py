@@ -82,3 +82,46 @@ class TableauDeBordTests(TestCase):
     def test_dashboard_renvoie_vers_les_jours_de_vaccination(self):
         self._enfant(12)
         self.assertContains(self.client.get('/dashboard/'), '/carte/vaccination/')
+
+
+class CreatesuperuserAutoTests(TestCase):
+    """Le compte administrateur vient de l'environnement, jamais du code."""
+
+    def _lancer(self, **env):
+        import os
+        from unittest import mock
+        from io import StringIO
+        from django.core.management import call_command
+        sortie = StringIO()
+        variables = {k: v for k, v in env.items()}
+        with mock.patch.dict(os.environ, variables, clear=False):
+            for cle in ('DJANGO_SUPERUSER_USERNAME', 'DJANGO_SUPERUSER_EMAIL',
+                        'DJANGO_SUPERUSER_PASSWORD'):
+                if cle not in variables:
+                    os.environ.pop(cle, None)
+            call_command('createsuperuser_auto', stdout=sortie)
+        return sortie.getvalue()
+
+    def test_echec_explicite_sans_mot_de_passe(self):
+        from django.core.management.base import CommandError
+        with self.assertRaises(CommandError):
+            self._lancer()
+        self.assertFalse(User.objects.filter(is_superuser=True).exists())
+
+    def test_creation_depuis_l_environnement(self):
+        self._lancer(DJANGO_SUPERUSER_USERNAME='admin_test',
+                     DJANGO_SUPERUSER_EMAIL='admin@exemple.bj',
+                     DJANGO_SUPERUSER_PASSWORD='UnMotDePasseSolide2026!')
+        admin = User.objects.get(username='admin_test')
+        self.assertTrue(admin.is_superuser)
+        self.assertTrue(admin.is_staff)
+        self.assertTrue(admin.check_password('UnMotDePasseSolide2026!'))
+
+    def test_idempotente_et_synchronise_le_mot_de_passe(self):
+        self._lancer(DJANGO_SUPERUSER_USERNAME='admin_test',
+                     DJANGO_SUPERUSER_PASSWORD='UnMotDePasseSolide2026!')
+        self._lancer(DJANGO_SUPERUSER_USERNAME='admin_test',
+                     DJANGO_SUPERUSER_PASSWORD='UnAutreMotDePasse2026!')
+        self.assertEqual(User.objects.filter(username='admin_test').count(), 1)
+        admin = User.objects.get(username='admin_test')
+        self.assertTrue(admin.check_password('UnAutreMotDePasse2026!'))
