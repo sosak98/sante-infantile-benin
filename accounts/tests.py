@@ -66,7 +66,7 @@ class TableauDeBordTests(TestCase):
                 date_reelle=enfant.date_naissance + timedelta(days=1),
             )
         apres = self.client.get('/dashboard/').context['vaccins_en_retard_count']
-        self.assertEqual(apres, avant - 4)
+        self.assertEqual(apres, avant - 3)
 
     def test_ancien_libelle_de_dose_est_reconnu(self):
         """Les doses saisies avant l'unification des clés restent comptées."""

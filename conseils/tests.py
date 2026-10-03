@@ -230,7 +230,7 @@ class PlanificationTests(TestCase):
         self.assertEqual(resume['recus'], 1)
         self.assertEqual(
             resume['recus'] + resume['en_retard'] + resume['aujourd_hui']
-            + resume['a_venir'],
+            + resume['a_venir'] + resume['maternite'],
             resume['total'],
         )
 

@@ -7,7 +7,7 @@ from .pev import (
     SUPPLEMENTATIONS,
     calendrier_affichable,
     normaliser_cle,
-    planifier,
+    planifier, adapter_au_centre,
 )
 from .seed_data import CONSEILS
 from enfants.models import Enfant, VaccinRecu
@@ -77,6 +77,11 @@ def conseils_nutritionnels(request):
     })
 
 
+
+def _centres_vaccinateurs():
+    from sante.models import Etablissement
+    return Etablissement.objects.filter(fait_vaccination=True, jours_confirmes=True).exclude(jours_vaccination='').order_by('nom')
+
 def calculer_rdv(request):
     resultats = None
     enfants = []
@@ -85,6 +90,8 @@ def calculer_rdv(request):
         enfants = list(Enfant.objects.filter(parent=parent))
 
     erreur = None
+    centres = list(_centres_vaccinateurs())
+    centre = None
     if request.method == 'POST':
         enfant = None
         date_naissance = None
@@ -112,8 +119,12 @@ def calculer_rdv(request):
                 'enfants': enfants,
                 'calendrier': CALENDRIER_PEV,
                 'erreur': erreur,
+                'centres': centres, 'centre': centre,
             })
 
+        centre_id = request.POST.get('centre_id')
+        if centre_id:
+            centre = next((c for c in centres if str(c.pk) == str(centre_id)), None)
         # Doses déjà enregistrées pour cet enfant (elles ne doivent pas être
         # perdues quand le parent recalcule son planning).
         vaccins_recus = {}
@@ -147,10 +158,13 @@ def calculer_rdv(request):
                 )
 
         resultats = planifier(date_naissance, vaccins_recus)
+        if centre:
+            resultats = adapter_au_centre(resultats, centre.jours_liste, centre.jours_9mois_liste)
 
     return render(request, 'conseils/rdv.html', {
         'resultats': resultats,
         'enfants': enfants,
         'calendrier': CALENDRIER_PEV,
         'erreur': erreur,
+        'centres': centres, 'centre': centre,
     })

@@ -14,7 +14,7 @@
 </nav>
 <div class="page-head">
   <div class="container">
-    <h1>💉 Calculateur de rendez-vous vaccinaux</h1>
+    <h1> Calculateur de rendez-vous vaccinaux</h1>
     <p>Générez automatiquement le calendrier de vaccination de votre enfant et repérez les doses en retard.</p>
   </div>
 </div>
@@ -22,8 +22,10 @@
 <div class="container page-body">
   <div class="grid2" style="align-items:start;">
     <div class="panel">
-      <h3>👶 Informations de l'enfant</h3>
+      <h3> Informations de l'enfant</h3>
       <div class="sub">Date de naissance et vaccins déjà reçus</div>
+      <div class="field"><label for="centre_id">Centre de vaccination</label><select name="centre_id" id="centre_id" class="form-select"><option value="">Planning théorique (sans centre)</option>{% for c in centres %}<option value="{{ c.id }}" {% if centre.id == c.id %}selected{% endif %}>{{ c.nom }} - {{ c.jours_affichage }}</option>{% endfor %}</select></div>
+      {% if centre %}<div class="info-note">{{ centre.jours_affichage }}{% if centre.jours_9mois_libelles %}; 9 mois : {{ centre.jours_9mois_libelles|join:", " }}{% endif %}. {{ centre.horaire_vaccination }}. Les séances dédiées concernent les doses dues à 9 mois. {{ centre.precision_vaccination }}</div>{% endif %}
       <form method="post" id="formRdv">
         {% csrf_token %}
         {% if erreur %}<div class="alert alert-danger">{{ erreur }}</div>{% endif %}
@@ -45,13 +47,13 @@
         {% endif %}
 
         <hr style="border-color:var(--line);margin:18px 0;">
-        <h3 style="font-size:1rem;">💉 Vaccins déjà reçus <span style="font-weight:400;color:var(--muted);font-size:.85rem;">(optionnel)</span></h3>
+        <h3 style="font-size:1rem;"> Vaccins déjà reçus <span style="font-weight:400;color:var(--muted);font-size:.85rem;">(optionnel)</span></h3>
         <div class="sub">Ajoutez les vaccins reçus avec leur date réelle.</div>
 
         <div id="vaccinsContainer"></div>
         <button type="button" class="btn btn-ghost btn-sm" style="margin-bottom:16px;" onclick="ajouterVaccin()">+ Ajouter un vaccin reçu</button>
 
-        <button type="submit" class="btn btn-primary btn-block">📅 Calculer les rendez-vous</button>
+        <button type="submit" class="btn btn-primary btn-block"> Calculer les rendez-vous</button>
       </form>
     </div>
 
@@ -61,23 +63,23 @@
 
       {% if resultats %}
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
-          <span class="badge-pill badge-ok" style="font-size:.72rem;">✅ Reçu</span>
-          <span class="badge-pill badge-info" style="font-size:.72rem;">🕐 À venir</span>
-          <span class="badge-pill badge-warn" style="font-size:.72rem;">📅 Aujourd'hui</span>
-          <span class="badge-pill badge-danger" style="font-size:.72rem;">⚠️ En retard</span>
+          <span class="badge-pill badge-ok" style="font-size:.72rem;"> Reçu</span>
+          <span class="badge-pill badge-info" style="font-size:.72rem;"> À venir</span>
+          <span class="badge-pill badge-warn" style="font-size:.72rem;"> Aujourd'hui</span>
+          <span class="badge-pill badge-danger" style="font-size:.72rem;"> En retard</span>
         </div>
         <div class="timeline">
           {% for rdv in resultats %}
             <div class="tl-item {% if rdv.statut == 'Reçu' %}ok{% elif rdv.statut == 'En retard' %}late{% elif rdv.statut == "Aujourd'hui" %}next{% endif %}">
-              <div class="t">{{ rdv.nom }} <span class="tag" style="font-size:.7rem;">{{ rdv.age_affichage }}</span></div>
-              <div class="d">📅 {{ rdv.date_prevue|date:"d/m/Y" }} — {{ rdv.statut }}{% if rdv.statut == 'En retard' %} depuis {{ rdv.retard_jours }} jour{{ rdv.retard_jours|pluralize }}{% endif %}</div>
+              <div class="t">{{ rdv.nom }}{% if rdv.categorie == "chimioprevention" %} <span class="tag">chimioprévention</span>{% elif rdv.categorie == "supplementation" %} <span class="tag">supplément</span>{% endif %} <span class="tag" style="font-size:.7rem;">{{ rdv.age_affichage }}</span></div>
+              <div class="d">{% if rdv.date_centre %}<strong>{{ rdv.date_centre|date:"d/m/Y" }}</strong> <small>(théorique : {{ rdv.date_theorique|date:"d/m/Y" }}, report {{ rdv.decalage_jours }} j)</small>{% else %}{{ rdv.date_prevue|date:"d/m/Y" }}{% endif %} - {{ rdv.statut }}</div>
               <div class="d" style="font-size:.78rem;color:var(--muted);">Protège contre : {{ rdv.maladies }}</div>
             </div>
           {% endfor %}
         </div>
       {% else %}
         <div style="text-align:center;padding:30px;color:var(--muted);">
-          <div style="font-size:3rem;">💉</div>
+          <div style="font-size:3rem;"></div>
           <p>Renseignez la date de naissance pour générer le planning.</p>
         </div>
       {% endif %}
@@ -91,7 +93,7 @@
   // La liste vient du calendrier de référence (conseils/pev.py) : les valeurs
   // envoyées sont les clés stables, donc une dose saisie est toujours reconnue.
   var VACCINS_LIST = [
-    {% for v in calendrier %}{ cle: '{{ v.cle|escapejs }}', nom: '{{ v.nom|escapejs }} — {{ v.affichage|escapejs }}' }{% if not forloop.last %},{% endif %}
+    {% for v in calendrier %}{ cle: '{{ v.cle|escapejs }}', nom: '{{ v.nom|escapejs }} - {{ v.affichage|escapejs }}' }{% if not forloop.last %},{% endif %}
     {% endfor %}
   ];
 
@@ -107,7 +109,7 @@
           VACCINS_LIST.map(function(v){return '<option value="'+v.cle+'">'+v.nom+'</option>';}).join('') +
         '</select>' +
         '<input type="date" name="date_vaccin[]" class="form-control" style="flex:1;min-width:140px;">' +
-        '<button type="button" class="btn btn-ghost btn-sm" onclick="this.parentElement.parentElement.remove()">✕</button>' +
+        '<button type="button" class="btn btn-ghost btn-sm" onclick="this.parentElement.parentElement.remove()"></button>' +
       '</div>';
     container.appendChild(div);
   }

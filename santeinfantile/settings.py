@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------------------------------------------------------------------
 # Sécurité
 # ---------------------------------------------------------------------------
-SECRET_KEY = config('SECRET_KEY', default='dev-insecure-key-change-me-in-production')
+SECRET_KEY = config('SECRET_KEY', default='local-development-key-do-not-use-in-production-8f1e3c9a7b6d5e4f')
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
@@ -31,7 +31,7 @@ ALLOWED_HOSTS = config(
 
 CSRF_TRUSTED_ORIGINS = config(
     'CSRF_TRUSTED_ORIGINS',
-    default='https://*.onrender.com,https://*.e2b.app',
+    default='https://*.onrender.com,https://*.e2b.app,http://*.e2b.app',
     cast=Csv(),
 )
 
@@ -56,12 +56,14 @@ INSTALLED_APPS = [
     'conseils',
     'sib_intelligence',
     'pro',
+    'rappels',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -85,6 +87,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
             ],
         },
     },
@@ -124,6 +127,8 @@ LOGOUT_REDIRECT_URL = 'accounts:accueil'
 LANGUAGE_CODE = 'fr-fr'
 TIME_ZONE = 'Africa/Porto-Novo'
 USE_I18N = True
+LANGUAGES = [('fr', 'Français'), ('en', 'English')]
+LOCALE_PATHS = [BASE_DIR / 'locale']
 USE_TZ = True
 
 # ---------------------------------------------------------------------------
@@ -195,3 +200,11 @@ CSRF_COOKIE_HTTPONLY = False
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024   # 5 Mio
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 500
+
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = config('EMAIL_HOST', default='')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='webmaster@localhost')

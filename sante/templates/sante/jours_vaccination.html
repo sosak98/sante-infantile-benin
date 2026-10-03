@@ -16,7 +16,7 @@
 
 <div class="page-head">
   <div class="container">
-    <h1>💉 Jours de vaccination par centre</h1>
+    <h1> Jours de vaccination par centre</h1>
     <p>Les séances du PEV n'ont pas lieu tous les jours. Vérifiez le jour avant de vous déplacer avec votre enfant.</p>
   </div>
 </div>
@@ -83,24 +83,24 @@
                   <strong>{{ c.nom }}</strong>
                   <div class="sub" style="margin:0;font-size:.78rem;">{{ c.get_type_etab_display }}</div>
                   {% if c.precision_vaccination %}
-                    <div class="sub" style="margin:2px 0 0;font-size:.78rem;">ℹ️ {{ c.precision_vaccination }}</div>
+                    <div class="sub" style="margin:2px 0 0;font-size:.78rem;">ℹ {{ c.precision_vaccination }}</div>
                   {% endif %}
                 </td>
-                <td>{{ c.commune|default:"—" }}</td>
+                <td>{{ c.commune|default:"-" }}</td>
                 <td>
                   {% for j in c.jours_libelles %}
                     <span class="tag" style="font-size:.72rem;">{{ j }}</span>
                   {% endfor %}
                 </td>
-                <td>{{ c.horaire_vaccination|default:"—" }}</td>
+                <td>{{ c.horaire_vaccination|default:"-" }}</td>
                 <td>
                   {% if c.telephone %}
                     <a href="tel:{{ c.telephone }}">{{ c.telephone }}</a>
-                  {% else %}—{% endif %}
+                  {% else %}-{% endif %}
                 </td>
                 <td>
                   <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener"
-                     href="https://www.google.com/maps/dir/?api=1&destination={{ c.latitude }},{{ c.longitude }}">🧭 Y aller</a>
+                     href="https://www.google.com/maps/dir/?api=1&destination={{ c.latitude }},{{ c.longitude }}"> Y aller</a>
                 </td>
               </tr>
             {% endfor %}
@@ -109,7 +109,7 @@
       </div>
     {% else %}
       <div style="text-align:center;padding:26px;color:var(--muted);">
-        <div style="font-size:2.4rem;">🗓️</div>
+        <div style="font-size:2.4rem;"></div>
         <p style="margin:6px 0 0;">
           Aucun centre n'a encore publié de séance{% if jour != 'tous' %} le {{ jour_libelle|lower }}{% endif %}{% if recherche %} pour « {{ recherche }} »{% endif %}.
         </p>
@@ -121,7 +121,7 @@
   {% if sans_jours %}
     <div class="panel" style="background:var(--teal-50);">
       <h2 style="margin-top:0;font-size:1.05rem;">
-        🏥 {{ nb_sans_jours }} centre{{ nb_sans_jours|pluralize }} du PEV sans jours communiqués
+         {{ nb_sans_jours }} centre{{ nb_sans_jours|pluralize }} du PEV sans jours communiqués
       </h2>
       <p class="sub">
         Ces structures font partie du PEV mais n'ont pas encore déclaré leurs jours de séance.
@@ -130,7 +130,7 @@
       <ul style="columns:2;column-gap:24px;margin:8px 0 0;padding-left:18px;font-size:.88rem;">
         {% for c in sans_jours %}
           <li style="break-inside:avoid;margin:3px 0;">
-            {{ c.nom }}{% if c.telephone %} — <a href="tel:{{ c.telephone }}">{{ c.telephone }}</a>{% endif %}
+            {{ c.nom }}{% if c.telephone %} - <a href="tel:{{ c.telephone }}">{{ c.telephone }}</a>{% endif %}
           </li>
         {% endfor %}
       </ul>
@@ -138,7 +138,7 @@
   {% endif %}
 
   <div class="panel">
-    <h2 style="margin-top:0;font-size:1.05rem;">👩‍⚕️ Vous travaillez dans un centre de santé ?</h2>
+    <h2 style="margin-top:0;font-size:1.05rem;">‍ Vous travaillez dans un centre de santé ?</h2>
     <p class="sub">
       Publiez les jours de séance de votre centre : les parents de votre zone les verront
       immédiatement, et vous réduirez les déplacements inutiles.

@@ -5,15 +5,15 @@
 {% block content %}
 <div class="page-head">
   <div class="container">
-    <h1>👩‍⚕️ Espace professionnel</h1>
-    <p>{{ pro.user.get_full_name|default:pro.user.username }} — {{ pro.get_fonction_display }} · {{ pro.structure_affichee }}</p>
+    <h1>‍ Espace professionnel</h1>
+    <p>{{ pro.user.get_full_name|default:pro.user.username }} - {{ pro.get_fonction_display }} · {{ pro.structure_affichee }}</p>
   </div>
 </div>
 
 <div class="container page-body">
   <div class="grid3">
     <div class="panel" style="text-align:center;">
-      <div style="font-size:2.4rem;">🗓️</div>
+      <div style="font-size:2.4rem;"></div>
       <h3 style="margin:6px 0 2px;font-size:1.05rem;">Séance aujourd'hui ({{ jour_libelle }})</h3>
       {% if seance_aujourd_hui is None %}
         <span class="badge-pill badge-info" style="font-size:.72rem;">Jours non déclarés</span>
@@ -24,13 +24,13 @@
       {% endif %}
     </div>
     <div class="panel" style="text-align:center;">
-      <div style="font-size:2.4rem;">🏥</div>
+      <div style="font-size:2.4rem;"></div>
       <h3 style="margin:6px 0 2px;font-size:1.05rem;">Mon centre</h3>
       <p class="sub" style="margin:0;">{{ etablissement.nom|default:"Non rattaché" }}</p>
       <a class="btn btn-primary btn-sm" style="margin-top:8px;" href="{% url 'pro:fiche_centre' %}">Gérer la fiche</a>
     </div>
     <div class="panel" style="text-align:center;">
-      <div style="font-size:2.4rem;">💉</div>
+      <div style="font-size:2.4rem;"></div>
       <h3 style="margin:6px 0 2px;font-size:1.05rem;">Planificateur PEV</h3>
       <p class="sub" style="margin:0;">Calcul rapide en consultation.</p>
       <a class="btn btn-primary btn-sm" style="margin-top:8px;" href="{% url 'pro:outil_pev' %}">Ouvrir l'outil</a>
@@ -45,8 +45,8 @@
           <tr><th style="width:34%;">Vaccination PEV</th>
             <td>{% if etablissement.fait_vaccination %}Oui{% else %}Non déclarée{% endif %}</td></tr>
           <tr><th>Jours de séance</th><td>{{ etablissement.jours_affichage }}</td></tr>
-          <tr><th>Horaire</th><td>{{ etablissement.horaire_vaccination|default:"—" }}</td></tr>
-          <tr><th>Téléphone</th><td>{{ etablissement.telephone|default:"—" }}</td></tr>
+          <tr><th>Horaire</th><td>{{ etablissement.horaire_vaccination|default:"-" }}</td></tr>
+          <tr><th>Téléphone</th><td>{{ etablissement.telephone|default:"-" }}</td></tr>
           <tr><th>Dernière mise à jour</th>
             <td>{% if etablissement.maj_vaccination %}{{ etablissement.maj_vaccination|date:"d/m/Y H:i" }}{% else %}Jamais{% endif %}</td></tr>
         </tbody>
@@ -63,7 +63,7 @@
   {% endif %}
 
   <div class="panel">
-    <h3 style="margin-top:0;">📋 Calendrier PEV de référence</h3>
+    <h3 style="margin-top:0;"> Calendrier PEV de référence</h3>
     <div style="overflow-x:auto;">
       <table class="sib-table">
         <thead><tr><th>Âge</th><th>Vaccin</th><th>Protège contre</th><th>Voie</th></tr></thead>

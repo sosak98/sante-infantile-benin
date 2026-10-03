@@ -25,14 +25,14 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; overflow-x: hidden; width: 100%; }
+html { scroll-behavior: smooth; overflow-x: clip; width: 100%; }
 body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--ink);
   background: #f6fbfa;
   line-height: 1.6;
   margin: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
 }
 a { color: inherit; text-decoration: none; }
@@ -86,7 +86,7 @@ img { max-width: 100%; display: block; }
 
 /* ------------------------------------------------------------------ Navbar */
 .sib-nav {
-  position: sticky; top: 0; z-index: 50;
+  position: sticky; top: 0; z-index: 100;
   background: rgba(255,255,255,.92); backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
@@ -97,9 +97,6 @@ img { max-width: 100%; display: block; }
 .sib-nav .nav-links a { padding: 4px 0; white-space: nowrap; }
 .sib-nav .nav-links a:hover, .sib-nav .nav-links a.active { color: var(--teal-700); }
 .sib-nav .nav-links a.active { border-bottom: 2px solid var(--amber); }
-.sib-nav .nav-cta { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
-.sib-nav .nav-cta .btn { white-space: nowrap; flex: none; }
-.sib-nav .nav-toggler { display: none; background: none; border: 1px solid var(--line); border-radius: 10px; padding: 7px 11px; font-size: 1.2rem; line-height: 1; cursor: pointer; color: var(--teal-800); }
 
 /* ------------------------------------------------------------------ Hero */
 .hero {
@@ -397,9 +394,7 @@ body.has-cookie-banner .sib-pwa-banner { bottom: 64px; }
 /* ------------------------------------------------------------------ Responsive */
 @media (max-width: 1180px) {
   .sib-nav .nav-links { gap: 10px; font-size: .84rem; }
-  .sib-nav .nav-cta { gap: 6px; }
-  .sib-nav .nav-cta .btn { padding: 7px 10px; font-size: .8rem; }
-  .sib-brand img { height: 50px; }
+      .sib-brand img { height: 50px; }
   .hero-inner { gap: 24px; }
   .hero h1 { font-size: 2.3rem; }
 }
@@ -416,17 +411,12 @@ body.has-cookie-banner .sib-pwa-banner { bottom: 64px; }
   .about .skills { justify-content: center; }
   .foot-grid { grid-template-columns: 1fr; }
   .grid3 { grid-template-columns: 1fr; }
-  .sib-nav .nav-links { display: none; }
-  .sib-nav .nav-toggler { display: block; order: 2; margin-left: 10px; }
-  .sib-brand { order: 1; }
-  .sib-nav .nav-cta { order: 3; margin-left: auto; }
-  .sib-brand span { display: none; }
+    .sib-brand { order: 0; }
+    .sib-brand span { display: none; }
   .sib-brand img { height: 52px; }
   .float-card { display: none; }
   .hero-visual { position: relative; }
-  .sib-nav .nav-cta { gap: 6px; }
-  .sib-nav .nav-cta .btn { padding: 8px 11px; font-size: .8rem; }
-  .sib-nav.open .nav-links {
+      .sib-nav.open .nav-links {
     display: flex; flex-direction: column; position: absolute; top: 76px; left: 0; right: 0;
     background: #fff; padding: 4px 20px 10px; gap: 0; border-bottom: 1px solid var(--line);
     box-shadow: var(--shadow-md); max-height: calc(100vh - 68px); overflow-y: auto; text-align: left;
@@ -441,9 +431,7 @@ body.has-cookie-banner .sib-pwa-banner { bottom: 64px; }
   .nos-numeros { grid-template-columns: 1fr; }
   .offline-grid { grid-template-columns: 1fr; }
   /* En-tête : « Connexion » / « Inscription » nets, jamais coupés */
-  .sib-nav .nav-cta .btn { padding: 8px 10px; font-size: .78rem; white-space: nowrap; flex: none; }
-  .sib-nav .nav-cta { gap: 6px; }
-  .sib-pwa-banner { flex-wrap: wrap; padding: 12px 14px; gap: 10px; }
+      .sib-pwa-banner { flex-wrap: wrap; padding: 12px 14px; gap: 10px; }
   .sib-pwa-banner .pwa-actions { margin-left: 0; width: 100%; }
   .sib-pwa-banner .pwa-actions .btn { flex: 1; }
   body.has-cookie-banner .sib-pwa-banner { bottom: 88px; }
@@ -457,3 +445,40 @@ body.has-cookie-banner .sib-pwa-banner { bottom: 64px; }
   .urgence-num { font-size: 3rem; }
   .hero-actions .btn, .urgence-actions .btn { width: 100%; }
 }
+
+/* Navigation escamotable, identique a toutes les largeurs */
+.nav-inner { position: relative; }
+.nav-outils { display:flex; align-items:center; gap:10px; margin-left:auto; }
+.nav-toggler { display:grid !important; place-items:center; width:44px; height:44px; padding:0; border:1px solid var(--line); border-radius:10px; background:#fff; color:var(--teal-800); cursor:pointer; }
+.nav-toggler .menu-close { display:none; }.sib-nav.open .nav-toggler .menu-open { display:none; }.sib-nav.open .nav-toggler .menu-close { display:block; }
+.nav-avatar { width:44px; height:44px; border-radius:50%; overflow:hidden; display:grid; place-items:center; background:var(--teal-100); color:var(--teal-800); font-weight:800; }
+.nav-avatar img { width:100%; height:100%; object-fit:cover; object-position:50% 18%; }
+.nav-links { position:absolute !important; display:none !important; top:76px; right:0; min-width:280px; max-width:min(430px, calc(100vw - 32px)); padding:12px 18px; flex-direction:column; align-items:stretch; gap:0 !important; background:#fff; border:1px solid var(--line); border-radius:0 0 14px 14px; box-shadow:var(--shadow-md); z-index:10; }
+.sib-nav.open .nav-links { display:flex !important; }
+.nav-links a { padding:11px 4px !important; border-bottom:1px solid var(--line); }
+.nav-actions { display:flex; flex-wrap:wrap; gap:8px; padding-top:12px; }
+.ic { width:1em; height:1em; vertical-align:-.125em; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }.ic-lg{width:1.5em;height:1.5em}
+.profil-entete { display:flex; align-items:center; gap:22px; }.profil-entete .avatar { width:104px;height:104px;border-radius:50%;object-fit:cover;object-position:50% 18%;border:4px solid #fff;box-shadow:var(--shadow-md); }.profil-entete .avatar-vide { display:grid;place-items:center;background:var(--teal-100);color:var(--teal-800);font-size:2.4rem;font-weight:800; }
+@media (max-width:560px){.profil-entete .avatar{width:78px;height:78px}.profil-entete{gap:14px}}
+.page-head .profil-entete { flex:1; }
+.page-head > .container > .avatar { width:104px;height:104px;border-radius:50%;object-fit:cover;object-position:50% 18%;border:4px solid #fff;box-shadow:var(--shadow-md);float:left;margin-right:22px; }
+@media(max-width:560px){.page-head > .container > .avatar{width:78px;height:78px}}
+/* Le panneau s'ancre toujours au bord du bouton hamburger. */
+.sib-nav .nav-links { left:auto; }
+.ico .ic { color:var(--teal-700); }
+
+.nav-outils { order:1; }
+.sib-nav .nav-inner > .sib-brand { margin-right:auto; }
+.hero-summary { background:#fff; border:1px solid var(--teal-100); border-radius:24px; padding:30px; box-shadow:var(--shadow-md); max-width:390px; margin:0 auto; }
+.hero-summary-icon { width:52px;height:52px;border-radius:16px;background:var(--teal-50);color:var(--teal-700);display:grid;place-items:center;margin-bottom:18px; }
+.hero-summary h2 { color:var(--teal-800);font-size:1.35rem;margin:12px 0 10px; }
+.hero-summary p { color:var(--muted);font-size:.95rem;margin-bottom:16px; }
+.hero-summary ul { list-style:none;padding:0;margin:0;display:grid;gap:10px;color:var(--teal-800);font-size:.88rem;font-weight:600; }.hero-summary li { display:flex;align-items:center;gap:8px; }.hero-summary li .ic { color:var(--ok); }
+.about-profile { display:grid;grid-template-columns:190px 1fr;gap:30px;align-items:center;background:linear-gradient(135deg,var(--teal-900),var(--teal-700));color:#fff; }
+.about-profile-photo { width:190px;height:190px;border-radius:22px;overflow:hidden;border:3px solid rgba(255,255,255,.7); }.about-profile-photo img{width:100%;height:100%;object-fit:cover;}.about-profile h2{color:#fff;margin:8px 0}.about-profile p{color:rgba(255,255,255,.88);max-width:680px}.about-profile .role{font-weight:700}.about-columns h2,.about-contact h2{color:var(--teal-800);margin-top:0}.about-list{color:var(--muted);padding-left:20px;display:grid;gap:10px}.about-contact{border-left:5px solid var(--amber)}
+@media(max-width:700px){.about-profile{grid-template-columns:1fr;text-align:center}.about-profile-photo{margin:auto}.about-profile .btn{width:100%}}
+
+/* Le menu reste aligne sous les outils a droite, meme dans les media queries historiques. */
+.sib-nav.open .nav-links { left:auto !important; right:0 !important; width:max-content; }
+
+.about-principles h2{color:var(--teal-800);margin-top:0}.about-principles h3{color:var(--teal-700);font-size:1rem}.about-principles p{color:var(--muted);margin:0}

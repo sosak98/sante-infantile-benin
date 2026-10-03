@@ -19,7 +19,7 @@
     <form method="post">
       {% csrf_token %}
       {{ form.phone }}
-      <div class="field"><label for="id_code">🔢 Code reçu</label>{{ form.code }}</div>
+      <div class="field"><label for="id_code"> Code reçu</label>{{ form.code }}</div>
       <button class="btn btn-primary btn-block">Vérifier</button>
     </form>
     <p style="margin-top:14px;text-align:center;"><a href="{% url 'accounts:phone_send' %}" style="color:var(--teal-600);font-weight:700;">Renvoyer un code</a></p>

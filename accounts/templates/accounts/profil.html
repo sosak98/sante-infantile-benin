@@ -14,49 +14,50 @@
 </nav>
 <div class="page-head">
   <div class="container">
-    <h1>{% if parent.nom_complet != parent.user.username %}{{ parent.nom_complet }}{% else %}Mon profil{% endif %}</h1>
-    <p>📱 {{ parent.telephone }}</p>
+    {% if parent.photo %}<img class="avatar" src="{{ parent.photo.url }}" alt="Photo de {{ parent.nom_complet }}">{% else %}<div class="avatar avatar-vide">{{ parent.nom_complet|first|upper }}</div>{% endif %}
+    <div class="profil-entete"><div><h1>{% if parent.nom_complet != parent.user.username %}{{ parent.nom_complet }}{% else %}Mon profil{% endif %}</h1>
+    {% if parent.telephone %}<p>{{ parent.telephone }}</p>{% endif %}<p>{{ parent.quartier }}{% if parent.quartier and parent.ville %}, {% endif %}{{ parent.ville }}</p></div></div>
   </div>
 </div>
 
 <div class="container page-body">
   <div class="grid2" style="align-items:start;">
     <div class="panel">
-      <h3>✏️ Mes informations</h3>
+      <h3> Mes informations</h3>
       <div class="sub">Mettez à jour vos coordonnées</div>
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="field"><label for="id_prenom">👤 Prénom</label><input type="text" id="id_prenom" name="prenom" class="form-control" value="{{ parent.prenom }}" placeholder="Votre prénom"></div>
-        <div class="field"><label for="id_nom">👤 Nom</label><input type="text" id="id_nom" name="nom" class="form-control" value="{{ parent.nom }}" placeholder="Votre nom"></div>
-        <div class="field"><label for="id_quartier">📍 Quartier</label><input type="text" id="id_quartier" name="quartier" class="form-control" value="{{ parent.quartier }}" placeholder="Votre quartier"></div>
-        <div class="field"><label for="id_ville">🏙️ Ville</label><input type="text" id="id_ville" name="ville" class="form-control" value="{{ parent.ville }}" placeholder="Votre ville"></div>
+        <div class="field"><label for="id_prenom"> Prénom</label><input type="text" id="id_prenom" name="prenom" class="form-control" value="{{ parent.prenom }}" placeholder="Votre prénom"></div>
+        <div class="field"><label for="id_nom"> Nom</label><input type="text" id="id_nom" name="nom" class="form-control" value="{{ parent.nom }}" placeholder="Votre nom"></div>
+        <div class="field"><label for="id_quartier"> Quartier</label><input type="text" id="id_quartier" name="quartier" class="form-control" value="{{ parent.quartier }}" placeholder="Votre quartier"></div>
+        <div class="field"><label for="id_ville"> Ville</label><input type="text" id="id_ville" name="ville" class="form-control" value="{{ parent.ville }}" placeholder="Votre ville"></div>
         <div class="field">
-          <label for="id_photo">📷 Photo de profil</label>
+          <label for="id_photo"> Photo de profil</label>
           {% if parent.photo %}
             <div style="margin-bottom:8px;"><img src="{{ parent.photo.url }}" width="80" height="80" style="border-radius:50%;object-fit:cover;"></div>
           {% endif %}
           <input type="file" id="id_photo" name="photo" class="form-control" accept="image/*">
         </div>
-        <button type="submit" class="btn btn-primary btn-block">💾 Sauvegarder</button>
+        <button type="submit" class="btn btn-primary btn-block"> Sauvegarder</button>
       </form>
     </div>
 
     <div class="panel">
-      <h3>👶 Mes enfants</h3>
+      <h3> Mes enfants</h3>
       <div class="sub">Profils et rendez-vous vaccinaux</div>
       {% if enfants %}
         {% for enfant in enfants %}
           <div style="background:var(--teal-50);border-left:5px solid var(--teal-600);border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
             <div>
-              <div style="font-weight:800;color:var(--teal-800);">{% if enfant.sexe == 'M' %}👦{% else %}👧{% endif %} {{ enfant.prenom }} {{ enfant.nom }}</div>
-              <div class="sub" style="margin:0;">📅 Né(e) le {{ enfant.date_naissance|date:"d/m/Y" }}</div>
+              <div style="font-weight:800;color:var(--teal-800);">{% if enfant.sexe == 'M' %}{% else %}{% endif %} {{ enfant.prenom }} {{ enfant.nom }}</div>
+              <div class="sub" style="margin:0;"> Né(e) le {{ enfant.date_naissance|date:"d/m/Y" }}</div>
             </div>
-            <a class="btn btn-ghost btn-sm" href="{% url 'conseils:calculer_rdv' %}?enfant={{ enfant.id }}">💉 RDV</a>
+            <a class="btn btn-ghost btn-sm" href="{% url 'conseils:calculer_rdv' %}?enfant={{ enfant.id }}"> RDV</a>
           </div>
         {% endfor %}
       {% else %}
         <div style="text-align:center;padding:24px;color:var(--muted);">
-          <div style="font-size:3rem;">👶</div>
+          <div style="font-size:3rem;"></div>
           <p>Aucun enfant ajouté</p>
         </div>
       {% endif %}

@@ -51,7 +51,7 @@
 <div class="container page-body">
   <div class="level-card level-{{ niveau }}" style="margin-bottom:20px;">
     <div class="big">
-      {% if niveau == 'rouge' %}🚨{% elif niveau == 'jaune' %}⚠️{% else %}✅{% endif %}
+      {% if niveau == 'rouge' %}{% elif niveau == 'jaune' %}{% else %}{% endif %}
     </div>
     <h2>
       {% if niveau == 'rouge' %}Urgence immédiate
@@ -65,7 +65,7 @@
     <div class="panel" style="padding:0;">
       <div class="chat-card">
         <div class="chat-header">
-          <h5>🤖 Assistant SIB Intelligence</h5>
+          <h5> Assistant SIB Intelligence</h5>
           <small style="opacity:.8;">Posez vos questions sur l'état de {{ enfant.prenom }}</small>
         </div>
         <div class="chat-messages" id="chatMessages">
@@ -94,15 +94,15 @@
     </div>
 
     <div class="panel">
-      <h3>🎯 Actions recommandées</h3>
+      <h3> Actions recommandées</h3>
       <div class="sub">Selon le niveau de gravité</div>
       {% if niveau == 'rouge' %}
-        <a class="btn btn-block" style="background:#c62828;color:#fff;margin-bottom:10px;font-weight:800;" href="tel:112">📞 Appeler le 112</a>
+        <a class="btn btn-block" style="background:#c62828;color:#fff;margin-bottom:10px;font-weight:800;" href="tel:112"> Appeler le 112</a>
       {% endif %}
       {% if niveau == 'rouge' or niveau == 'jaune' %}
-        <a class="btn btn-amber btn-block" style="margin-bottom:10px;" href="{% url 'sante:carte' %}">🗺️ Voir les centres de santé proches</a>
+        <a class="btn btn-amber btn-block" style="margin-bottom:10px;" href="{% url 'sante:carte' %}"> Voir les centres de santé proches</a>
       {% endif %}
-      <a class="btn btn-primary btn-block" style="margin-bottom:10px;" href="{% url 'sib:triage' %}">🔄 Nouveau triage</a>
+      <a class="btn btn-primary btn-block" style="margin-bottom:10px;" href="{% url 'sib:triage' %}"> Nouveau triage</a>
       {% if user.is_authenticated %}
       <a class="btn btn-ghost btn-block" href="{% url 'accounts:dashboard' %}">Retour à mon espace</a>
       {% else %}
@@ -211,10 +211,10 @@
       const data = await response.json();
       typing.style.display = 'none';
       if (data.status === 'ok') ajouterMessage(data.reponse, 'bot');
-      else ajouterMessage('❌ Erreur : ' + data.reponse, 'bot');
+      else ajouterMessage(' Erreur : ' + data.reponse, 'bot');
     } catch (error) {
       typing.style.display = 'none';
-      ajouterMessage('❌ Erreur de connexion. Réessayez.', 'bot');
+      ajouterMessage(' Erreur de connexion. Réessayez.', 'bot');
     }
   }
 

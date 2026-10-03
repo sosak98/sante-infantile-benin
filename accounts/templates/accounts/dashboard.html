@@ -21,17 +21,17 @@
 <div class="container page-body">
   <div class="grid3">
     <div class="panel" style="text-align:center;">
-      <div style="font-size:2.6rem;">👶</div>
+      <div style="font-size:2.6rem;"></div>
       <h3 style="font-size:1.8rem;margin:0;">{{ children_count }}</h3>
       <div class="sub" style="margin:0;">Enfant(s) suivi(s)</div>
     </div>
     <div class="panel" style="text-align:center;">
-      <div style="font-size:2.6rem;">💉</div>
+      <div style="font-size:2.6rem;"></div>
       <h3 style="font-size:1.8rem;margin:0;">{{ vaccins_a_venir_count|default:0 }}</h3>
       <div class="sub" style="margin:0;">RDV à venir</div>
     </div>
     <div class="panel" style="text-align:center;">
-      <div style="font-size:2.6rem;">🛡️</div>
+      <div style="font-size:2.6rem;"></div>
       <h3 style="font-size:1.8rem;margin:0;">{{ vaccins_recus_count }}</h3>
       <div class="sub" style="margin:0;">Vaccins reçus</div>
     </div>
@@ -39,7 +39,7 @@
 
   {% if vaccins_en_retard_count %}
     <div class="panel" style="border-left:4px solid #c62828;background:#fff5f5;">
-      <h3 style="margin:0 0 4px;color:#c62828;">⚠️ {{ vaccins_en_retard_count }} dose{{ vaccins_en_retard_count|pluralize }} en retard</h3>
+      <h3 style="margin:0 0 4px;color:#c62828;"> {{ vaccins_en_retard_count }} dose{{ vaccins_en_retard_count|pluralize }} en retard</h3>
       <p class="sub" style="margin:0;">
         Le PEV vaccine gratuitement jusqu'à 59 mois : un retard se rattrape.
         Présentez-vous au centre de santé le plus proche avec le carnet de vaccination.
@@ -50,7 +50,7 @@
 
   {% if prochains_rdv %}
     <div class="panel">
-      <h3 style="margin-top:0;">📅 Prochains rendez-vous vaccinaux</h3>
+      <h3 style="margin-top:0;"> Prochains rendez-vous vaccinaux</h3>
       <div class="sub">Calculés d'après le calendrier PEV Bénin et les doses déjà enregistrées.</div>
       <table class="sib-table" style="margin-top:8px;">
         <thead><tr><th>Enfant</th><th>Dose</th><th>Date</th><th>Statut</th></tr></thead>
@@ -83,7 +83,7 @@
       <div style="display:flex;gap:14px;flex-wrap:wrap;">
         {% for enfant in children_sample %}
           <div style="flex:1;min-width:150px;background:var(--teal-50);border-radius:14px;padding:16px;text-align:center;">
-            <div style="font-size:2rem;">{% if enfant.sexe == 'M' %}👦{% else %}👧{% endif %}</div>
+            <div style="font-size:2rem;">{% if enfant.sexe == 'M' %}{% else %}{% endif %}</div>
             <div style="font-weight:800;color:var(--teal-800);">{{ enfant.prenom }}</div>
             <div class="sub" style="margin:0;">{{ enfant.date_naissance|date:"d/m/Y" }}</div>
           </div>
@@ -103,7 +103,7 @@
       <h3>Prochaine étape</h3>
       <div class="sub">À ne pas manquer</div>
       <div style="display:flex;align-items:center;gap:14px;background:var(--amber-light);border-radius:14px;padding:14px 16px;">
-        <div style="font-size:1.8rem;">📅</div>
+        <div style="font-size:1.8rem;"></div>
         <div style="flex:1;">
           <div style="font-weight:800;color:var(--amber-dark);">Calculez les RDV vaccinaux</div>
           <div class="sub" style="margin:0;">Planifiez les prochaines doses de votre enfant.</div>
@@ -111,7 +111,7 @@
         <a class="btn btn-amber btn-sm" href="{% url 'conseils:calculer_rdv' %}">Calculer</a>
       </div>
       <div style="display:flex;align-items:center;gap:14px;background:#fdf0ef;border:1px solid #f6c6c2;border-radius:14px;padding:14px 16px;margin-top:12px;">
-        <div style="font-size:1.8rem;">🆘</div>
+        <div style="font-size:1.8rem;"></div>
         <div style="flex:1;">
           <div style="font-weight:800;color:#b71c1c;">Module SOS : signes de danger &amp; premiers secours</div>
           <div class="sub" style="margin:0;">À lire une fois pour être prêt le jour où ça compte.</div>
@@ -125,11 +125,11 @@
     <h3>Accès rapide aux outils</h3>
     <div class="sub">Tout votre suivi en quelques clics</div>
     <div class="tools" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
-      <a class="tool" href="{% url 'sante:carte' %}"><div class="ico">🗺️</div><h3>Carte</h3><p style="margin:0;">Centres & pharmacies proches</p></a>
-      <a class="tool" href="{% url 'enfants:detection_malnutrition' %}"><div class="ico">📏</div><h3>Dépistage</h3><p style="margin:0;">État nutritionnel</p></a>
-      <a class="tool" href="{% url 'conseils:calendrier_vaccinal' %}"><div class="ico">📅</div><h3>Vaccins</h3><p style="margin:0;">Calendrier &amp; RDV</p></a>
-      <a class="tool" href="{% url 'sib:triage' %}"><div class="ico">🤖</div><h3>Triage IA</h3><p style="margin:0;">Orientation d'urgence</p></a>
-      <a class="tool" href="{% url 'premiers_secours' %}"><div class="ico">🆘</div><h3>SOS</h3><p style="margin:0;">Signes de danger</p></a>
+      <a class="tool" href="{% url 'sante:carte' %}"><div class="ico"><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-infos"></use></svg></div><h3>Carte</h3><p style="margin:0;">Centres & pharmacies proches</p></a>
+      <a class="tool" href="{% url 'enfants:detection_malnutrition' %}"><div class="ico"><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-infos"></use></svg></div><h3>Dépistage</h3><p style="margin:0;">État nutritionnel</p></a>
+      <a class="tool" href="{% url 'conseils:calendrier_vaccinal' %}"><div class="ico"><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-infos"></use></svg></div><h3>Vaccins</h3><p style="margin:0;">Calendrier &amp; RDV</p></a>
+      <a class="tool" href="{% url 'sib:triage' %}"><div class="ico"><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-infos"></use></svg></div><h3>Triage IA</h3><p style="margin:0;">Orientation d'urgence</p></a>
+      <a class="tool" href="{% url 'premiers_secours' %}"><div class="ico"><svg class="ic ic-lg" aria-hidden="true"><use href="#ic-infos"></use></svg></div><h3>SOS</h3><p style="margin:0;">Signes de danger</p></a>
     </div>
   </div>
 </div>

@@ -1,71 +1,19 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block title %}À propos - Santé Infantile Bénin{% endblock %}
-
 {% block content %}
-<nav class="sib-breadcrumb" aria-label="Fil d'Ariane">
-  <div class="container">
-    <a href="/">Accueil</a>
-    <span class="sep">›</span>
-    <span class="current">À propos</span>
-  </div>
-</nav>
-<div class="page-head">
-  <div class="container">
-    <h1>À propos</h1>
-    <p>La plateforme, son fondateur et sa mission.</p>
-  </div>
-</div>
-
+<nav class="sib-breadcrumb" aria-label="Fil d'Ariane"><div class="container"><a href="/">Accueil</a><span class="sep">-</span><span class="current">À propos</span></div></nav>
+<section class="page-head"><div class="container"><span class="eyebrow">Santé, proximité, prévention</span><h1>Une e-santé conçue pour le terrain</h1><p>Des informations fiables et des outils simples pour accompagner chaque famille dans le suivi de la santé de l'enfant.</p></div></section>
 <div class="container page-body">
-  <div class="grid2" style="align-items:start;">
-    <div class="panel" style="text-align:center;">
-      <div class="portrait" style="margin:0 auto 18px;"><img src="{% static 'img/photo-darius.jpg' %}" alt="SOSSA G. M. Darius"></div>
-      <h3 style="font-size:1.3rem;">SOSSA Gninazé Mingnissê Darius</h3>
-      <div class="sub" style="margin:0 0 14px;">Fondateur de Santé Infantile Bénin</div>
-      <div class="sub" style="margin:0;">Infirmier diplômé d'État · Spécialisé en puériculture &amp; pédiatrie · Développeur web &amp; mobile</div>
-    </div>
-
-    <div class="panel">
-      <h3>La mission</h3>
-      <p style="font-size:.93rem;color:var(--muted);margin-bottom:16px;">
-        Santé Infantile Bénin met à la disposition des familles, des relais communautaires et des
-        professionnels de santé des outils fiables et gratuits pour le suivi des nourrissons et des
-        jeunes enfants : calendrier vaccinal suivant le Programme Élargi de Vaccination (PEV) en vigueur
-        au Bénin, dépistage de la malnutrition selon les normes de l'OMS, carte nationale des centres de
-        santé, conseils nutritionnels et gestes de premiers secours. La plateforme fonctionne même avec
-        une connexion limitée et sur les téléphones modestes, parce que c'est la réalité du terrain.
-      </p>
-
-      <h3>Le fondateur</h3>
-      <p style="font-size:.93rem;color:var(--muted);margin-bottom:16px;">
-        Infirmier diplômé d'État, spécialisé en puériculture et pédiatrie et actuellement en Master 2 dans ce
-        domaine, j'exerce en santé maternelle et infantile au Bénin. Également développeur web et mobile,
-        j'ai conçu cette plateforme pour répondre aux difficultés constatées chaque jour en consultation :
-        rendez-vous vaccinaux manqués, malnutrition dépistée trop tard, familles sans information fiable.
-        Cette double compétence — clinique et technologique — garantit des outils exacts sur le plan médical
-        et réellement utilisables par les familles.
-      </p>
-
-      <h3>Engagements</h3>
-      <ul style="color:var(--muted);font-size:.93rem;padding-left:20px;display:grid;gap:8px;margin-bottom:18px;">
-        <li>Des contenus fondés sur le calendrier du PEV en vigueur au Bénin et les recommandations de l'OMS</li>
-        <li>Une initiative indépendante, qui ne revendique à ce jour aucune approbation officielle de l'État</li>
-        <li>Un accès entièrement gratuit, sans publicité</li>
-        <li>La protection des données des familles, conformément à la loi béninoise (APDP)</li>
-        <li>Des outils d'aide au suivi et à l'orientation, qui ne remplacent jamais une consultation</li>
-        <li>Une amélioration continue, nourrie par les retours des relais communautaires et des professionnels de santé</li>
-      </ul>
-
-      <h3>Contact professionnel</h3>
-      <p style="font-size:.93rem;margin-bottom:14px;">
-        <a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a><br>
-        <a href="https://www.linkedin.com/in/darius-sossa-743721376">LinkedIn</a>
-        · <a href="https://wa.me/2290198419240">WhatsApp +229 01 98 41 92 40</a>
-      </p>
-      <a class="btn btn-primary" href="mailto:sante.infantile.benin@gmail.com">✉️ Écrire au fondateur</a>
-    </div>
+  <section class="about-profile panel">
+    <div class="about-profile-photo"><img src="{% static 'img/photo-darius.jpg' %}" alt="SOSSA G. M. Darius"></div>
+    <div><span class="eyebrow">Fondateur et responsable du projet</span><h2>SOSSA Gninazé Mingnissê Darius</h2><p class="role">Infirmier diplômé d'État, spécialisé en puériculture et pédiatrie, développeur web et mobile.</p><p>Mon expérience auprès des familles et ma pratique du numérique se rencontrent dans Santé Infantile Bénin : transformer les besoins observés sur le terrain en services compréhensibles, accessibles et réellement utiles.</p><a class="btn btn-light" href="mailto:sante.infantile.benin@gmail.com">Écrire au fondateur</a></div>
+  </section>
+  <div class="grid2 about-columns">
+    <section class="panel"><h2>Notre mission</h2><p>Santé Infantile Bénin aide les parents, les relais communautaires et les professionnels à mieux prévenir, suivre et orienter la santé des nourrissons et des jeunes enfants au Bénin.</p><p>La plateforme rassemble le calendrier vaccinal du PEV, le calculateur de rendez-vous, le dépistage nutritionnel, les conseils par âge, la carte des structures de santé, le triage et les premiers secours.</p><h3>Pour qui ?</h3><p>Pour les familles qui veulent retrouver une information claire, préparer une consultation ou ne pas oublier un rendez-vous. Les professionnels disposent également d'outils pratiques pour expliquer et orienter.</p></section>
+    <section class="panel"><h2>Notre méthode</h2><ul class="about-list"><li><strong>Références :</strong> contenus fondés sur le PEV en vigueur au Bénin et les recommandations de l'OMS.</li><li><strong>Simplicité :</strong> langage accessible, parcours courts et fonctionnement adapté aux téléphones modestes.</li><li><strong>Proximité :</strong> orientation vers les centres, les séances de vaccination et les soins d'urgence.</li><li><strong>Amélioration :</strong> évolutions nourries par les retours du terrain et des professionnels.</li></ul><h3>Un outil, pas un diagnostic</h3><p>Les calculateurs et le triage sont des aides au suivi et à l'orientation. Ils ne remplacent jamais l'examen d'un enfant par un professionnel de santé.</p></section>
   </div>
+  <section class="panel about-principles"><h2>Nos engagements</h2><div class="grid3"><div><h3>Gratuit</h3><p>Un accès sans publicité pour les familles.</p></div><div><h3>Responsable</h3><p>Les limites et les sources sont présentées clairement.</p></div><div><h3>Confidentiel</h3><p>Les données sont utilisées uniquement pour les fonctionnalités demandées.</p></div></div></section>
+  <section class="panel about-contact"><h2>Contact professionnel</h2><p>Partenariat, retour d'expérience, correction ou question sur la plateforme :</p><a href="mailto:sante.infantile.benin@gmail.com">sante.infantile.benin@gmail.com</a><span> - </span><a href="https://www.linkedin.com/in/darius-sossa-743721376">LinkedIn</a><span> - </span><a href="https://wa.me/2290198419240">WhatsApp</a></section>
 </div>
 {% endblock %}
