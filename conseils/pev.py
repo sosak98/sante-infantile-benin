@@ -82,7 +82,7 @@ CALENDRIER_PEV = [
         'description': "Dose de naissance contre l'hépatite B, idéalement dans "
                        "les 24 heures. Les doses suivantes sont incluses dans "
                        "le Pentavalent.",
-        'obligatoire': True,
+        'obligatoire': True, 'maternite': True,
     },
 
     # --- 6 semaines --------------------------------------------------------
@@ -271,6 +271,30 @@ CALENDRIER_PEV = [
 ]
 
 
+# Prévention et supplémentation, synchronisées avec les séances PEV.
+for cle, nom, age, affichage in [
+    ('tpi_1', 'TPI 1 (sulfadoxine-pyriméthamine)', 10, '10 semaines'),
+    ('tpi_2', 'TPI 2 (sulfadoxine-pyriméthamine)', 14, '14 semaines'),
+    ('tpi_3', 'TPI 3 (sulfadoxine-pyriméthamine)', 9, '9 mois'),
+]:
+    CALENDRIER_PEV.append({
+        'cle': cle, 'nom': nom, 'dose': int(cle[-1]), 'serie': cle,
+        **({'mois': age} if age == 9 else {'semaines': age}),
+        'affichage': affichage, 'maladies': 'Paludisme',
+        'voie': 'Orale', 'categorie': 'chimioprevention',
+        'description': '¼ de comprime sous 5 kg, ½ au-dela; contre-indique sous cotrimoxazole.',
+        'obligatoire': True,
+    })
+for age in range(6, 60, 6):
+    CALENDRIER_PEV.append({
+        'cle': f'vitamine_a_{age}', 'nom': 'Vitamine A', 'dose': age // 6,
+        'serie': 'vitamine_a', 'mois': age, 'affichage': f'{age} mois',
+        'maladies': 'Carence en vitamine A', 'voie': 'Orale',
+        'categorie': 'supplementation', 'description': "Supplement de vitamine A tous les six mois jusqu'a 59 mois.",
+        'obligatoire': True,
+    })
+
+
 # Supplémentations associées au PEV : ce ne sont pas des vaccins, elles ne
 # figurent donc pas dans le planning vaccinal mais sont rappelées à l'écran.
 SUPPLEMENTATIONS = [
@@ -358,7 +382,7 @@ def ajouter_mois(depart, mois):
 
 def date_theorique(date_naissance, entree):
     """Date à laquelle la dose est due, d'après l'âge cible du calendrier."""
-    if 'mois' in entree:
+    if entree.get('mois') is not None:
         return ajouter_mois(date_naissance, entree['mois'])
     return date_naissance + timedelta(weeks=entree['semaines'])
 
@@ -384,77 +408,75 @@ def calendrier_affichable():
             'voie': entree['voie'],
             'description': entree['description'],
             'obligatoire': entree['obligatoire'],
-            'age_min_mois': entree.get('mois', entree.get('semaines', 0) // 4),
+            'categorie': entree.get('categorie', 'vaccination'),
+            'age_min_mois': entree.get('mois') or (entree.get('semaines') or 0) // 4,
         })
     return lignes
 
 
 def planifier(date_naissance, vaccins_recus, aujourd_hui=None):
-    """Planning vaccinal complet d'un enfant.
-
-    `vaccins_recus` : dict {libellé ou clé -> date d'administration}. Les
-    libellés sont normalisés, donc les doses saisies avant cette version sont
-    correctement reconnues.
-
-    Retourne une liste de dicts triés par date, avec pour chaque dose :
-    `nom`, `cle`, `dose`, `date_prevue`, `statut`, `couleur`, `retard_jours`,
-    `maladies`, `voie`, `age_affichage`.
-    """
     aujourd_hui = aujourd_hui or date.today()
-
-    # Normalisation des doses déjà reçues
-    recus = {}
-    for libelle, jour in (vaccins_recus or {}).items():
-        cle = normaliser_cle(libelle)
-        if cle and jour:
-            recus[cle] = jour
-
-    resultats = []
-    dates_serie = {}  # dernière date planifiée/reçue par série
-
+    recus = {normaliser_cle(k): v for k, v in (vaccins_recus or {}).items()
+             if normaliser_cle(k) and v}
+    resultats, dates_serie = [], {}
     for entree in CALENDRIER_PEV:
-        cle = entree['cle']
-        serie = entree['serie']
-        prevue = date_theorique(date_naissance, entree)
-
-        # Respect de l'intervalle minimal avec la dose précédente de la série
+        cle, serie = entree['cle'], entree['serie']
+        theorique = date_theorique(date_naissance, entree)
         precedente = dates_serie.get(serie)
         if precedente is not None:
-            prevue = max(prevue, precedente + timedelta(weeks=INTERVALLE_MIN_SEMAINES))
-
+            theorique = max(theorique, precedente + timedelta(weeks=INTERVALLE_MIN_SEMAINES))
+        maternité = bool(entree.get('maternite'))
         if cle in recus:
-            reelle = recus[cle]
-            statut, couleur, retard = 'Reçu', 'success', 0
-            dates_serie[serie] = reelle
-            date_affichee = reelle
+            date_affichee, statut, couleur, retard = recus[cle], 'Reçu', 'success', 0
+            dates_serie[serie] = recus[cle]
+        elif maternité:
+            date_affichee, statut, couleur, retard = theorique, 'À la maternité', 'info', 0
+            dates_serie[serie] = theorique
         else:
-            dates_serie[serie] = prevue
-            date_affichee = prevue
-            retard = (aujourd_hui - prevue).days
-            if retard < 0:
-                statut, couleur, retard = 'À venir', 'info', 0
-            elif retard == 0:
-                statut, couleur = "Aujourd'hui", 'warning'
-            else:
-                statut, couleur = 'En retard', 'danger'
+            date_affichee = theorique; dates_serie[serie] = theorique
+            retard = (aujourd_hui - theorique).days
+            if retard < 0: statut, couleur, retard = 'À venir', 'info', 0
+            elif retard == 0: statut, couleur = "Aujourd'hui", 'warning'
+            else: statut, couleur = 'En retard', 'danger'
+        resultats.append({**{k: entree.get(k) for k in ('nom','cle','dose','serie','maladies','voie','categorie')},
+            'date_prevue': date_affichee, 'date_theorique': theorique, 'statut': statut,
+            'couleur': couleur, 'retard_jours': retard, 'age_affichage': entree['affichage'],
+            'age_mois': entree.get('mois'), 'maternite': maternité})
+    return sorted(resultats, key=lambda ligne: (ligne['date_prevue'], ligne['nom']))
 
-        resultats.append({
-            'nom': entree['nom'],
-            'cle': cle,
-            'dose': entree['dose'],
-            'serie': serie,
-            'date_prevue': date_affichee,
-            'statut': statut,
-            'couleur': couleur,
-            'retard_jours': retard,
-            'maladies': entree['maladies'],
-            'voie': entree['voie'],
-            'age_affichage': entree['affichage'],
-        })
+AGES_SEANCE_DEDIEE = (9,)
 
-    resultats.sort(key=lambda ligne: (ligne['date_prevue'], ligne['nom']))
-    return resultats
+def releve_de_la_seance_dediee(age, ages):
+    return any(abs(float(age) - float(a)) <= 0.5 for a in ages)
 
+def prochaine_seance(depart, codes):
+    codes = set(codes or [])
+    if not codes: return None
+    for i in range(14):
+        candidate = depart + timedelta(days=i)
+        if candidate.weekday() in codes or candidate.strftime('%A').lower() in codes:
+            return candidate
+    return None
+
+def adapter_au_centre(planning, jours_ordinaires, jours_9mois, ages_dedies=AGES_SEANCE_DEDIEE):
+    ordinaires = set(jours_ordinaires or []); dedies = set(jours_9mois or [])
+    def code(d): return d.weekday() if all(isinstance(x, int) for x in ordinaires | dedies) else d.strftime('%A').lower()
+    resultat, retenues = [], {}
+    for ligne in sorted(planning, key=lambda x: x['date_prevue']):
+        ligne = dict(ligne); theorique = ligne['date_prevue']
+        if ligne.get('maternite') or ligne['statut'] == 'À la maternité':
+            retenue = theorique
+        else:
+            codes = dedies if releve_de_la_seance_dediee(ligne.get('age_mois') or 0, ages_dedies) else ordinaires
+            serie = ligne.get('serie'); depart = theorique
+            if serie in retenues: depart = max(depart, retenues[serie] + timedelta(weeks=INTERVALLE_MIN_SEMAINES))
+            retenue = prochaine_seance(depart, codes)
+        ligne['date_theorique'] = theorique; ligne['date_centre'] = retenue
+        ligne['decalage_jours'] = (retenue - theorique).days if retenue else None
+        ligne['seance_tardive'] = bool(retenue and retenue > theorique)
+        if ligne.get('serie') and retenue: retenues[ligne['serie']] = retenue
+        resultat.append(ligne)
+    return resultat
 
 def prochain_rdv(date_naissance, vaccins_recus, aujourd_hui=None):
     """La prochaine dose due (en retard d'abord, puis la plus proche)."""
@@ -475,6 +497,7 @@ def resume_couverture(date_naissance, vaccins_recus, aujourd_hui=None):
     return {
         'total': len(planning),
         'recus': sum(1 for ligne in planning if ligne['statut'] == 'Reçu'),
+        'maternite': sum(1 for ligne in planning if ligne['statut'] == 'À la maternité'),
         'en_retard': sum(1 for ligne in planning if ligne['statut'] == 'En retard'),
         'aujourd_hui': sum(1 for ligne in planning if ligne['statut'] == "Aujourd'hui"),
         'a_venir': sum(1 for ligne in planning if ligne['statut'] == 'À venir'),

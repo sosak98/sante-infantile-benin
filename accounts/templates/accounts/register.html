@@ -28,17 +28,17 @@
       <form method="post">
         {% csrf_token %}
         <div class="field">
-          <label for="id_telephone">📱 Numéro de téléphone</label>
+          <label for="id_telephone"> Numéro de téléphone</label>
           {{ form.telephone }}
           {% if form.telephone.errors %}<div class="alert alert-danger" style="margin:8px 0 0;padding:8px 12px;">{{ form.telephone.errors.0 }}</div>{% endif %}
         </div>
         <div class="field">
-          <label for="id_password1">🔒 Mot de passe</label>
+          <label for="id_password1"> Mot de passe</label>
           {{ form.password1 }}
           {% if form.password1.errors %}<div class="alert alert-danger" style="margin:8px 0 0;padding:8px 12px;">{{ form.password1.errors.0 }}</div>{% endif %}
         </div>
         <div class="field">
-          <label for="id_password2">🔒 Confirmer le mot de passe</label>
+          <label for="id_password2"> Confirmer le mot de passe</label>
           {{ form.password2 }}
           {% if form.password2.errors %}<div class="alert alert-danger" style="margin:8px 0 0;padding:8px 12px;">{{ form.password2.errors.0 }}</div>{% endif %}
         </div>
@@ -49,7 +49,7 @@
           </label>
           {% if form.accepte_conditions.errors %}<div class="alert alert-danger" style="margin:8px 0 0;padding:8px 12px;">{{ form.accepte_conditions.errors.0 }}</div>{% endif %}
         </div>
-        <button type="submit" class="btn btn-primary btn-block">✅ Créer mon compte</button>
+        <button type="submit" class="btn btn-primary btn-block"> Créer mon compte</button>
       </form>
 
       <p class="auth-alt">

@@ -12,7 +12,7 @@
 </nav>
 <div class="page-head">
   <div class="container">
-    <h1>🥣 Conseils nutritionnels par âge</h1>
+    <h1> Conseils nutritionnels par âge</h1>
     <p>Recommandations OMS, en français simple : allaitement, diversification, fer, vitamine A, hydratation.</p>
   </div>
 </div>
@@ -20,7 +20,7 @@
 <div class="container page-body">
   <div style="max-width:720px;margin:0 auto;">
     <div class="panel">
-      <h3>🔍 Rechercher des conseils</h3>
+      <h3> Rechercher des conseils</h3>
       <div class="sub">Selon l'âge et le type de conseil</div>
       <form method="post">
         {% csrf_token %}
@@ -41,15 +41,15 @@
             <input type="number" id="id_age_mois" name="age_mois" class="form-control" min="0" max="120" placeholder="Obligatoire si aucun enfant choisi" value="{{ age_mois|default:'' }}" {% if not enfants %}required{% endif %}>
           </div>
           <div class="field">
-            <label for="id_categorie">📋 Type de conseil</label>
+            <label for="id_categorie"> Type de conseil</label>
             <select id="id_categorie" name="categorie" class="form-control">
-              <option value="tous">🌟 Tous les conseils</option>
-              <option value="aliment" {% if categorie == 'aliment' %}selected{% endif %}>🥗 Type d'aliment</option>
-              <option value="probleme" {% if categorie == 'probleme' %}selected{% endif %}>🏥 Problème de santé</option>
+              <option value="tous"> Tous les conseils</option>
+              <option value="aliment" {% if categorie == 'aliment' %}selected{% endif %}> Type d'aliment</option>
+              <option value="probleme" {% if categorie == 'probleme' %}selected{% endif %}> Problème de santé</option>
             </select>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary btn-block">🔍 Rechercher</button>
+        <button type="submit" class="btn btn-primary btn-block"> Rechercher</button>
       </form>
     </div>
 
@@ -57,7 +57,7 @@
       {% if conseils %}
         <div class="panel" style="background:linear-gradient(135deg,var(--teal-100),#b2dfdb);border:none;">
           <div style="display:flex;justify-content:space-between;align-items:center;">
-            <strong style="color:var(--teal-800);">📊 Résultats pour {{ age_mois }} mois</strong>
+            <strong style="color:var(--teal-800);"> Résultats pour {{ age_mois }} mois</strong>
             <span class="badge-pill" style="background:var(--teal-600);color:#fff;font-size:.8rem;">{{ conseils|length }} conseil(s)</span>
           </div>
         </div>
@@ -67,22 +67,22 @@
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
               <h3 style="margin:0;">{{ conseil.titre }}</h3>
               {% if conseil.categorie == 'aliment' %}
-                <span class="badge-pill" style="background:var(--teal-100);color:var(--teal-700);font-size:.75rem;">🥗 Aliment</span>
+                <span class="badge-pill" style="background:var(--teal-100);color:var(--teal-700);font-size:.75rem;"> Aliment</span>
               {% else %}
-                <span class="badge-pill" style="background:var(--amber-light);color:var(--amber-dark);font-size:.75rem;">🏥 Santé</span>
+                <span class="badge-pill" style="background:var(--amber-light);color:var(--amber-dark);font-size:.75rem;"> Santé</span>
               {% endif %}
             </div>
             <p style="color:var(--muted);font-size:.95rem;margin:0 0 8px;">{{ conseil.contenu }}</p>
-            <span class="tag" style="font-size:.72rem;">📅 {{ conseil.age_min_mois }} - {{ conseil.age_max_mois }} mois</span>
+            <span class="tag" style="font-size:.72rem;"> {{ conseil.age_min_mois }} - {{ conseil.age_max_mois }} mois</span>
           </div>
         {% endfor %}
 
         <div class="alert alert-info">
-          <strong>⚠️ Important :</strong> ces conseils sont basés sur les recommandations OMS. Consultez toujours un professionnel de santé pour des conseils personnalisés.
+          <strong> Important :</strong> ces conseils sont basés sur les recommandations OMS. Consultez toujours un professionnel de santé pour des conseils personnalisés.
         </div>
       {% else %}
         <div class="panel" style="text-align:center;padding:36px;">
-          <div style="font-size:3rem;">🔍</div>
+          <div style="font-size:3rem;"></div>
           <h3 style="color:var(--muted);">Aucun conseil trouvé</h3>
           <p style="color:var(--muted);">Essayez le filtre « Tous les conseils ».</p>
         </div>

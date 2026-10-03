@@ -14,7 +14,7 @@
 </nav>
 <div class="container" style="max-width:520px;padding-top:40px;padding-bottom:60px;">
   <div class="panel" style="text-align:center;">
-    <div style="font-size:3rem;">📩</div>
+    <div style="font-size:3rem;"></div>
     <h3>Code envoyé</h3>
     <p style="color:var(--muted);">Un code a été envoyé par SMS au <strong>{{ phone }}</strong>.</p>
     <a href="{% url 'accounts:phone_verify' %}?phone={{ phone }}" class="btn btn-primary">Entrer le code</a>

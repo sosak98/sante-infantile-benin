@@ -33,6 +33,7 @@ urlpatterns = [
 
     # Espace professionnels de santé
     path('pro/', include('pro.urls')),
+    path('i18n/', include('django.conf.urls.i18n')),
 
     # Photos profil (Render n'a pas DEBUG=True)
     path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),

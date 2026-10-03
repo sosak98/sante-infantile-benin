@@ -12,7 +12,7 @@
 </nav>
 <div class="page-head">
   <div class="container">
-    <h1>💉 Calendrier vaccinal - PEV Bénin</h1>
+    <h1> Calendrier vaccinal - PEV Bénin</h1>
     <p>Programme Élargi de Vaccination du Bénin, de la naissance à 5 ans.</p>
   </div>
 </div>
@@ -20,15 +20,15 @@
 <div class="container page-body">
   <div class="panel" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;">
     <div>
-      <h3 style="margin:0;">📅 Calculateur de RDV personnalisé</h3>
+      <h3 style="margin:0;"> Calculateur de RDV personnalisé</h3>
       <div class="sub" style="margin:0;">Obtenez un planning vaccinal avec les dates exactes de chaque rendez-vous.</div>
     </div>
-    <a class="btn btn-primary" href="{% url 'conseils:calculer_rdv' %}">📅 Calculer mes RDV</a>
+    <a class="btn btn-primary" href="{% url 'conseils:calculer_rdv' %}"> Calculer mes RDV</a>
   </div>
 
   <div class="panel" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;">
     <div>
-      <h3 style="margin:0;">💉 Jours de vaccination par centre</h3>
+      <h3 style="margin:0;"> Jours de vaccination par centre</h3>
       <div class="sub" style="margin:0;">Les séances n'ont pas lieu tous les jours : vérifiez avant de vous déplacer.</div>
     </div>
     <a class="btn btn-ghost" href="{% url 'sante:jours_vaccination' %}">Voir les jours par centre</a>
@@ -66,20 +66,20 @@
   </div>
 
   <div class="panel">
-    <h3 style="margin-top:0;">🥄 Supplémentations associées</h3>
+    <h3 style="margin-top:0;"> Supplémentations associées</h3>
     <div class="sub">Administrées lors des séances de vaccination, ce ne sont pas des vaccins.</div>
     <ul style="margin:10px 0 0;padding-left:20px;">
       {% for s in supplementations %}
-        <li style="margin:6px 0;"><strong>{{ s.nom }}</strong> — <span class="tag">{{ s.affichage }}</span><br>
+        <li style="margin:6px 0;"><strong>{{ s.nom }}</strong> - <span class="tag">{{ s.affichage }}</span><br>
           <span class="sub" style="font-size:.85rem;">{{ s.description }}</span></li>
       {% endfor %}
     </ul>
   </div>
 
   <div class="panel" style="background:var(--teal-50);">
-    <h3 style="margin-top:0;">ℹ️ Sources du calendrier</h3>
+    <h3 style="margin-top:0;">ℹ Sources du calendrier</h3>
     <p class="sub" style="margin:0;">
-      Calendrier de routine du Programme Élargi de Vaccination (PEV) du Bénin —
+      Calendrier de routine du Programme Élargi de Vaccination (PEV) du Bénin -
       {{ nb_doses }} doses de la naissance à 18 mois. Intègre le vaccin
       antirotavirus (introduit en décembre 2019), le vaccin antipaludique RTS,S
       (avril 2024) et la 2ᵉ dose rougeole-rubéole (décembre 2024).

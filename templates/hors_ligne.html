@@ -15,7 +15,7 @@
 
 <div class="page-head">
   <div class="container">
-    <h1>📡 Mode hors-ligne</h1>
+    <h1> Mode hors-ligne</h1>
     <p>Pas de connexion ? Les outils essentiels restent disponibles : les pages déjà enregistrées sur votre téléphone s'ouvrent normalement, sans réseau.</p>
   </div>
 </div>
@@ -24,69 +24,69 @@
 
   <!-- Rappel urgence 112, toujours visible -->
   <div class="urgence-bar" style="border-left-width:6px;">
-    <span style="font-size:1.6rem;line-height:1;">🚨</span>
+    <span style="font-size:1.6rem;line-height:1;"></span>
     <div>
-      <b>Urgence vitale ? Appelez le 112 (SAMU Bénin)</b> — appel gratuit, 24h/24, depuis tous les réseaux, même sans crédit.
+      <b>Urgence vitale ? Appelez le 112 (SAMU Bénin)</b> - appel gratuit, 24h/24, depuis tous les réseaux, même sans crédit.
       Vous pouvez aussi vous rendre directement au centre de santé le plus proche.
     </div>
-    <a class="btn btn-primary btn-sm" href="tel:112" style="margin-left:auto;white-space:nowrap;">📞 Appeler le 112</a>
+    <a class="btn btn-primary btn-sm" href="tel:112" style="margin-left:auto;white-space:nowrap;"> Appeler le 112</a>
   </div>
 
   <div class="panel">
-    <h3>🧰 Vos outils disponibles hors ligne</h3>
+    <h3> Vos outils disponibles hors ligne</h3>
     <p class="sub">Ouvrez-les normalement : ils fonctionnent avec les données enregistrées sur votre appareil.</p>
     <div class="offline-grid">
       <a class="offline-tool" href="{% url 'conseils:calendrier_vaccinal' %}">
-        <div class="ico">💉</div>
+        <div class="ico"></div>
         <div>
           <b>Vaccination (PEV Bénin)</b>
           <span>Calendrier vaccinal officiel de la naissance à 5 ans.</span>
         </div>
       </a>
       <a class="offline-tool" href="{% url 'conseils:conseils_nutritionnels' %}">
-        <div class="ico">🥣</div>
+        <div class="ico"></div>
         <div>
           <b>Nutrition par âge</b>
           <span>Allaitement, diversification, aliments locaux du Bénin.</span>
         </div>
       </a>
       <a class="offline-tool" href="{% url 'enfants:detection_malnutrition' %}">
-        <div class="ico">📏</div>
+        <div class="ico"></div>
         <div>
           <b>Dépistage Z-scores (OMS)</b>
           <span>Vérifiez poids, taille et périmètre brachial de votre enfant.</span>
         </div>
       </a>
       <a class="offline-tool" href="{% url 'premiers_secours' %}">
-        <div class="ico">🆘</div>
+        <div class="ico"></div>
         <div>
           <b>Premiers secours (SOS)</b>
           <span>Signes de danger et gestes qui sauvent, de 0 à 5 ans.</span>
         </div>
       </a>
       <a class="offline-tool" href="{% url 'sante:jours_vaccination' %}">
-        <div class="ico">🗓️</div>
+        <div class="ico"></div>
         <div>
           <b>Jours de vaccination</b>
           <span>Les jours de séance déclarés par les centres, consultés lors de votre dernière connexion.</span>
         </div>
       </a>
       <a class="offline-tool" href="{% url 'conseils:calculer_rdv' %}">
-        <div class="ico">📅</div>
+        <div class="ico"></div>
         <div>
           <b>Calculateur de RDV vaccinaux</b>
           <span>Générez le planning des doses à partir de la date de naissance.</span>
         </div>
       </a>
       <a class="offline-tool" href="{% url 'sante:carte' %}">
-        <div class="ico">🗺️</div>
+        <div class="ico"></div>
         <div>
           <b>Carte des structures</b>
           <span>842 centres, hôpitaux et pharmacies du Bénin enregistrés. Le fond de carte peut être incomplet sans réseau : les coordonnées et itinéraires restent accessibles.</span>
         </div>
       </a>
       <a class="offline-tool" href="/">
-        <div class="ico">🏠</div>
+        <div class="ico"></div>
         <div>
           <b>Accueil</b>
           <span>Présentation de tous les outils et urgences.</span>
@@ -96,15 +96,15 @@
   </div>
 
   <div class="panel">
-    <h3>ℹ️ Bon à savoir</h3>
+    <h3>ℹ Bon à savoir</h3>
     <ul style="color:var(--muted);font-size:.93rem;padding-left:20px;display:grid;gap:6px;margin:0;">
       <li>Le <b>triage IA</b> et la recherche en ligne nécessitent une connexion : réessayez plus tard.</li>
       <li>Une page jamais ouverte avant la coupure réseau peut ne pas être en cache : les outils ci-dessus, eux, sont enregistrés dès l'installation de l'application.</li>
-      <li>💡 Pour que tout soit toujours disponible, <b>installez l'application</b> sur votre écran d'accueil (menu du navigateur → « Installer » ou « Sur l'écran d'accueil »).</li>
+      <li> Pour que tout soit toujours disponible, <b>installez l'application</b> sur votre écran d'accueil (menu du navigateur  puis  « Installer » ou « Sur l'écran d'accueil »).</li>
     </ul>
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;">
-      <button class="btn btn-primary" onclick="window.location.reload()">🔄 Réessayer la connexion</button>
-      <a class="btn btn-ghost" href="/">🏠 Retour à l'accueil</a>
+      <button class="btn btn-primary" onclick="window.location.reload()"> Réessayer la connexion</button>
+      <a class="btn btn-ghost" href="/"> Retour à l'accueil</a>
     </div>
   </div>
 

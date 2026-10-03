@@ -93,34 +93,35 @@
   {% block extra_head %}{% endblock %}
 </head>
 <body>
+  {% include "partials/icones.html" %}
+  {% comment %}Sélecteur de langue masqué : environ 8 400 mots de contenu médical ne sont pas traduits ; un sélecteur qui ne traduit rien dessert les familles. Le balisage reste dans partials/selecteur_langue.html.{% endcomment %}
 
   <nav class="sib-nav">
     <div class="container nav-inner">
       <a class="sib-brand" href="{% url 'accounts:accueil' %}" aria-label="Santé Infantile Bénin">
         <img src="{% static 'img/logo.png' %}" alt="Santé Infantile Bénin">
       </a>
-      <button class="nav-toggler" type="button" aria-label="Ouvrir le menu" aria-expanded="false" onclick="var n=document.querySelector('.sib-nav');n.classList.toggle('open');var o=n.classList.contains('open');this.textContent=o?'×':'☰';this.setAttribute('aria-expanded',o);this.setAttribute('aria-label',o?'Fermer le menu':'Ouvrir le menu');">☰</button>
-      <div class="nav-links">
-        <a href="{% url 'accounts:accueil' %}" {% if request.resolver_match.url_name == 'accueil' %}class="active"{% endif %}>Accueil</a>
-        <a href="{% url 'sante:carte' %}">Carte</a>
-        <a href="{% url 'enfants:detection_malnutrition' %}">Dépistage</a>
-        <a href="{% url 'conseils:calendrier_vaccinal' %}">Vaccination</a>
-        <a href="{% url 'conseils:conseils_nutritionnels' %}">Nutrition</a>
-        <a href="{% url 'sib:triage' %}">Triage IA</a>
-        <a href="{% url 'premiers_secours' %}" class="nav-secours {% if request.resolver_match.url_name == 'premiers_secours' %}active{% endif %}"><span class="badge-sos">SOS</span> Secours</a>
-        <a href="{% url 'accounts:a_propos' %}">À propos</a>
+      <div class="nav-outils">
+        <a class="nav-avatar" href="{% url 'accounts:profil' %}" title="Mon profil" aria-label="Mon profil">
+          {% if user.is_authenticated and user.parent.photo %}<img src="{{ user.parent.photo.url }}" alt="">{% else %}{% with ini=user.parent.prenom|default:user.username %}<span>{{ ini|first|upper }}</span>{% endwith %}{% endif %}
+        </a>
+        <button class="nav-toggler" type="button" aria-label="Ouvrir le menu" aria-expanded="false" onclick="var n=document.querySelector('.sib-nav');n.classList.toggle('open');var o=n.classList.contains('open');this.setAttribute('aria-expanded',o);this.setAttribute('aria-label',o?'Fermer le menu':'Ouvrir le menu');">
+          <svg class="ic menu-open" aria-hidden="true"><use href="#ic-menu"></use></svg><svg class="ic menu-close" aria-hidden="true"><use href="#ic-fermer"></use></svg>
+        </button>
       </div>
-      <div class="nav-cta">
-        {% if user.is_authenticated %}
-          {% if user.parent and user.parent.photo %}
-            <a href="{% url 'accounts:profil' %}" title="Mon profil"><img src="{{ user.parent.photo.url }}" alt="" width="36" height="36" style="width:36px;height:36px;border-radius:50%;object-fit:cover;object-position:50% 18%;"></a>
-          {% endif %}
-          <a class="btn btn-ghost btn-sm" href="{% url 'accounts:dashboard' %}">Mon espace</a>
-          <a class="btn btn-primary btn-sm" href="{% url 'accounts:logout' %}">Se déconnecter</a>
-        {% else %}
-          <a class="btn btn-ghost btn-sm" href="{% url 'accounts:login' %}">Connexion</a>
-          <a class="btn btn-primary btn-sm" href="{% url 'accounts:register' %}">Inscription</a>
-        {% endif %}
+      <div class="nav-links">
+        <a href="{% url 'accounts:accueil' %}"><svg class="ic"><use href="#ic-accueil"></use></svg> Accueil</a>
+        <a href="{% url 'sante:carte' %}"><svg class="ic"><use href="#ic-carte"></use></svg> Carte</a>
+        <a href="{% url 'enfants:detection_malnutrition' %}"><svg class="ic"><use href="#ic-mesure"></use></svg> Dépistage</a>
+        <a href="{% url 'conseils:calendrier_vaccinal' %}"><svg class="ic"><use href="#ic-vaccin"></use></svg> Vaccination</a>
+        <a href="{% url 'conseils:conseils_nutritionnels' %}"><svg class="ic"><use href="#ic-nutrition"></use></svg> Nutrition</a>
+        <a href="{% url 'sib:triage' %}"><svg class="ic"><use href="#ic-triage"></use></svg> Triage IA</a>
+        <a href="{% url 'premiers_secours' %}" class="nav-secours"><svg class="ic"><use href="#ic-secours"></use></svg> Secours</a>
+        <a href="{% url 'accounts:a_propos' %}"><svg class="ic"><use href="#ic-infos"></use></svg> À propos</a>
+        <div class="nav-actions">
+          {% if user.is_authenticated %}<a class="btn btn-primary btn-sm" href="{% url 'accounts:dashboard' %}">Mon espace</a><a class="btn btn-ghost btn-sm" href="{% url 'accounts:logout' %}">Se déconnecter</a>
+          {% else %}<a class="btn btn-ghost btn-sm" href="{% url 'accounts:login' %}">Connexion</a><a class="btn btn-primary btn-sm" href="{% url 'accounts:register' %}">Inscription</a>{% endif %}
+        </div>
       </div>
     </div>
   </nav>
@@ -187,7 +188,7 @@
     <img src="{% static 'img/icons/icon-192.png' %}" alt="" width="44" height="44">
     <div class="pwa-txt">
       <b>Installez l'application Santé Infantile Bénin</b>
-      <span id="pwaHint">Vaccination, nutrition, dépistage et secours sur votre écran d'accueil — même sans réseau.</span>
+      <span id="pwaHint">Vaccination, nutrition, dépistage et secours sur votre écran d'accueil - même sans réseau.</span>
     </div>
     <div class="pwa-actions">
       <button class="btn btn-primary btn-sm" type="button" id="pwaInstall">Installer</button>
@@ -197,7 +198,7 @@
 
   <!-- Bandeau d'information cookies (discret, non bloquant) -->
   <div class="sib-cookie-banner" id="cookieBanner" hidden role="region" aria-label="Information cookies">
-    <span class="cookie-txt">🍪 Ce site n'utilise que des <b>cookies techniques</b> indispensables (session, sécurité) — aucun cookie publicitaire ni traceur tiers. <a href="{% url 'accounts:politique_des_cookies' %}">En savoir plus</a></span>
+    <span class="cookie-txt"> Ce site n'utilise que des <b>cookies techniques</b> indispensables (session, sécurité) - aucun cookie publicitaire ni traceur tiers. <a href="{% url 'accounts:politique_des_cookies' %}">En savoir plus</a></span>
     <button class="btn btn-primary btn-sm" type="button" id="cookieOk">Compris</button>
   </div>
 
@@ -279,7 +280,7 @@
       if (!nav || !nav.classList.contains('open')) return;
       if (e.target.closest('.nav-links a')) {
         nav.classList.remove('open');
-        toggler.textContent = '☰';
+        toggler.textContent = '';
         toggler.setAttribute('aria-expanded', 'false');
       }
     });

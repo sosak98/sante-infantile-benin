@@ -126,6 +126,8 @@ class JoursVaccinationForm(forms.ModelForm):
         if jours:
             etablissement.source_vaccination = source
             etablissement.maj_vaccination = timezone.now()
+        if source != 'admin':
+            etablissement.jours_confirmes = False
         else:
             etablissement.source_vaccination = ''
             etablissement.maj_vaccination = None

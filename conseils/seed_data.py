@@ -16,7 +16,7 @@ VACCINS = [
     {
         "nom": entree["nom"],
         "age_affichage": entree["affichage"],
-        "age_min_mois": entree.get("mois", entree.get("semaines", 0) // 4),
+        "age_min_mois": entree.get("mois") or (entree.get("semaines") or 0) // 4,
         "age_max_mois": None,
         "description": entree["description"],
         "obligatoire": entree["obligatoire"],

@@ -19,7 +19,7 @@
 </nav>
 <div class="page-head">
   <div class="container">
-    <h1>📍 Centres de santé & pharmacies</h1>
+    <h1> Centres de santé & pharmacies</h1>
     <p>Trouvez l'établissement le plus proche de chez vous, avec itinéraire Google Maps.</p>
   </div>
 </div>
@@ -47,9 +47,9 @@
         <button class="btn btn-primary btn-sm" id="localiserBtn">Me localiser</button>
         <button class="btn btn-ghost btn-sm" id="prochesBtn">Les 10 plus proches</button>
         <label style="display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:600;color:var(--teal-800);">
-          <input type="checkbox" id="filtreVaccination"> 💉 Vaccination aujourd'hui
+          <input type="checkbox" id="filtreVaccination">  Vaccination aujourd'hui
         </label>
-        <a class="btn btn-ghost btn-sm" href="{% url 'sante:jours_vaccination' %}">🗓️ Jours de vaccination</a>
+        <a class="btn btn-ghost btn-sm" href="{% url 'sante:jours_vaccination' %}"> Jours de vaccination</a>
       </div>
       <p class="sub" id="infoVaccination" style="margin:8px 0 0;font-size:.8rem;display:none;">
         Seuls les centres ayant déclaré une séance le <b>{{ jour_actuel }}</b> sont affichés.
@@ -130,7 +130,7 @@
     var pastille = aujourdhui
       ? '<span style="background:#00695c;color:#fff;border-radius:8px;padding:1px 7px;font-size:.72rem;">Séance aujourd\'hui</span> '
       : '';
-    return '<p style="margin:6px 0 0;font-size:0.82rem;color:#00695c;">💉 ' + pastille + txt + horaire + '</p>';
+    return '<p style="margin:6px 0 0;font-size:0.82rem;color:#00695c;"> ' + pastille + txt + horaire + '</p>';
   }
 
   function popupContent(e) {
@@ -138,9 +138,9 @@
     return '<div style="font-family:Segoe UI;min-width:160px;">' +
       '<h6 style="color:#004d40;margin-bottom:5px;">' + echapper(e.nom) + '</h6>' +
       '<p style="margin:0;font-size:0.85rem;color:#666;">' + echapper(e.adresse) + '</p>' +
-      (e.telephone ? '<p style="margin:5px 0 0;font-size:0.85rem;">📞 ' + echapper(e.telephone) + '</p>' : '') +
+      (e.telephone ? '<p style="margin:5px 0 0;font-size:0.85rem;"> ' + echapper(e.telephone) + '</p>' : '') +
       blocVaccination(e) +
-      '<a href="https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '" target="_blank" rel="noopener" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;display:block;text-align:center;text-decoration:none;">🧭 Y aller (Google Maps)</a></div>';
+      '<a href="https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '" target="_blank" rel="noopener" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;display:block;text-align:center;text-decoration:none;"> Y aller (Google Maps)</a></div>';
   }
 
   function distanceKm(lat1, lon1, lat2, lon2) {
@@ -192,7 +192,7 @@
   function messageCarte(texte) {
     var bloc = document.getElementById('nearList');
     bloc.style.display = 'block';
-    bloc.innerHTML = '<div class="alert alert-info" style="margin:0;">📍 ' + texte + '</div>';
+    bloc.innerHTML = '<div class="alert alert-info" style="margin:0;"> ' + texte + '</div>';
   }
 
   document.getElementById('localiserBtn').addEventListener('click', function () {
@@ -208,7 +208,7 @@
         radius: 10, color: '#ffffff', weight: 3,
         fillColor: '#1e88e5', fillOpacity: 1
       }).addTo(map);
-      userMarker.bindPopup('<b>📍 Vous êtes ici</b>').openPopup();
+      userMarker.bindPopup('<b> Vous êtes ici</b>').openPopup();
       document.getElementById('nearList').style.display = 'none';
     }, function () {
       messageCarte("L'accès à votre position est bloqué par le navigateur ou par cette fenêtre d'aperçu. Autorisez la localisation dans les réglages du navigateur, ou déplacez la carte sur votre quartier puis cliquez sur « Les 10 plus proches ».");
@@ -232,7 +232,7 @@
       var kmTxt = km < 1 ? Math.round(km * 1000) + ' m' : km.toFixed(1) + ' km';
       html += '<li style="margin:4px 0;"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + couleur + ';margin-right:4px;"></i>' +
         '<b>' + echapper(e.nom) + '</b> · ' + kmTxt +
-        (e.vaccination && (e.jours || []).indexOf(JOUR_ACTUEL) !== -1 ? ' · <span style="color:#00695c;font-weight:700;">💉 séance aujourd\'hui</span>' : '') +
+        (e.vaccination && (e.jours || []).indexOf(JOUR_ACTUEL) !== -1 ? ' · <span style="color:#00695c;font-weight:700;"> séance aujourd\'hui</span>' : '') +
         ' · <a href="https://www.google.com/maps/dir/?api=1&destination=' + e.latitude + ',' + e.longitude +
         '" target="_blank" style="color:#00796b;text-decoration:none;">Y aller</a></li>';
       bounds.push([e.latitude, e.longitude]);

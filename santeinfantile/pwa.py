@@ -45,7 +45,7 @@ def hors_ligne(request):
 # Version du cache. À incrémenter à CHAQUE changement du service worker ou de
 # la liste CORE : c'est ce qui déclenche la purge des anciens caches chez les
 # visiteurs qui ont déjà installé l'application.
-SW_VERSION = 'v10'
+SW_VERSION = 'v11'
 
 # Pages pré-mises en cache dès l'installation : tous les modules utiles hors
 # ligne, y compris les nouvelles pages « jours de vaccination » et l'espace
@@ -58,6 +58,7 @@ PAGES_HORS_LIGNE = [
     '/depistage/',
     '/conseils/',
     '/conseils/rdv/',
+    '/triage/',
     '/conseils/nutrition/',
     '/premiers-secours/',
     '/pro/',
@@ -177,7 +178,7 @@ async function cacheAbordPuisReseau(request) {
 
 self.addEventListener('fetch', (e) => {
   const { request } = e;
-  if (request.method !== 'GET') return;
+  if (request.method !== 'GET' && request.mode !== 'navigate') return;
 
   let url;
   try { url = new URL(request.url); } catch (err) { return; }

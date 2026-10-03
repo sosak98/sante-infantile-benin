@@ -236,12 +236,12 @@ class EnTetesSecuriteTests(TestCase):
         self.assertEqual(self.client.get('/triage/').status_code, 200)
 
 
-class ServiceWorkerV10Tests(TestCase):
+class ServiceWorkerV11Tests(TestCase):
     """Mode hors-ligne étendu : version du cache et pages pré-enregistrées."""
 
-    def test_version_v10(self):
+    def test_version_v11(self):
         sw = self.client.get('/sw.js').content.decode('utf-8')
-        self.assertIn("const VERSION = 'v10'", sw)
+        self.assertIn("const VERSION = 'v11'", sw)
         self.assertIn("'sib-cache-' + VERSION", sw)
 
     def test_nouvelles_pages_precachees(self):

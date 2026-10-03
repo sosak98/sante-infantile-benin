@@ -115,9 +115,9 @@ def calculer_score_triage(symptomes, poids=None, taille=None, muac=None):
     if score >= 6:
         return 'rouge', '🔴 Urgence immédiate : consultez un médecin maintenant !', score
     elif score >= 3:
-        return 'jaune', '🟡 Consultation recommandée dans les 24-48h', score
+        return 'jaune', 'Consultation recommandée dans les 24-48h', score
     else:
-        return 'vert', '🟢 Conseils à domicile suffisants pour le moment', score
+        return 'vert', 'Conseils à domicile suffisants pour le moment', score
 
 
 def construire_contexte_systeme(enfant_nom, age_mois, niveau, message, symptomes):

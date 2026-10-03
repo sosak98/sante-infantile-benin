@@ -13,7 +13,7 @@
 
 <div class="page-head">
   <div class="container">
-    <h1>🏥 {{ etablissement.nom }}</h1>
+    <h1> {{ etablissement.nom }}</h1>
     <p>Déclarez les jours de séance de vaccination : ils sont publiés immédiatement pour les parents.</p>
   </div>
 </div>
@@ -41,7 +41,7 @@
   <div class="panel" style="background:var(--teal-50);max-width:740px;">
     <h3 style="margin-top:0;font-size:1rem;">Aperçu côté parent</h3>
     <p class="sub" style="margin:0;">
-      <strong>{{ etablissement.nom }}</strong> — {{ etablissement.jours_affichage }}
+      <strong>{{ etablissement.nom }}</strong> - {{ etablissement.jours_affichage }}
       {% if etablissement.horaire_vaccination %} · {{ etablissement.horaire_vaccination }}{% endif %}
     </p>
     <a class="btn btn-ghost btn-sm" style="margin-top:10px;" href="{% url 'sante:jours_vaccination' %}">Voir la page publique</a>
