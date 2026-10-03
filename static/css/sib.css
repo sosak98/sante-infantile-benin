@@ -477,3 +477,6 @@ body.has-cookie-banner .sib-pwa-banner { bottom: 64px; }
 .about-profile { display:grid;grid-template-columns:190px 1fr;gap:30px;align-items:center;background:linear-gradient(135deg,var(--teal-900),var(--teal-700));color:#fff; }
 .about-profile-photo { width:190px;height:190px;border-radius:22px;overflow:hidden;border:3px solid rgba(255,255,255,.7); }.about-profile-photo img{width:100%;height:100%;object-fit:cover;}.about-profile h2{color:#fff;margin:8px 0}.about-profile p{color:rgba(255,255,255,.88);max-width:680px}.about-profile .role{font-weight:700}.about-columns h2,.about-contact h2{color:var(--teal-800);margin-top:0}.about-list{color:var(--muted);padding-left:20px;display:grid;gap:10px}.about-contact{border-left:5px solid var(--amber)}
 @media(max-width:700px){.about-profile{grid-template-columns:1fr;text-align:center}.about-profile-photo{margin:auto}.about-profile .btn{width:100%}}
+
+/* Le menu reste aligne sous les outils a droite, meme dans les media queries historiques. */
+.sib-nav.open .nav-links { left:auto !important; right:0 !important; width:max-content; }
