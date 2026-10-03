@@ -45,7 +45,7 @@ def hors_ligne(request):
 # Version du cache. À incrémenter à CHAQUE changement du service worker ou de
 # la liste CORE : c'est ce qui déclenche la purge des anciens caches chez les
 # visiteurs qui ont déjà installé l'application.
-SW_VERSION = 'v11'
+SW_VERSION = 'v12'
 
 # Pages pré-mises en cache dès l'installation : tous les modules utiles hors
 # ligne, y compris les nouvelles pages « jours de vaccination » et l'espace
