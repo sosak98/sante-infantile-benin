@@ -15,6 +15,10 @@ services:
         value: "False"
       - key: CSRF_COOKIE_SECURE
         value: "True"
+      - key: SECURE_SSL_REDIRECT
+        value: "True"
+      - key: X_FRAME_OPTIONS
+        value: "DENY"
       - key: ALLOWED_HOSTS
         value: ".onrender.com"
       - key: CSRF_TRUSTED_ORIGINS
