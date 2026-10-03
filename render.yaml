@@ -13,6 +13,8 @@ services:
         sync: false
       - key: DEBUG
         value: "False"
+      - key: CSRF_COOKIE_SECURE
+        value: "True"
       - key: ALLOWED_HOSTS
         value: ".onrender.com"
       - key: CSRF_TRUSTED_ORIGINS

@@ -81,16 +81,18 @@
     subdomains: 'abcd',
     maxZoom: 20
   });
-  var tuilesActives = tuilesOSM;
-  tuilesOSM.on('tileerror', function () {
-    if (tuilesActives === tuilesOSM) {
-      map.removeLayer(tuilesOSM);
-      tuilesSecours.addTo(map);
-      tuilesActives = tuilesSecours;
+  // CARTO est utilisé en premier : le serveur public OSM limite les aperçus
+  // qui chargent une grande zone et renvoie alors 403.
+  var tuilesActives = tuilesSecours;
+  tuilesSecours.on('tileerror', function () {
+    if (tuilesActives === tuilesSecours) {
+      map.removeLayer(tuilesSecours);
+      tuilesOSM.addTo(map);
+      tuilesActives = tuilesOSM;
     }
   });
-  tuilesOSM.addTo(map);
-  map.fitBounds([[6.2, 0.8], [12.4, 3.85]]);
+  tuilesSecours.addTo(map);
+  map.setView([6.37, 2.42], 11);
 
   var userMarker = null, userLat = null, userLng = null;
   var countCentres = 0, countCliniques = 0, countHopitaux = 0, countPharmacies = 0;

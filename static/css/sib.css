@@ -463,3 +463,6 @@ body.has-cookie-banner .sib-pwa-banner { bottom: 64px; }
 .page-head .profil-entete { flex:1; }
 .page-head > .container > .avatar { width:104px;height:104px;border-radius:50%;object-fit:cover;object-position:50% 18%;border:4px solid #fff;box-shadow:var(--shadow-md);float:left;margin-right:22px; }
 @media(max-width:560px){.page-head > .container > .avatar{width:78px;height:78px}}
+/* Le panneau s'ancre toujours au bord du bouton hamburger. */
+.sib-nav .nav-links { left:auto; }
+.ico .ic { color:var(--teal-700); }
