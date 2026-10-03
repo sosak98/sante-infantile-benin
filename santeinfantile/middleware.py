@@ -18,10 +18,7 @@ tierce (`frame-ancestors`) et restreint les destinations de formulaire.
 CDN_SCRIPTS = "https://cdn.jsdelivr.net"
 CDN_STYLES = "https://cdn.jsdelivr.net https://fonts.googleapis.com"
 CDN_POLICES = "https://fonts.gstatic.com"
-TUILES_CARTE = (
-    "https://tile.openstreetmap.org https://*.tile.openstreetmap.org "
-    "https://*.basemaps.cartocdn.com"
-)
+TUILES_CARTE = "https://tile.openstreetmap.org https://*.tile.openstreetmap.org"
 
 def _frame_ancestors():
     """Origines autorisées à embarquer le site dans une iframe.

@@ -28,6 +28,9 @@
   <div class="panel" style="padding:0;overflow:hidden;">
     <div class="map-wrap">
       <div id="map"></div>
+      <div id="mapError" class="alert alert-info" role="alert" hidden style="position:absolute;left:16px;right:16px;top:16px;z-index:1000;margin:0;">
+        La carte ne peut pas se charger. Vérifiez votre connexion.
+      </div>
     </div>
     <div style="padding:10px 14px 14px;">
       <div class="map-legend" style="display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);align-items:center;">
@@ -74,24 +77,10 @@
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributeurs',
     maxZoom: 19
   });
-  // Si les serveurs OSM renvoient 403 dans cet environnement, bascule automatique
-  // sur les tuiles de secours CARTO (mêmes données OpenStreetMap).
-  var tuilesSecours = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 20
+  tuilesOSM.on('tileerror', function () {
+    document.getElementById('mapError').hidden = false;
   });
-  // CARTO est utilisé en premier : le serveur public OSM limite les aperçus
-  // qui chargent une grande zone et renvoie alors 403.
-  var tuilesActives = tuilesSecours;
-  tuilesSecours.on('tileerror', function () {
-    if (tuilesActives === tuilesSecours) {
-      map.removeLayer(tuilesSecours);
-      tuilesOSM.addTo(map);
-      tuilesActives = tuilesOSM;
-    }
-  });
-  tuilesSecours.addTo(map);
+  tuilesOSM.addTo(map);
   map.setView([6.37, 2.42], 11);
 
   var userMarker = null, userLat = null, userLng = null;

@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Vaccin, ConseilNutritionnel
 from .pev import (
     CALENDRIER_PEV,
+    CHIMIOPREVENTION_PALUDISME,
     SUPPLEMENTATIONS,
     calendrier_affichable,
     normaliser_cle,
@@ -37,6 +38,7 @@ def calendrier_vaccinal(request):
     return render(request, 'conseils/calendrier.html', {
         'vaccins': vaccins,
         'nb_doses': len(vaccins),
+        'chimioprevention': CHIMIOPREVENTION_PALUDISME,
         'supplementations': SUPPLEMENTATIONS,
     })
 

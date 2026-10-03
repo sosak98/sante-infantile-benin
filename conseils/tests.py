@@ -6,6 +6,8 @@ from django.test import TestCase
 
 from conseils.pev import (
     CALENDRIER_PEV,
+    CHIMIOPREVENTION_PALUDISME,
+    SUPPLEMENTATIONS,
     ajouter_mois,
     calendrier_affichable,
     normaliser_cle,
@@ -93,6 +95,20 @@ class CalendrierReferenceTests(TestCase):
             with self.subTest(cle=ligne['cle']):
                 self.assertTrue(ligne['maladies'])
                 self.assertTrue(ligne['voie'])
+
+    def test_tpi_est_distinct_du_calendrier_vaccinal(self):
+        cles_tpi = [prise['cle'] for prise in CHIMIOPREVENTION_PALUDISME]
+        self.assertEqual(cles_tpi, ['tpi_1', 'tpi_2', 'tpi_3'])
+        self.assertEqual(
+            [prise.get('semaines') for prise in CHIMIOPREVENTION_PALUDISME[:2]],
+            [10, 14],
+        )
+        self.assertEqual(CHIMIOPREVENTION_PALUDISME[2].get('mois'), 9)
+        self.assertFalse(set(cles_tpi) & {entree['cle'] for entree in CALENDRIER_PEV})
+
+    def test_vitamine_a_est_une_supplementation_hors_calendrier(self):
+        self.assertTrue(any(s['nom'] == 'Vitamine A' for s in SUPPLEMENTATIONS))
+        self.assertFalse(any(entree['nom'] == 'Vitamine A' for entree in CALENDRIER_PEV))
 
 
 class AjouterMoisTests(TestCase):
@@ -253,6 +269,9 @@ class PagesVaccinationTests(TestCase):
     def test_calendrier_mentionne_les_supplementations(self):
         reponse = self.client.get('/conseils/')
         self.assertContains(reponse, 'Vitamine A')
+        self.assertContains(reponse, 'Chimioprévention du paludisme (TPI)')
+        self.assertContains(reponse, 'trois prises orales de sulfadoxine-pyriméthamine')
+        self.assertNotContains(reponse, 'TPI 1 (sulfadoxine-pyriméthamine)')
 
     def test_calendrier_sans_colonne_voie(self):
         """La voie d'administration est une information de soignant, pas de
@@ -266,6 +285,28 @@ class PagesVaccinationTests(TestCase):
         })
         self.assertEqual(reponse.status_code, 200)
         self.assertContains(reponse, 'BCG')
+        self.assertNotContains(reponse, 'TPI 1 (sulfadoxine-pyriméthamine)')
+        self.assertNotContains(reponse, 'Vitamine A')
+
+    def test_hepatite_b_a_la_maternite_est_affichee_comme_ok(self):
+        reponse = self.client.post('/conseils/rdv/', {
+            'date_naissance': '2025-01-15',
+        })
+        self.assertContains(
+            reponse,
+            'id="rdv-hepb_0" data-cle="hepb_0" class="tl-item ok"',
+        )
+        self.assertContains(
+            reponse,
+            "Administré en salle d'accouchement dans les 24 heures suivant la naissance.",
+        )
+
+    def test_rdv_sans_centre_affiche_le_repli(self):
+        reponse = self.client.get('/conseils/rdv/')
+        self.assertContains(
+            reponse,
+            "Ces dates suivent le calendrier national du PEV. Les jours de séance varient d'un centre à l'autre : sélectionnez votre centre ci-dessus pour obtenir les dates réelles de ses séances. Si votre centre n'apparaît pas dans la liste, c'est qu'il n'a pas encore déclaré ses jours de vaccination.",
+        )
 
     def test_rdv_refuse_une_date_invalide_sans_erreur_500(self):
         """Une saisie invalide renvoyait une erreur 500."""
