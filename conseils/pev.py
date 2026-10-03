@@ -271,32 +271,33 @@ CALENDRIER_PEV = [
 ]
 
 
-# Prévention et supplémentation, synchronisées avec les séances PEV.
-for cle, nom, age, affichage in [
-    ('tpi_1', 'TPI 1 (sulfadoxine-pyriméthamine)', 10, '10 semaines'),
-    ('tpi_2', 'TPI 2 (sulfadoxine-pyriméthamine)', 14, '14 semaines'),
-    ('tpi_3', 'TPI 3 (sulfadoxine-pyriméthamine)', 9, '9 mois'),
-]:
-    CALENDRIER_PEV.append({
-        'cle': cle, 'nom': nom, 'dose': int(cle[-1]), 'serie': cle,
-        **({'mois': age} if age == 9 else {'semaines': age}),
-        'affichage': affichage, 'maladies': 'Paludisme',
-        'voie': 'Orale', 'categorie': 'chimioprevention',
-        'description': '¼ de comprime sous 5 kg, ½ au-dela; contre-indique sous cotrimoxazole.',
-        'obligatoire': True,
-    })
-for age in range(6, 60, 6):
-    CALENDRIER_PEV.append({
-        'cle': f'vitamine_a_{age}', 'nom': 'Vitamine A', 'dose': age // 6,
-        'serie': 'vitamine_a', 'mois': age, 'affichage': f'{age} mois',
-        'maladies': 'Carence en vitamine A', 'voie': 'Orale',
-        'categorie': 'supplementation', 'description': "Supplement de vitamine A tous les six mois jusqu'a 59 mois.",
-        'obligatoire': True,
-    })
+# Chimioprévention et supplémentation associées aux séances PEV : ce ne sont
+# pas des vaccins et elles ne figurent ni dans le calendrier ni dans le
+# planning du calculateur.
+CHIMIOPREVENTION_PALUDISME = [
+    {
+        'cle': 'tpi_1', 'nom': 'TPI 1 (sulfadoxine-pyriméthamine)', 'dose': 1,
+        'serie': 'tpi_1', 'semaines': 10, 'affichage': '10 semaines',
+        'maladies': 'Paludisme', 'voie': 'Orale',
+        'categorie': 'chimioprevention',
+        'description': 'Première prise de sulfadoxine-pyriméthamine.',
+    },
+    {
+        'cle': 'tpi_2', 'nom': 'TPI 2 (sulfadoxine-pyriméthamine)', 'dose': 2,
+        'serie': 'tpi_2', 'semaines': 14, 'affichage': '14 semaines',
+        'maladies': 'Paludisme', 'voie': 'Orale',
+        'categorie': 'chimioprevention',
+        'description': 'Deuxième prise de sulfadoxine-pyriméthamine.',
+    },
+    {
+        'cle': 'tpi_3', 'nom': 'TPI 3 (sulfadoxine-pyriméthamine)', 'dose': 3,
+        'serie': 'tpi_3', 'mois': 9, 'affichage': '9 mois',
+        'maladies': 'Paludisme', 'voie': 'Orale',
+        'categorie': 'chimioprevention',
+        'description': 'Troisième prise de sulfadoxine-pyriméthamine.',
+    },
+]
 
-
-# Supplémentations associées au PEV : ce ne sont pas des vaccins, elles ne
-# figurent donc pas dans le planning vaccinal mais sont rappelées à l'écran.
 SUPPLEMENTATIONS = [
     {
         'nom': 'Vitamine A',

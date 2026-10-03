@@ -70,10 +70,11 @@
         </div>
         <div class="timeline">
           {% for rdv in resultats %}
-            <div class="tl-item {% if rdv.statut == 'Reçu' %}ok{% elif rdv.statut == 'En retard' %}late{% elif rdv.statut == "Aujourd'hui" %}next{% endif %}">
+            <div id="rdv-{{ rdv.cle }}" data-cle="{{ rdv.cle }}" class="tl-item {% if rdv.statut == 'Reçu' or rdv.statut == 'À la maternité' %}ok{% elif rdv.statut == 'En retard' %}late{% elif rdv.statut == "Aujourd'hui" %}next{% endif %}">
               <div class="t">{{ rdv.nom }}{% if rdv.categorie == "chimioprevention" %} <span class="tag">chimioprévention</span>{% elif rdv.categorie == "supplementation" %} <span class="tag">supplément</span>{% endif %} <span class="tag" style="font-size:.7rem;">{{ rdv.age_affichage }}</span></div>
               <div class="d">{% if rdv.date_centre %}<strong>{{ rdv.date_centre|date:"d/m/Y" }}</strong> <small>(théorique : {{ rdv.date_theorique|date:"d/m/Y" }}, report {{ rdv.decalage_jours }} j)</small>{% else %}{{ rdv.date_prevue|date:"d/m/Y" }}{% endif %} - {{ rdv.statut }}</div>
               <div class="d" style="font-size:.78rem;color:var(--muted);">Protège contre : {{ rdv.maladies }}</div>
+              {% if rdv.cle == 'hepb_0' %}<div class="d" style="font-size:.78rem;color:var(--muted);">Administré en salle d'accouchement dans les 24 heures suivant la naissance. À corriger si l'accouchement a eu lieu à domicile.</div>{% endif %}
             </div>
           {% endfor %}
         </div>
@@ -82,6 +83,10 @@
           <div style="font-size:3rem;"></div>
           <p>Renseignez la date de naissance pour générer le planning.</p>
         </div>
+      {% endif %}
+
+      {% if not centre %}
+        <div class="info-note" style="margin-top:16px;">Ces dates suivent le calendrier national du PEV. Les jours de séance varient d'un centre à l'autre : sélectionnez votre centre ci-dessus pour obtenir les dates réelles de ses séances. Si votre centre n'apparaît pas dans la liste, c'est qu'il n'a pas encore déclaré ses jours de vaccination.</div>
       {% endif %}
     </div>
   </div>

@@ -93,7 +93,7 @@ default-src 'self'
 script-src  'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com
 style-src   'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://fonts.googleapis.com
 font-src    'self' data: https://fonts.gstatic.com
-img-src     'self' data: blob: <tuiles OSM et CARTO>
+img-src     'self' data: blob: <tuiles OpenStreetMap>
 connect-src 'self' https://overpass-api.de
 object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'
 manifest-src 'self'; worker-src 'self'

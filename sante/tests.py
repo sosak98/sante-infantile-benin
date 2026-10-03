@@ -169,3 +169,14 @@ class CarteAvecVaccinationTests(TestCase):
         reponse = self.client.get('/carte/')
         self.assertNotContains(reponse, '<script>alert(1)</script>')
         self.assertContains(reponse, 'function echapper')
+
+    def test_carte_utilise_osm_sans_fournisseur_a_cle(self):
+        html = self.client.get('/carte/').content.decode('utf-8').lower()
+        self.assertNotIn('basemaps.cartocdn.com', html)
+        self.assertNotIn('apikey', html)
+
+    def test_carte_annonce_une_erreur_de_tuiles(self):
+        self.assertContains(
+            self.client.get('/carte/'),
+            'La carte ne peut pas se charger. Vérifiez votre connexion.',
+        )

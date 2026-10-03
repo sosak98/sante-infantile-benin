@@ -198,10 +198,10 @@ class EnTetesSecuriteTests(TestCase):
         # Leaflet est auto-hébergé : unpkg.com ne doit plus être autorisé.
         self.assertNotIn('unpkg.com', csp)
 
-    def test_csp_autorise_les_tuiles_de_carte(self):
+    def test_csp_autorise_uniquement_les_tuiles_osm(self):
         csp = self.client.get('/carte/').headers.get('Content-Security-Policy', '')
         self.assertIn('tile.openstreetmap.org', csp)
-        self.assertIn('basemaps.cartocdn.com', csp)
+        self.assertNotIn('basemaps.cartocdn.com', csp)
 
     def test_permissions_policy_restrictive(self):
         entete = self.client.get('/').headers.get('Permissions-Policy', '')
