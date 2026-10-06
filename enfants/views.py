@@ -8,6 +8,10 @@ from .oms_lms import (
 )
 
 
+MUAC_AGE_MIN_MOIS = 6
+MUAC_AGE_MAX_MOIS = 59
+
+
 def _ligne(nom, z):
     if z is None:
         return {"indicateur": nom, "statut": "Mesure incomplète", "couleur": "info", "z": None}
@@ -19,19 +23,54 @@ def _ligne(nom, z):
     return {"indicateur": nom, "statut": "Normale", "couleur": "success", "z": z_r}
 
 
-def evaluer_malnutrition(poids, taille, age_mois, sexe, muac=None):
+def _ligne_muac(muac, age_mois):
+    """Interprète le MUAC seulement dans sa tranche d'âge validée."""
+    if not MUAC_AGE_MIN_MOIS <= age_mois <= MUAC_AGE_MAX_MOIS:
+        return {
+            "indicateur": "Tour de bras (MUAC)",
+            "statut": "Non interprétable à cet âge",
+            "couleur": "info",
+            "z": None,
+            "note": (
+                "Le périmètre brachial n'est utilisable qu'entre 6 et 59 mois. "
+                f"À {age_mois} mois, la mesure ne permet aucune conclusion : "
+                "fiez-vous au poids et à la taille."
+            ),
+        }
+    if muac < 11.5:
+        statut, couleur = "Malnutrition aiguë sévère", "danger"
+    elif muac < 12.5:
+        statut, couleur = "Malnutrition aiguë modérée", "warning"
+    else:
+        statut, couleur = "Normale", "success"
+    return {
+        "indicateur": "Tour de bras (MUAC)",
+        "statut": statut,
+        "couleur": couleur,
+        "z": None,
+    }
+
+
+def evaluer_malnutrition(poids, taille, age_mois, sexe, muac=None, oedemes=False):
     resultats = [
         _ligne("Poids pour l'âge", z_poids_age(poids, sexe, age_mois)),
         _ligne("Taille pour l'âge", z_taille_age(taille, sexe, age_mois)),
         _ligne("Poids pour la taille", z_poids_taille(poids, taille, sexe, age_mois)),
     ]
-    if muac:
-        if muac < 11.5:
-            resultats.append({"indicateur": "Tour de bras (MUAC)", "statut": "Malnutrition sévère", "couleur": "danger", "z": None})
-        elif muac < 12.5:
-            resultats.append({"indicateur": "Tour de bras (MUAC)", "statut": "Malnutrition modérée", "couleur": "warning", "z": None})
-        else:
-            resultats.append({"indicateur": "Tour de bras (MUAC)", "statut": "Normale", "couleur": "success", "z": None})
+    if muac is not None:
+        resultats.append(_ligne_muac(muac, age_mois))
+    if oedemes:
+        resultats.insert(0, {
+            "indicateur": "Œdèmes bilatéraux",
+            "statut": "Malnutrition aiguë sévère",
+            "couleur": "danger",
+            "z": None,
+            "note": (
+                "Des œdèmes des deux pieds signent une malnutrition aiguë sévère, "
+                "quels que soient le poids et le périmètre brachial. Conduisez "
+                "l'enfant au centre de santé aujourd'hui."
+            ),
+        })
     return resultats
 
 
@@ -47,7 +86,8 @@ def detection_malnutrition(request):
             taille = float(request.POST.get("taille"))
             muac_val = request.POST.get("muac")
             muac = float(muac_val) if muac_val else None
-            ev = evaluer_malnutrition(poids, taille, age_mois, sexe, muac)
+            oedemes = request.POST.get("oedemes") == "oui"
+            ev = evaluer_malnutrition(poids, taille, age_mois, sexe, muac, oedemes)
             ordre = {"danger": 0, "warning": 1, "info": 2, "success": 3}
             pire = min((ordre.get(e["couleur"], 3) for e in ev), default=3)
             if pire == 0:

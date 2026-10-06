@@ -83,6 +83,15 @@ class TableauDeBordTests(TestCase):
         self._enfant(12)
         self.assertContains(self.client.get('/dashboard/'), '/carte/vaccination/')
 
+    def test_outils_du_tableau_de_bord_utilisent_les_icones_dediees(self):
+        html = self.client.get('/dashboard/').content.decode('utf-8')
+        outils = html[html.index('Accès rapide aux outils'):]
+        for icone in ('ic-carte', 'ic-mesure', 'ic-vaccin', 'ic-nutrition',
+                      'ic-triage', 'ic-secours'):
+            with self.subTest(icone=icone):
+                self.assertIn(f'href="#{icone}"', outils)
+        self.assertNotIn('href="#ic-infos"', outils)
+
 
 class CreatesuperuserAutoTests(TestCase):
     """Le compte administrateur vient de l'environnement, jamais du code."""
@@ -126,3 +135,58 @@ class CreatesuperuserAutoTests(TestCase):
         self.assertEqual(User.objects.filter(username='admin_test').count(), 1)
         admin = User.objects.get(username='admin_test')
         self.assertTrue(admin.check_password('UnAutreMotDePasse2026!'))
+
+
+class AProposTests(TestCase):
+
+    def test_qualification_et_contacts_explicitement_affiches(self):
+        html = self.client.get('/a-propos/').content.decode('utf-8')
+        self.assertIn(
+            "Infirmier diplômé d'État, en spécialisation Puériculture-Pédiatrie (Master 2), développeur web.",
+            html,
+        )
+        self.assertIn('class="about-contacts"', html)
+        whatsapp = html.index('Écrire sur WhatsApp')
+        email = html.index('Écrire par e-mail')
+        self.assertLess(whatsapp, email)
+        self.assertIn('href="https://wa.me/2290198419240"', html)
+        self.assertIn('href="mailto:sante.infantile.benin@gmail.com"', html)
+        self.assertNotIn('Écrire au fondateur', html)
+
+
+class AdditionalDashboardTests(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='dashboard@test.bj', password='MotDePasse123', first_name='Awa',
+        )
+        Parent.objects.create(
+            user=self.user, telephone='97000000', prenom='Awa', nom='Koffi',
+        )
+        self.client.login(username='dashboard@test.bj', password='MotDePasse123')
+
+    def test_dashboard_contient_la_carte_nutrition(self):
+        self.assertContains(self.client.get('/dashboard/'), "Conseils adaptés à l'âge")
+
+    def test_dashboard_garde_cinq_outils_d_origine_et_ajoute_nutrition(self):
+        html = self.client.get('/dashboard/').content.decode('utf-8')
+        outils = html[html.index('Accès rapide aux outils'):]
+        self.assertEqual(outils.count('class="tool"'), 6)
+        self.assertIn('/conseils/nutrition/', outils)
+
+    def test_page_a_propos_utilise_les_deux_styles_de_bouton(self):
+        html = self.client.get('/a-propos/').content.decode('utf-8')
+        contacts = html[html.index('class="about-contacts"'):]
+        self.assertIn('btn-light', contacts)
+        self.assertIn('btn-ghost', contacts)
+
+
+class SecuriteAuthentificationTests(TestCase):
+
+    def test_connexion_refuse_une_redirection_externe(self):
+        User.objects.create_user(username='redir@test.bj', password='MotDePasse123')
+        reponse = self.client.post(
+            '/connexion/?next=https://evil.example/',
+            {'username': 'redir@test.bj', 'password': 'MotDePasse123'},
+        )
+        self.assertRedirects(reponse, '/dashboard/', fetch_redirect_response=False)

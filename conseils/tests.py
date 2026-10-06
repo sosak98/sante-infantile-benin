@@ -45,7 +45,7 @@ class CalendrierReferenceTests(TestCase):
 
     def test_series_6_10_14_semaines(self):
         """Pentavalent, VPO, PCV et rotavirus suivent bien 6/10/14 semaines."""
-        attendus = {'penta': [6, 10, 14], 'vpo': [6, 10, 14],
+        attendus = {'penta': [6, 10, 14], 'vpo': [6, 10],
                     'pcv': [6, 10, 14], 'rota': [6, 10, 14]}
         for serie, semaines in attendus.items():
             obtenues = [e['semaines'] for e in CALENDRIER_PEV if e['serie'] == serie]
@@ -53,10 +53,20 @@ class CalendrierReferenceTests(TestCase):
                 self.assertEqual(obtenues, semaines)
 
     def test_vpi_present_a_14_semaines(self):
-        """Le VPI (polio injectable) manquait complètement au calendrier."""
+        """Le VPI remplace la troisième dose orale à 14 semaines."""
         vpi = [e for e in CALENDRIER_PEV if e['cle'] == 'vpi']
         self.assertEqual(len(vpi), 1)
         self.assertEqual(vpi[0]['semaines'], 14)
+        self.assertIn(
+            "Il remplace la troisième dose orale : la série orale s'arrête au VPO 2.",
+            vpi[0]['description'],
+        )
+
+    def test_vpo_3_est_absent_et_les_anciens_libelles_sont_rattaches_au_vpi(self):
+        self.assertFalse(any(e['cle'] == 'vpo_3' for e in CALENDRIER_PEV))
+        self.assertTrue(any(e['cle'] == 'vpi' for e in CALENDRIER_PEV))
+        self.assertEqual(normaliser_cle('VPO 3'), 'vpi')
+        self.assertEqual(normaliser_cle('vpo_3'), 'vpi')
 
     def test_rotavirus_present_trois_doses(self):
         """Le rotavirus (introduit au Bénin en 2019) manquait au calendrier."""
@@ -319,3 +329,30 @@ class PagesVaccinationTests(TestCase):
         reponse = self.client.post('/conseils/rdv/', {'date_naissance': futur})
         self.assertEqual(reponse.status_code, 200)
         self.assertContains(reponse, 'ne peut pas être dans le futur')
+
+
+class AdditionalPolioTests(TestCase):
+
+    def test_vpo_et_vpi_sont_deux_series_distinctes(self):
+        self.assertEqual(
+            [e['cle'] for e in CALENDRIER_PEV if e['serie'] == 'vpo'],
+            ['vpo_1', 'vpo_2'],
+        )
+        self.assertEqual(
+            [e['cle'] for e in CALENDRIER_PEV if e['serie'] == 'vpi'],
+            ['vpi'],
+        )
+
+    def test_description_du_vpi_est_complete(self):
+        vpi = next(e for e in CALENDRIER_PEV if e['cle'] == 'vpi')
+        self.assertEqual(
+            vpi['description'],
+            "Vaccin polio inactivé injectable, administré à 14 semaines. "
+            "Il remplace la troisième dose orale : la série orale s'arrête au VPO 2.",
+        )
+
+    def test_calendrier_affichable_ne_propose_pas_de_vpo_3(self):
+        self.assertNotIn('VPO 3', {ligne['nom'] for ligne in calendrier_affichable()})
+
+    def test_ancien_libelle_vpo_3_est_reconnu_avec_espaces(self):
+        self.assertEqual(normaliser_cle('  VPO 3  '), 'vpi')

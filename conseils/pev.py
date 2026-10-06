@@ -164,14 +164,6 @@ CALENDRIER_PEV = [
         'obligatoire': True,
     },
     {
-        'cle': 'vpo_3', 'nom': 'VPO 3', 'dose': 3, 'serie': 'vpo',
-        'semaines': 14, 'affichage': '14 semaines',
-        'maladies': 'Poliomyélite',
-        'voie': 'Orale, 2 gouttes',
-        'description': "3ᵉ et dernière dose de la série polio orale.",
-        'obligatoire': True,
-    },
-    {
         'cle': 'pcv_3', 'nom': 'PCV-13 3', 'dose': 3, 'serie': 'pcv',
         'semaines': 14, 'affichage': '14 semaines',
         'maladies': 'Infections à pneumocoque',
@@ -192,8 +184,8 @@ CALENDRIER_PEV = [
         'semaines': 14, 'affichage': '14 semaines',
         'maladies': 'Poliomyélite',
         'voie': 'Intramusculaire, cuisse',
-        'description': "Dose de vaccin polio inactivé injectable, administrée "
-                       "en même temps que le VPO 3.",
+        'description': "Vaccin polio inactivé injectable, administré à 14 semaines. "
+                       "Il remplace la troisième dose orale : la série orale s'arrête au VPO 2.",
         'obligatoire': True,
     },
 
@@ -330,8 +322,9 @@ for _ancien, _nouveau in [
     ('pentavalent_3', 'penta_3'),
     ('pentavalent 1', 'penta_1'), ('pentavalent 2', 'penta_2'),
     ('pentavalent 3', 'penta_3'),
-    ('vpo_1', 'vpo_1'), ('vpo_2', 'vpo_2'), ('vpo_3', 'vpo_3'),
-    ('vpo 1', 'vpo_1'), ('vpo 2', 'vpo_2'), ('vpo 3', 'vpo_3'),
+    ('vpo_1', 'vpo_1'), ('vpo_2', 'vpo_2'),
+    ('vpo_3', 'vpi'),
+    ('vpo 1', 'vpo_1'), ('vpo 2', 'vpo_2'), ('vpo 3', 'vpi'),
     ('pcv_1', 'pcv_1'), ('pcv_2', 'pcv_2'), ('pcv_3', 'pcv_3'),
     ('pneumocoque 1 (pcv)', 'pcv_1'), ('pneumocoque 2 (pcv)', 'pcv_2'),
     ('pneumocoque 3 (pcv)', 'pcv_3'),
