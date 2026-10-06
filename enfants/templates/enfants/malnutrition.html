@@ -38,6 +38,7 @@
           {% elif eval.couleur == 'warning' %}<span class="badge-pill badge-warn">{{ eval.statut }}</span>
           {% elif eval.couleur == 'info' %}<span class="badge-pill badge-info">{{ eval.statut }}</span>
           {% else %}<span class="badge-pill badge-danger">{{ eval.statut }}</span>{% endif %}
+          {% if eval.note %}<div style="flex-basis:100%;color:var(--muted);font-size:.88rem;">{{ eval.note }}</div>{% endif %}
         </div>
       {% endfor %}
     </div>
@@ -92,7 +93,11 @@
       </div>
       <div class="grid2">
         <div class="field"><label for="id_taille">Taille (cm)</label><input type="number" id="id_taille" name="taille" class="form-control" step="0.1" min="0" required></div>
-        <div class="field"><label for="id_muac">MUAC bras (cm), optionnel</label><input type="number" id="id_muac" name="muac" class="form-control" step="0.1" min="0"></div>
+        <div class="field"><label for="id_muac">MUAC bras (cm), optionnel</label><input type="number" id="id_muac" name="muac" class="form-control" step="0.1" min="0"><div class="sub" style="margin:2px 0 0;font-size:.8rem;">Mesure valable de 6 à 59 mois uniquement.</div></div>
+      </div>
+      <div style="background:#fff5f5;border:1px solid #f6c6c2;border-left:4px solid #c62828;border-radius:12px;padding:12px 14px;margin:4px 0 16px;">
+        <label for="id_oedemes" style="font-weight:700;color:#8e1b1b;"><input type="checkbox" id="id_oedemes" name="oedemes" value="oui"> Œdèmes bilatéraux</label>
+        <p class="sub" style="margin:6px 0 0;">Appuyez trois secondes avec le pouce sur le dessus des deux pieds. Si une empreinte reste dans les deux, cochez cette case.</p>
       </div>
       <button type="submit" class="btn btn-primary btn-block">Voir le résultat</button>
     </form>

@@ -29,6 +29,10 @@
       {% endif %}
       {% for champ in form %}
         <div class="field">
+          {% if champ.name == 'etablissement' %}
+            <label for="recherche_etablissement">Rechercher une formation sanitaire</label>
+            <input type="search" id="recherche_etablissement" class="form-control" placeholder="Tapez le nom ou la commune" autocomplete="off">
+          {% endif %}
           <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
           {{ champ }}
           {% if champ.help_text %}<div class="sub" style="margin:2px 0 0;font-size:.8rem;">{{ champ.help_text }}</div>{% endif %}
@@ -37,6 +41,31 @@
       {% endfor %}
       <button type="submit" class="btn btn-primary btn-block">Envoyer ma demande</button>
     </form>
+    <script>
+      (function () {
+        var recherche = document.getElementById('recherche_etablissement');
+        var select = document.getElementById('id_etablissement');
+        var optionsOriginales = null;
+        if (!recherche || !select) return;
+
+        recherche.addEventListener('input', function () {
+          if (!optionsOriginales) {
+            optionsOriginales = Array.prototype.slice.call(select.options).map(function (option) {
+              return option.cloneNode(true);
+            });
+          }
+          var terme = recherche.value.trim().toLocaleLowerCase();
+          var resultats = optionsOriginales.filter(function (option) {
+            return !terme || option.textContent.toLocaleLowerCase().indexOf(terme) !== -1;
+          }).slice(0, 200);
+          select.innerHTML = '';
+          resultats.forEach(function (option) {
+            select.appendChild(option.cloneNode(true));
+          });
+          select.setAttribute('size', String(Math.min(Math.max(resultats.length, 1), 10)));
+        });
+      })();
+    </script>
     <p class="sub" style="margin-top:14px;font-size:.82rem;">
       Les données transmises servent uniquement à vérifier votre qualité d'agent de santé
       et à rattacher votre compte à un centre. Voir la

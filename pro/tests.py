@@ -7,6 +7,7 @@ pouvoir modifier aucune information publique d'un centre de santé.
 from django.contrib.auth.models import User
 from django.test import TestCase
 
+from pro.admin import ProfessionnelSanteAdmin
 from pro.models import ProfessionnelSante
 from sante.models import Etablissement
 
@@ -230,3 +231,58 @@ class ModeleProTests(TestCase):
         pro = creer_pro(identifiant='b@test.bj')
         pro.structure_libre = 'Case de santé de Zè'
         self.assertEqual(pro.structure_affichee, 'Case de santé de Zè')
+
+
+class InscriptionProTemplateTests(TestCase):
+
+    def test_recherche_des_structures_est_presente(self):
+        reponse = self.client.get('/pro/inscription/')
+        self.assertContains(reponse, 'type="search"')
+        self.assertContains(reponse, 'id="recherche_etablissement"')
+        self.assertContains(reponse, 'optionsOriginales')
+        self.assertContains(reponse, '.slice(0, 200)')
+        self.assertContains(reponse, "setAttribute('size'")
+
+
+class AdminProfessionnelTests(TestCase):
+
+    def test_criteres_de_validation_documentes(self):
+        criteres = ProfessionnelSanteAdmin.CRITERES_VALIDATION
+        for attendu in (
+            'fonction soignante', 'numéro d\'ordre ou matricule',
+            'structure déclarée existe', 'adresse électronique est joignable',
+            'Refuser plutôt que valider à moitié',
+        ):
+            with self.subTest(attendu=attendu):
+                self.assertIn(attendu, criteres)
+
+    def test_demandes_en_attente_affichees_en_premier(self):
+        creer_pro(statut='valide', identifiant='valide@test.bj')
+        creer_pro(statut='en_attente', identifiant='attente@test.bj')
+        admin_instance = ProfessionnelSanteAdmin(ProfessionnelSante, None)
+        demandes = admin_instance.get_queryset(None)
+        self.assertEqual(demandes.first().statut, 'en_attente')
+
+
+class AdditionalInscriptionProTemplateTests(TestCase):
+
+    def test_recherche_est_placee_au_dessus_du_selecteur(self):
+        html = self.client.get('/pro/inscription/').content.decode('utf-8')
+        self.assertLess(
+            html.index('id="recherche_etablissement"'),
+            html.index('id="id_etablissement"'),
+        )
+
+    def test_filtre_conserve_les_options_originales(self):
+        html = self.client.get('/pro/inscription/').content.decode('utf-8')
+        self.assertIn('option.cloneNode(true)', html)
+        self.assertIn('var optionsOriginales = null', html)
+
+    def test_filtre_ne_depend_d_aucune_bibliotheque(self):
+        html = self.client.get('/pro/inscription/').content.decode('utf-8')
+        self.assertIn("addEventListener('input'", html)
+        self.assertNotIn('jquery', html.lower())
+
+    def test_resultats_du_filtre_sont_limites_a_deux_cents(self):
+        html = self.client.get('/pro/inscription/').content.decode('utf-8')
+        self.assertIn(".slice(0, 200)", html)

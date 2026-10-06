@@ -180,3 +180,24 @@ class CarteAvecVaccinationTests(TestCase):
             self.client.get('/carte/'),
             'La carte ne peut pas se charger. Vérifiez votre connexion.',
         )
+
+
+class PremiersSecoursTests(TestCase):
+
+    def test_regle_des_cinq_minutes_avant_la_liste_a_faire(self):
+        html = self.client.get('/premiers-secours/').content.decode('utf-8')
+        debut = html.index('Comptez la durée de la crise')
+        a_faire = html.index('À faire', debut)
+        self.assertLess(debut, a_faire)
+        self.assertIn('Plus de 5 minutes', html)
+        self.assertIn('appelez le 112 tout de suite', html)
+        self.assertIn('Moins de 5 minutes', html)
+
+
+class AdditionalPremiersSecoursTests(TestCase):
+
+    def test_encadre_convulsions_est_rouge(self):
+        html = self.client.get('/premiers-secours/').content.decode('utf-8')
+        debut = html.index('Comptez la durée de la crise')
+        encadre = html[html.rfind('<div', 0, debut):debut]
+        self.assertIn('alert-danger', encadre)
