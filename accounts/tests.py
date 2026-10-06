@@ -179,3 +179,14 @@ class AdditionalDashboardTests(TestCase):
         contacts = html[html.index('class="about-contacts"'):]
         self.assertIn('btn-light', contacts)
         self.assertIn('btn-ghost', contacts)
+
+
+class SecuriteAuthentificationTests(TestCase):
+
+    def test_connexion_refuse_une_redirection_externe(self):
+        User.objects.create_user(username='redir@test.bj', password='MotDePasse123')
+        reponse = self.client.post(
+            '/connexion/?next=https://evil.example/',
+            {'username': 'redir@test.bj', 'password': 'MotDePasse123'},
+        )
+        self.assertRedirects(reponse, '/dashboard/', fetch_redirect_response=False)

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
@@ -88,7 +89,13 @@ def login_view(request):
             cache.delete(cle_tentatives)
             auth_login(request, form.get_user())
             next_url = request.POST.get('next') or request.GET.get('next')
-            return redirect(next_url or 'accounts:dashboard')
+            if next_url and url_has_allowed_host_and_scheme(
+                next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+            ):
+                return redirect(next_url)
+            return redirect('accounts:dashboard')
         else:
             nouvelles_tentatives = tentatives + 1
             cache.set(cle_tentatives, nouvelles_tentatives, timeout=900)  # 15 min = 900s

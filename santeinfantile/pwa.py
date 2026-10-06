@@ -45,7 +45,7 @@ def hors_ligne(request):
 # Version du cache. À incrémenter à CHAQUE changement du service worker ou de
 # la liste CORE : c'est ce qui déclenche la purge des anciens caches chez les
 # visiteurs qui ont déjà installé l'application.
-SW_VERSION = 'v12'
+SW_VERSION = 'v13'
 
 # Pages pré-mises en cache dès l'installation : tous les modules utiles hors
 # ligne, y compris les nouvelles pages « jours de vaccination » et l'espace
@@ -62,6 +62,9 @@ PAGES_HORS_LIGNE = [
     '/conseils/nutrition/',
     '/premiers-secours/',
     '/pro/',
+    '/pro/inscription/',
+    '/inscription/',
+    '/connexion/',
     '/a-propos/',
     '/cgu/',
     '/politique-de-confidentialite/',
@@ -71,9 +74,12 @@ PAGES_HORS_LIGNE = [
 STATIQUES_HORS_LIGNE = [
     '/static/css/sib.css',
     '/static/img/logo.png',
+    '/static/img/logo@2x.png',
+    '/static/img/photo-darius.jpg',
     '/static/img/icons/icon-192.png',
     '/static/img/icons/icon-512.png',
     '/static/img/icons/apple-touch-icon.png',
+    '/static/img/icons/splash-512.png',
     '/static/vendor/leaflet/leaflet.css',
     '/static/vendor/leaflet/leaflet.js',
     '/static/vendor/markercluster/MarkerCluster.css',
@@ -165,7 +171,9 @@ self.addEventListener('message', (e) => {
 // Cache d'abord, puis rafraichissement silencieux en arriere-plan.
 async function cacheAbordPuisReseau(request) {
   const cache = await caches.open(CACHE);
-  const cached = await cache.match(request);
+  // Les feuilles de style portent parfois une query string de version
+  // (ex. sib.css?v=13) : elle ne doit pas empêcher le fonctionnement hors ligne.
+  const cached = await cache.match(request, { ignoreSearch: true });
   const reseau = fetch(request).then((res) => {
     if (res && res.ok) {
       cache.put(request, res.clone());

@@ -16,6 +16,7 @@ from functools import wraps
 from django.contrib import messages
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect, render
 
 from conseils.pev import (
@@ -29,6 +30,10 @@ from sante.models import CODES_JOURS, LIBELLES_JOURS, Etablissement, code_du_jou
 
 from .forms import InscriptionProForm, JoursVaccinationForm
 from .models import ProfessionnelSante
+
+
+INSCRIPTION_PRO_MAX_POSTS = 5
+INSCRIPTION_PRO_RATE_LIMIT_SECONDS = 15 * 60
 
 
 def profil_pro(request):
@@ -80,16 +85,30 @@ def inscription(request):
         return redirect('pro:accueil')
 
     if request.method == 'POST':
+        ip_client = request.META.get('REMOTE_ADDR', '') or 'inconnu'
+        cle_limite = f"pro_inscription:{ip_client}"
+        tentatives = cache.get(cle_limite, 0)
         form = InscriptionProForm(request.POST)
-        if form.is_valid():
-            pro = form.save()
-            auth_login(request, pro.user)
-            messages.success(
-                request,
-                "Demande enregistrée. Votre compte sera actif dès validation "
-                "par l'équipe.",
+        if tentatives >= INSCRIPTION_PRO_MAX_POSTS:
+            form.add_error(
+                None,
+                "Trop de demandes depuis cette connexion. Réessayez dans 15 minutes.",
             )
-            return redirect('pro:en_attente')
+        else:
+            cache.set(
+                cle_limite,
+                tentatives + 1,
+                timeout=INSCRIPTION_PRO_RATE_LIMIT_SECONDS,
+            )
+            if form.is_valid():
+                pro = form.save()
+                auth_login(request, pro.user)
+                messages.success(
+                    request,
+                    "Demande enregistrée. Votre compte sera actif dès validation "
+                    "par l'équipe.",
+                )
+                return redirect('pro:en_attente')
     else:
         form = InscriptionProForm()
     return render(request, 'pro/inscription.html', {'form': form})

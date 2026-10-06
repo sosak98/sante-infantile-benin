@@ -236,12 +236,12 @@ class EnTetesSecuriteTests(TestCase):
         self.assertEqual(self.client.get('/triage/').status_code, 200)
 
 
-class ServiceWorkerV12Tests(TestCase):
+class ServiceWorkerV13Tests(TestCase):
     """Mode hors-ligne étendu : version du cache et pages pré-enregistrées."""
 
-    def test_version_v12(self):
+    def test_version_v13(self):
         sw = self.client.get('/sw.js').content.decode('utf-8')
-        self.assertIn("const VERSION = 'v12'", sw)
+        self.assertIn("const VERSION = 'v13'", sw)
         self.assertIn("'sib-cache-' + VERSION", sw)
 
     def test_nouvelles_pages_precachees(self):
@@ -378,3 +378,28 @@ class NavigationTests(TestCase):
         # L'ancien texte annonçait à tort « RTSS (rotavirus) » à 22 semaines.
         self.assertNotIn('RTSS (rotavirus)', txt)
         self.assertNotIn('À partir de 22 semaines', txt)
+
+
+class AuditHorsLigneEtRessourcesTests(TestCase):
+
+    def test_service_worker_est_incremente_et_precharge_les_ressources_du_site(self):
+        sw = self.client.get('/sw.js').content.decode('utf-8')
+        self.assertIn("const VERSION = 'v13'", sw)
+        for ressource in (
+            "'/static/img/photo-darius.jpg'",
+            "'/static/img/logo@2x.png'",
+            "'/static/img/icons/splash-512.png'",
+            "'/pro/inscription/'",
+            "'/connexion/'",
+        ):
+            with self.subTest(ressource=ressource):
+                self.assertIn(ressource, sw)
+
+    def test_service_worker_ignore_les_query_strings_des_statiques(self):
+        sw = self.client.get('/sw.js').content.decode('utf-8')
+        self.assertIn('cache.match(request, { ignoreSearch: true })', sw)
+
+    def test_logo_open_graph_pointe_vers_un_fichier_existant(self):
+        html = self.client.get('/').content.decode('utf-8')
+        self.assertIn('/static/img/logo.png', html)
+        self.assertNotIn('/static/sante/images/logo.png', html)

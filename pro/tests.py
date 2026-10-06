@@ -5,6 +5,7 @@ pouvoir modifier aucune information publique d'un centre de santé.
 """
 
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.test import TestCase
 
 from pro.admin import ProfessionnelSanteAdmin
@@ -286,3 +287,15 @@ class AdditionalInscriptionProTemplateTests(TestCase):
     def test_resultats_du_filtre_sont_limites_a_deux_cents(self):
         html = self.client.get('/pro/inscription/').content.decode('utf-8')
         self.assertIn(".slice(0, 200)", html)
+
+
+class SecuriteInscriptionProTests(TestCase):
+
+    def test_demandes_d_inscription_sont_limitees_par_adresse(self):
+        cache.clear()
+        donnees = {}
+        for _ in range(5):
+            self.client.post('/pro/inscription/', donnees)
+        reponse = self.client.post('/pro/inscription/', donnees)
+        self.assertEqual(reponse.status_code, 200)
+        self.assertContains(reponse, 'Trop de demandes depuis cette connexion')
