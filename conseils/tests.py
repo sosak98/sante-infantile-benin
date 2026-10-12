@@ -8,6 +8,7 @@ from conseils.pev import (
     CALENDRIER_PEV,
     CHIMIOPREVENTION_PALUDISME,
     SUPPLEMENTATIONS,
+    adapter_au_centre_detaille,
     ajouter_mois,
     calendrier_affichable,
     normaliser_cle,
@@ -16,6 +17,29 @@ from conseils.pev import (
     resume_couverture,
 )
 from conseils.seed_data import VACCINS
+from sante.models import Etablissement
+
+
+# Programme relevé auprès de CS Dowa : un vaccin par jour.
+DOWA = {
+    'lundi': {'mode': 'seulement', 'series': ['bcg', 'vpo', 'vpo_naissance']},
+    'mardi': {'mode': 'seulement', 'series': ['penta', 'pcv', 'rota', 'vpi']},
+    'mercredi': {'mode': 'seulement', 'series': ['vitamine_a']},
+    'jeudi': {'mode': 'seulement', 'series': ['penta', 'pcv', 'rota', 'vpi']},
+    'vendredi': {'mode': 'seulement', 'series': ['9mois', 'var']},
+}
+
+
+def creer_centre(**kwargs):
+    valeurs = {
+        'nom': 'CS Dowa', 'type_etab': 'centre', 'adresse': 'Bénin',
+        'latitude': 0.0, 'longitude': 0.0, 'fait_vaccination': True,
+        'jours_confirmes': True,
+        'jours_vaccination': 'lundi,mardi,mercredi,jeudi,vendredi',
+        'programme_vaccination': DOWA, 'vaccins_non_proposes': 'rtss',
+    }
+    valeurs.update(kwargs)
+    return Etablissement.objects.create(**valeurs)
 
 NAISSANCE = date(2025, 1, 15)
 
@@ -356,3 +380,164 @@ class AdditionalPolioTests(TestCase):
 
     def test_ancien_libelle_vpo_3_est_reconnu_avec_espaces(self):
         self.assertEqual(normaliser_cle('  VPO 3  '), 'vpi')
+
+
+class AdapterAuCentreDetailleTests(TestCase):
+    """Le calculateur demande au centre, dose par dose, ses jours de séance."""
+
+    def setUp(self):
+        self.dowa = creer_centre()
+
+    def _planning(self, naissance=NAISSANCE, recus=None, aujourd_hui=None):
+        planning = planifier(naissance, recus or {}, aujourd_hui or naissance)
+        return {ligne['cle']: ligne
+                for ligne in adapter_au_centre_detaille(planning, self.dowa)}
+
+    def test_le_bcg_tombe_le_jour_du_bcg(self):
+        """CS Dowa vaccine le BCG le lundi, et seulement le lundi."""
+        self.assertEqual(self._planning()['bcg']['date_centre'].weekday(), 0)
+
+    def test_le_pentavalent_tombe_un_jour_pentavalent(self):
+        planning = self._planning()
+        for cle in ('penta_1', 'penta_2', 'penta_3'):
+            with self.subTest(cle=cle):
+                self.assertIn(planning[cle]['date_centre'].weekday(), (1, 3))
+
+    def test_pcv_13_et_rotavirus_suivent_le_pentavalent(self):
+        """Les vaccins de 6, 10 et 14 semaines s'administrent ensemble."""
+        planning = self._planning()
+        self.assertEqual(planning['pcv_1']['date_centre'], planning['penta_1']['date_centre'])
+        self.assertEqual(planning['rota_1']['date_centre'], planning['penta_1']['date_centre'])
+        self.assertEqual(planning['vpi']['date_centre'], planning['penta_3']['date_centre'])
+
+    def test_les_doses_de_neuf_mois_tombent_un_vendredi(self):
+        """Var, VAA et MenA : le 15 octobre 2025 tombe un mercredi, donc vendredi 17."""
+        planning = self._planning()
+        self.assertEqual(planning['var_1']['date_centre'], date(2025, 10, 17))
+        for cle in ('var_1', 'vaa', 'mena'):
+            with self.subTest(cle=cle):
+                self.assertEqual(planning[cle]['date_centre'].weekday(), 4)
+
+    def test_aucune_dose_n_est_programmee_avant_sa_date_theorique(self):
+        for ligne in self._planning(naissance=date(2025, 1, 17)).values():
+            if ligne['non_administre_ici']:
+                continue
+            with self.subTest(cle=ligne['cle']):
+                self.assertGreaterEqual(ligne['date_centre'], ligne['date_prevue'])
+
+    def test_l_intervalle_de_28_jours_survit_au_report(self):
+        """Une dose reportée décale la suivante d'au moins 28 jours."""
+        planning = self._planning(naissance=date(2025, 1, 17))   # un vendredi
+        for premiere, suivante in (('penta_1', 'penta_2'), ('penta_2', 'penta_3'),
+                                   ('vpo_1', 'vpo_2')):
+            with self.subTest(serie=(premiere, suivante)):
+                ecart = planning[suivante]['date_centre'] - planning[premiere]['date_centre']
+                self.assertGreaterEqual(ecart.days, 28)
+
+    def test_chaque_dose_repart_de_la_date_retenue_pour_la_precedente(self):
+        """On ne rapproche jamais deux doses : la précédente compte, pas le calendrier."""
+        centre = creer_centre(
+            nom='CS Doses Var', vaccins_non_proposes='',
+            jours_vaccination='lundi,vendredi',
+            programme_vaccination={
+                'lundi': {'mode': 'seulement', 'series': ['var']},
+                'vendredi': {'mode': 'seulement', 'series': ['9mois']},
+            },
+        )
+        planning = [
+            {'cle': 'var_1', 'nom': 'VAR 1', 'serie': 'var', 'dose': 1,
+             'date_prevue': date(2025, 3, 7), 'statut': 'À venir', 'age_mois': 9,
+             'maternite': False, 'couleur': 'info', 'retard_jours': 0},
+            {'cle': 'var_2', 'nom': 'VAR 2', 'serie': 'var', 'dose': 2,
+             'date_prevue': date(2025, 3, 14), 'statut': 'À venir', 'age_mois': 18,
+             'maternite': False, 'couleur': 'info', 'retard_jours': 0},
+        ]
+        resultat = {ligne['cle']: ligne for ligne in adapter_au_centre_detaille(planning, centre)}
+        self.assertEqual(resultat['var_1']['date_centre'], date(2025, 3, 7))
+        # Le lundi 10 mars serait trop tôt : 3 jours après la deuxième dose.
+        self.assertGreaterEqual(
+            (resultat['var_2']['date_centre'] - resultat['var_1']['date_centre']).days, 28,
+        )
+        self.assertEqual(resultat['var_2']['date_centre'], date(2025, 4, 7))
+
+    def test_un_vaccin_non_propose_n_a_pas_de_date(self):
+        planning = self._planning()
+        for cle in ('rtss_1', 'rtss_2', 'rtss_3', 'rtss_4'):
+            with self.subTest(cle=cle):
+                self.assertIsNone(planning[cle]['date_centre'])
+                self.assertTrue(planning[cle]['non_administre_ici'])
+                self.assertNotEqual(planning[cle]['statut'], 'En retard')
+        # Les autres doses restent programmées.
+        self.assertIsNotNone(planning['var_1']['date_centre'])
+        self.assertFalse(planning['var_1']['non_administre_ici'])
+
+    def test_les_doses_trop_vieilles_ne_sont_pas_signalees_en_retard(self):
+        """Le 3 juillet 2026, la dose de RTS,S du 15 juillet 2026 est à venir."""
+        planning = self._planning(aujourd_hui=date(2026, 8, 1))
+        self.assertIsNone(planning['rtss_1']['date_centre'])
+        self.assertTrue(planning['rtss_1']['non_administre_ici'])
+
+
+class PageRdvAvecCentreTests(TestCase):
+    """La page de rendez-vous quand le centre a un programme détaillé."""
+
+    def setUp(self):
+        self.dowa = creer_centre()
+
+    def _poster(self, naissance=None):
+        return self.client.post('/conseils/rdv/', {
+            'date_naissance': (naissance or date.today()).isoformat(),
+            'centre_id': self.dowa.pk,
+        })
+
+    def _resultats(self, reponse):
+        return {ligne['cle']: ligne for ligne in reponse.context['resultats']}
+
+    def test_la_page_annonce_le_programme_du_centre(self):
+        reponse = self._poster()
+        self.assertContains(reponse, 'Séances de ce centre')
+        self.assertContains(reponse, 'Lundi : BCG, VPO')
+        self.assertContains(reponse, 'Mardi : Pentavalent, PCV-13')
+        self.assertContains(reponse, 'Vendredi : 9 mois, VAR')
+
+    def test_la_page_annonce_les_vaccins_non_proposes(self):
+        self.assertContains(self._poster(), 'Non proposé dans ce centre : Antipaludique RTS,S')
+
+    def test_une_dose_non_proposee_est_neutre_et_pas_en_retard(self):
+        reponse = self._poster()
+        self.assertContains(
+            reponse,
+            "Ce centre ne propose pas cette dose. Renseignez-vous auprès d'un autre centre, "
+            "ou demandez-leur directement.",
+        )
+        self.assertContains(reponse, 'selon le calendrier national.')
+        self.assertContains(reponse, 'id="rdv-rtss_3" data-cle="rtss_3" class="tl-item neutral"')
+        self.assertNotContains(reponse, 'En retard')
+
+    def test_les_autres_doses_restent_programmees_sur_les_jours_du_centre(self):
+        reponse = self._poster()
+        resultats = self._resultats(reponse)
+        self.assertIsNone(resultats['rtss_1']['date_centre'])
+        self.assertTrue(resultats['rtss_1']['non_administre_ici'])
+        self.assertEqual(resultats['penta_1']['date_centre'].weekday(), 1)   # mardi
+        self.assertEqual(resultats['bcg']['date_centre'].weekday(), 0)       # lundi
+        self.assertIsNotNone(resultats['var_1']['date_centre'])
+
+    def test_le_centre_choisi_est_pris_en_compte(self):
+        """Le sélecteur de centre doit être dans le formulaire (sinon rien n'est envoyé)."""
+        reponse = self._poster()
+        self.assertTrue(reponse.context['centre'])
+        self.assertEqual(reponse.context['centre'].pk, self.dowa.pk)
+
+    def test_centre_sans_programme_detaille_utilise_ses_jours_d_ouverture(self):
+        centre = creer_centre(
+            nom='CS Sans Programme Détaille', programme_vaccination={},
+            jours_vaccination='mardi,jeudi',
+        )
+        reponse = self.client.post('/conseils/rdv/', {
+            'date_naissance': date.today().isoformat(), 'centre_id': centre.pk,
+        })
+        resultats = {ligne['cle']: ligne for ligne in reponse.context['resultats']}
+        for cle in ('penta_1', 'pcv_1', 'var_1', 'rtss_1'):
+            with self.subTest(cle=cle):
+                self.assertIn(resultats[cle]['date_centre'].weekday(), (1, 3))

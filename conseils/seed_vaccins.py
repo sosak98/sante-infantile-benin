@@ -26,7 +26,7 @@ vaccins = [
 
     # 14 semaines
     {"nom": "Pentavalent 3", "age_affichage": "14 semaines", "age_min_mois": 4, "description": "Diphtérie, Tétanos, Coqueluche, Hépatite B, Hib - 3ème dose", "obligatoire": True},
-    {"nom": "VPO 3", "age_affichage": "14 semaines", "age_min_mois": 4, "description": "4ème dose vaccin polio oral", "obligatoire": True},
+    {"nom": "VPI (polio injectable)", "age_affichage": "14 semaines", "age_min_mois": 4, "description": "Vaccin polio inactivé injectable : la série orale s'arrête au VPO 2", "obligatoire": True},
     {"nom": "Pneumocoque 3 (PCV)", "age_affichage": "14 semaines", "age_min_mois": 4, "description": "Protection contre les pneumonies - 3ème dose", "obligatoire": True},
 
     # 6 mois

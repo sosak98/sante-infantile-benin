@@ -443,12 +443,19 @@ AGES_SEANCE_DEDIEE = (9,)
 def releve_de_la_seance_dediee(age, ages):
     return any(abs(float(age) - float(a)) <= 0.5 for a in ages)
 
+# Jours de la semaine dans l'ordre de `date.weekday()` (lundi = 0). On ne se
+# sert jamais de `strftime('%A')` : son résultat dépend de la locale du
+# processus (« Monday » sur un serveur configuré en anglais), et aucun code de
+# jour français ne correspondait alors.
+JOURS_DE_LA_SEMAINE = ('lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi',
+                       'samedi', 'dimanche')
+
 def prochaine_seance(depart, codes):
     codes = set(codes or [])
     if not codes: return None
     for i in range(14):
         candidate = depart + timedelta(days=i)
-        if candidate.weekday() in codes or candidate.strftime('%A').lower() in codes:
+        if candidate.weekday() in codes or JOURS_DE_LA_SEMAINE[candidate.weekday()] in codes:
             return candidate
     return None
 
@@ -461,7 +468,11 @@ def adapter_au_centre(planning, jours_ordinaires, jours_9mois, ages_dedies=AGES_
         if ligne.get('maternite') or ligne['statut'] == 'À la maternité':
             retenue = theorique
         else:
-            codes = dedies if releve_de_la_seance_dediee(ligne.get('age_mois') or 0, ages_dedies) else ordinaires
+            # Des jours dédiés aux 9 mois ne sont utilisés que si le centre
+            # en a déclaré : sinon il vaccine tout les jours où il ouvre.
+            seance_dediee = bool(dedies) and releve_de_la_seance_dediee(
+                ligne.get('age_mois') or 0, ages_dedies)
+            codes = dedies if seance_dediee else ordinaires
             serie = ligne.get('serie'); depart = theorique
             if serie in retenues: depart = max(depart, retenues[serie] + timedelta(weeks=INTERVALLE_MIN_SEMAINES))
             retenue = prochaine_seance(depart, codes)
@@ -471,6 +482,56 @@ def adapter_au_centre(planning, jours_ordinaires, jours_9mois, ages_dedies=AGES_
         if ligne.get('serie') and retenue: retenues[ligne['serie']] = retenue
         resultat.append(ligne)
     return resultat
+
+def adapter_au_centre_detaille(planning, centre):
+    """Adapte un planning aux jours réellement pratiqués par un centre.
+
+    `adapter_au_centre` ne connaît que deux cases (« jours ordinaires » et
+    « jours dédiés aux 9 mois »). Les centres, eux, organisent leurs séances
+    **par vaccin** : le BCG le lundi, le Pentavalent le mardi… On demande donc
+    au centre, dose par dose, quels jours conviennent (`jours_pour`).
+
+    Deux règles à ne jamais enfreindre :
+
+    - deux doses d'une même série ne se rapprochent pas : la dose suivante
+      repart de la date **effectivement retenue** pour la précédente, avec les
+      ``INTERVALLE_MIN_SEMAINES`` réglementaires ;
+    - quand aucun jour ne convient (vaccin non proposé dans ce centre), on
+      laisse ``date_centre`` à ``None`` et on pose ``non_administre_ici`` :
+      on n'invente pas de date.
+    """
+    resultat, retenues = [], {}
+    for ligne in sorted(planning, key=lambda x: (x['date_prevue'], x['nom'])):
+        ligne = dict(ligne)
+        serie = ligne.get('serie')
+        theorique = ligne['date_prevue']
+        deja_faite = (bool(ligne.get('maternite'))
+                      or ligne['statut'] in ('Reçu', 'À la maternité'))
+        if deja_faite:
+            retenue = theorique
+        else:
+            depart = theorique
+            precedente = retenues.get(serie)
+            if precedente is not None:
+                depart = max(depart, precedente + timedelta(weeks=INTERVALLE_MIN_SEMAINES))
+            codes = centre.jours_pour(serie, ligne.get('age_mois')) if serie else []
+            retenue = prochaine_seance(depart, codes) if codes else None
+        ligne['date_theorique'] = theorique
+        ligne['date_centre'] = retenue
+        ligne['decalage_jours'] = (retenue - theorique).days if retenue else None
+        ligne['seance_tardive'] = bool(retenue and retenue > theorique)
+        ligne['non_administre_ici'] = False
+        if serie and retenue:
+            retenues[serie] = retenue
+        if retenue is None:
+            # État neutre : surtout pas « en retard », un parent croirait
+            # avoir oublié un rendez-vous.
+            ligne['non_administre_ici'] = True
+            ligne['statut'] = 'Non proposé ici'
+            ligne['couleur'] = 'neutral'
+        resultat.append(ligne)
+    return resultat
+
 
 def prochain_rdv(date_naissance, vaccins_recus, aujourd_hui=None):
     """La prochaine dose due (en retard d'abord, puis la plus proche)."""

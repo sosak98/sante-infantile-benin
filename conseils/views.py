@@ -8,7 +8,7 @@ from .pev import (
     SUPPLEMENTATIONS,
     calendrier_affichable,
     normaliser_cle,
-    planifier, adapter_au_centre,
+    planifier, adapter_au_centre, adapter_au_centre_detaille,
 )
 from .seed_data import CONSEILS
 from enfants.models import Enfant, VaccinRecu
@@ -84,6 +84,24 @@ def _centres_vaccinateurs():
     from sante.models import Etablissement
     return Etablissement.objects.filter(fait_vaccination=True, jours_confirmes=True).exclude(jours_vaccination='').order_by('nom')
 
+
+# États du planning, dans l'ordre où ils sont présentés au parent.
+ETATS_PLANNING = (
+    ('Reçu', 'ok'), ('À la maternité', 'ok'), ('À venir', 'info'),
+    ("Aujourd'hui", 'warn'), ('En retard', 'danger'), ('Non proposé ici', 'neutral'),
+)
+
+
+def _legende(resultats):
+    """Légende du planning : seulement les états réellement présents.
+
+    Une dose que le centre ne propose pas ne doit jamais faire apparaître
+    « En retard » : le parent croirait avoir manqué un rendez-vous.
+    """
+    presents = {ligne['statut'] for ligne in (resultats or [])}
+    return [{'statut': statut, 'classe': classe}
+            for statut, classe in ETATS_PLANNING if statut in presents]
+
 def calculer_rdv(request):
     resultats = None
     enfants = []
@@ -122,6 +140,7 @@ def calculer_rdv(request):
                 'calendrier': CALENDRIER_PEV,
                 'erreur': erreur,
                 'centres': centres, 'centre': centre,
+                'legende': _legende(resultats),
             })
 
         centre_id = request.POST.get('centre_id')
@@ -160,7 +179,11 @@ def calculer_rdv(request):
                 )
 
         resultats = planifier(date_naissance, vaccins_recus)
-        if centre:
+        if centre and centre.programme_vaccination:
+            # Programme détaillé par vaccin : on demande au centre, dose par
+            # dose, quels jours lui conviennent.
+            resultats = adapter_au_centre_detaille(resultats, centre)
+        elif centre:
             resultats = adapter_au_centre(resultats, centre.jours_liste, centre.jours_9mois_liste)
 
     return render(request, 'conseils/rdv.html', {
@@ -169,4 +192,5 @@ def calculer_rdv(request):
         'calendrier': CALENDRIER_PEV,
         'erreur': erreur,
         'centres': centres, 'centre': centre,
+        'legende': _legende(resultats),
     })
