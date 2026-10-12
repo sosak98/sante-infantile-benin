@@ -24,10 +24,11 @@
     <div class="panel">
       <h3> Informations de l'enfant</h3>
       <div class="sub">Date de naissance et vaccins déjà reçus</div>
-      <div class="field"><label for="centre_id">Centre de vaccination</label><select name="centre_id" id="centre_id" class="form-select"><option value="">Planning théorique (sans centre)</option>{% for c in centres %}<option value="{{ c.id }}" {% if centre.id == c.id %}selected{% endif %}>{{ c.nom }} - {{ c.jours_affichage }}</option>{% endfor %}</select></div>
-      {% if centre %}<div class="info-note">{{ centre.jours_affichage }}{% if centre.jours_9mois_libelles %}; 9 mois : {{ centre.jours_9mois_libelles|join:", " }}{% endif %}. {{ centre.horaire_vaccination }}. Les séances dédiées concernent les doses dues à 9 mois. {{ centre.precision_vaccination }}</div>{% endif %}
+      {% if centre %}<div class="info-note">{% if centre.programme_affichage %}<b>Séances de ce centre :</b> {{ centre.programme_affichage }}.{% else %}{{ centre.jours_affichage }}{% if centre.jours_9mois_libelles %}; 9 mois : {{ centre.jours_9mois_libelles|join:", " }}{% endif %}.{% endif %}{% if centre.horaire_vaccination %} {{ centre.horaire_vaccination }}.{% endif %} {{ centre.precision_vaccination }}</div>
+      {% if centre.non_proposes_libelles %}<div class="alert alert-danger">Non proposé dans ce centre : {{ centre.non_proposes_libelles|join:", " }}</div>{% endif %}{% endif %}
       <form method="post" id="formRdv">
         {% csrf_token %}
+        <div class="field"><label for="centre_id">Centre de vaccination</label><select name="centre_id" id="centre_id" class="form-select"><option value="">Planning théorique (sans centre)</option>{% for c in centres %}<option value="{{ c.id }}" {% if centre.id == c.id %}selected{% endif %}>{{ c.nom }} - {{ c.jours_affichage }}</option>{% endfor %}</select></div>
         {% if erreur %}<div class="alert alert-danger">{{ erreur }}</div>{% endif %}
         {% if enfants %}
         <div class="field">
@@ -62,17 +63,22 @@
       <div class="sub">Planning vaccinal personnalisé, trié par date</div>
 
       {% if resultats %}
+        {% if legende %}
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
-          <span class="badge-pill badge-ok" style="font-size:.72rem;"> Reçu</span>
-          <span class="badge-pill badge-info" style="font-size:.72rem;"> À venir</span>
-          <span class="badge-pill badge-warn" style="font-size:.72rem;"> Aujourd'hui</span>
-          <span class="badge-pill badge-danger" style="font-size:.72rem;"> En retard</span>
+          {% for etat in legende %}<span class="badge-pill badge-{{ etat.classe }}" style="font-size:.72rem;">{{ etat.statut }}</span>{% endfor %}
         </div>
+        {% endif %}
         <div class="timeline">
           {% for rdv in resultats %}
-            <div id="rdv-{{ rdv.cle }}" data-cle="{{ rdv.cle }}" class="tl-item {% if rdv.statut == 'Reçu' or rdv.statut == 'À la maternité' %}ok{% elif rdv.statut == 'En retard' %}late{% elif rdv.statut == "Aujourd'hui" %}next{% endif %}">
+            <div id="rdv-{{ rdv.cle }}" data-cle="{{ rdv.cle }}" class="tl-item {% if rdv.statut == 'Reçu' or rdv.statut == 'À la maternité' %}ok{% elif rdv.non_administre_ici %}neutral{% elif rdv.statut == 'En retard' %}late{% elif rdv.statut == "Aujourd'hui" %}next{% endif %}">
               <div class="t">{{ rdv.nom }}{% if rdv.categorie == "chimioprevention" %} <span class="tag">chimioprévention</span>{% elif rdv.categorie == "supplementation" %} <span class="tag">supplément</span>{% endif %} <span class="tag" style="font-size:.7rem;">{{ rdv.age_affichage }}</span></div>
+              {% if rdv.non_administre_ici %}
+              <div class="d">Dose prévue vers le {{ rdv.date_prevue|date:"d/m/Y" }} selon le calendrier national.</div>
+              <div class="d">Ce centre ne propose pas cette dose. Renseignez-vous auprès d'un autre centre, ou demandez-leur directement.</div>
+              <div class="d"><span class="badge-pill badge-neutral" style="font-size:.7rem;">Non proposé dans ce centre</span></div>
+              {% else %}
               <div class="d">{% if rdv.date_centre %}<strong>{{ rdv.date_centre|date:"d/m/Y" }}</strong> <small>(théorique : {{ rdv.date_theorique|date:"d/m/Y" }}, report {{ rdv.decalage_jours }} j)</small>{% else %}{{ rdv.date_prevue|date:"d/m/Y" }}{% endif %} - {{ rdv.statut }}</div>
+              {% endif %}
               <div class="d" style="font-size:.78rem;color:var(--muted);">Protège contre : {{ rdv.maladies }}</div>
               {% if rdv.cle == 'hepb_0' %}<div class="d" style="font-size:.78rem;color:var(--muted);">Administré en salle d'accouchement dans les 24 heures suivant la naissance. À corriger si l'accouchement a eu lieu à domicile.</div>{% endif %}
             </div>

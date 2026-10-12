@@ -201,6 +201,7 @@ section { padding: 60px 0; }
 .badge-warn { background: var(--amber-light); color: var(--amber-dark); }
 .badge-danger { background: #fdecea; color: #b71c1c; }
 .badge-info { background: #e3f2fd; color: #1565c0; }
+.badge-neutral { background: #eef1f4; color: #44515e; }
 
 /* Niveaux de triage */
 .level-card { border-radius: var(--radius); padding: 26px; color: #fff; text-align: center; }
@@ -219,6 +220,8 @@ section { padding: 60px 0; }
 .tl-item.ok::before { background: var(--ok); box-shadow: 0 0 0 2px var(--ok); }
 .tl-item.late::before { background: var(--danger); box-shadow: 0 0 0 2px var(--danger); }
 .tl-item.next::before { background: var(--amber); box-shadow: 0 0 0 2px var(--amber); }
+.tl-item.neutral::before { background: #cbd5dd; box-shadow: 0 0 0 2px #cbd5dd; }
+.tl-item.neutral .t { color: var(--muted); }
 .tl-item .t { font-weight: 700; color: var(--teal-800); }
 .tl-item .d { font-size: .82rem; color: var(--muted); }
 
