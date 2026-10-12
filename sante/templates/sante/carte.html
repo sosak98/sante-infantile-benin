@@ -124,14 +124,23 @@
     return '<p style="margin:6px 0 0;font-size:0.82rem;color:#00695c;"> ' + pastille + txt + horaire + '</p>';
   }
 
+  // Itinéraire : seulement quand la position du centre est connue. Sinon on
+  // l'annonce clairement plutôt que d'envoyer la famille au point 0,0.
+  function lienItineraire(e) {
+    if (!e.coordonnees) {
+      return '<p style="margin:10px 0 0;font-size:0.8rem;color:#666;">Position non communiquée : demandez au centre, ou cherchez-le par son nom sur la carte.</p>';
+    }
+    return '<a href="https://www.google.com/maps/dir/?api=1&destination=' + Number(e.latitude) + ',' + Number(e.longitude) +
+      '" target="_blank" rel="noopener" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;display:block;text-align:center;text-decoration:none;"> Y aller (Google Maps)</a>';
+  }
+
   function popupContent(e) {
-    var lat = Number(e.latitude), lng = Number(e.longitude);
     return '<div style="font-family:Segoe UI;min-width:160px;">' +
       '<h6 style="color:#004d40;margin-bottom:5px;">' + echapper(e.nom) + '</h6>' +
       '<p style="margin:0;font-size:0.85rem;color:#666;">' + echapper(e.adresse) + '</p>' +
       (e.telephone ? '<p style="margin:5px 0 0;font-size:0.85rem;"> ' + echapper(e.telephone) + '</p>' : '') +
       blocVaccination(e) +
-      '<a href="https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '" target="_blank" rel="noopener" style="margin-top:10px;background:#00796b;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:0.85rem;display:block;text-align:center;text-decoration:none;"> Y aller (Google Maps)</a></div>';
+      lienItineraire(e) + '</div>';
   }
 
   function distanceKm(lat1, lon1, lat2, lon2) {
@@ -146,6 +155,13 @@
   var marqueurs = [];
   var marqueursVaccinationJour = [];
   etablissements.forEach(function (e) {
+    // Compteurs par type : la structure existe, même sans position connue.
+    if (e.type_etab === 'pharmacie') countPharmacies++;
+    else if (e.type_etab === 'hopital' || e.type_etab === 'hopital_zone') countHopitaux++;
+    else if (e.type_etab === 'clinique') countCliniques++;
+    else countCentres++;
+    // Position non renseignée : pas de marqueur au large du golfe de Guinée.
+    if (!e.coordonnees) return;
     var m = L.circleMarker([e.latitude, e.longitude], {
       radius: 7, color: '#ffffff', weight: 2,
       fillColor: COULEURS[e.type_etab] || COULEURS.centre, fillOpacity: 0.95
@@ -155,10 +171,6 @@
     if (e.vaccination && (e.jours || []).indexOf(JOUR_ACTUEL) !== -1) {
       marqueursVaccinationJour.push(m);
     }
-    if (e.type_etab === 'pharmacie') countPharmacies++;
-    else if (e.type_etab === 'hopital' || e.type_etab === 'hopital_zone') countHopitaux++;
-    else if (e.type_etab === 'clinique') countCliniques++;
-    else countCentres++;
   });
   clusters.addLayers(marqueurs);
 
@@ -209,7 +221,8 @@
   document.getElementById('prochesBtn').addEventListener('click', function () {
     var refLat = (userLat !== null) ? userLat : map.getCenter().lat;
     var refLng = (userLng !== null) ? userLng : map.getCenter().lng;
-    var liste = etablissements.slice().sort(function (a, b) {
+    var liste = etablissements.filter(function (e) { return e.coordonnees; })
+      .sort(function (a, b) {
       return distanceKm(refLat, refLng, a.latitude, a.longitude) -
              distanceKm(refLat, refLng, b.latitude, b.longitude);
     }).slice(0, 10);
@@ -224,7 +237,7 @@
       html += '<li style="margin:4px 0;"><i style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + couleur + ';margin-right:4px;"></i>' +
         '<b>' + echapper(e.nom) + '</b> · ' + kmTxt +
         (e.vaccination && (e.jours || []).indexOf(JOUR_ACTUEL) !== -1 ? ' · <span style="color:#00695c;font-weight:700;"> séance aujourd\'hui</span>' : '') +
-        ' · <a href="https://www.google.com/maps/dir/?api=1&destination=' + e.latitude + ',' + e.longitude +
+        ' · <a href="https://www.google.com/maps/dir/?api=1&destination=' + Number(e.latitude) + ',' + Number(e.longitude) +
         '" target="_blank" style="color:#00796b;text-decoration:none;">Y aller</a></li>';
       bounds.push([e.latitude, e.longitude]);
     });
