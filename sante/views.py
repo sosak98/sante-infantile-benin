@@ -31,6 +31,8 @@ def carte(request):
             'telephone': e.telephone,
             'latitude': e.latitude,
             'longitude': e.longitude,
+            # Position non saisie (0.0 / 0.0) : ni marqueur ni itinéraire.
+            'coordonnees': e.coordonnees_connues,
             'type_etab': e.type_etab,
             'vaccination': e.fait_vaccination,
             'jours': e.jours_liste,

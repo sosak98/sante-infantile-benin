@@ -112,6 +112,17 @@ class Etablissement(models.Model):
     def jours_renseignes(self): return bool(self.jours_liste)
 
     @property
+    def coordonnees_connues(self):
+        """La position du centre est-elle réellement connue ?
+
+        Les centres dont la position n'a pas encore été saisie dans
+        l'administration sont enregistrés à 0.0 / 0.0 : un point au large du
+        golfe de Guinée. Tant qu'elles le sont, on ne propose ni itinéraire ni
+        marqueur : un centre mal placé envoie une famille au mauvais endroit.
+        """
+        return bool(self.latitude) and bool(self.longitude)
+
+    @property
     def non_proposes_liste(self):
         """Groupes de vaccins que ce centre ne reçoit pas (clés, en minuscules)."""
         bruts = (self.vaccins_non_proposes or '').split(',')

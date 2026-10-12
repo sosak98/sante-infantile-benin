@@ -405,3 +405,56 @@ class SeedCentresVaccinationTests(TestCase):
     def test_jours_de_neuf_mois_de_dowa(self):
         """CS Dowa ne vaccine les doses de 9 mois que le vendredi."""
         self.assertEqual(self.centres['CS Dowa'].jours_pour('9mois', age_mois=9), ['vendredi'])
+
+
+class ItineraireSansCoordonneesTests(TestCase):
+    """Un centre sans position connue ne doit pas envoyer une famille ailleurs.
+
+    Les centres dont la position n'est pas encore saisie dans l'administration
+    sont enregistrés à 0.0 / 0.0 : un point au large du golfe de Guinée. On ne
+    propose donc ni itinéraire ni marqueur, mais on ne cache pas le centre pour
+    autant.
+    """
+
+    def setUp(self):
+        self.sans_position = creer_centre(
+            nom='CS Sans Position', jours_vaccination='lundi',
+            latitude=0.0, longitude=0.0, jours_confirmes=True,
+        )
+        self.avec_position = creer_centre(
+            nom='CS Avec Position', jours_vaccination='lundi',
+            latitude=6.35775, longitude=2.35839, jours_confirmes=True,
+        )
+
+    def test_un_centre_sans_position_n_a_pas_d_itineraire(self):
+        reponse = self.client.get('/carte/vaccination/', {'jour': 'tous'})
+        self.assertContains(reponse, 'CS Sans Position')
+        self.assertNotContains(reponse, 'destination=0.0,0.0')
+        self.assertContains(reponse, 'Position non communiquée')
+
+    def test_un_centre_localise_garde_son_itineraire(self):
+        reponse = self.client.get('/carte/vaccination/', {'jour': 'tous'})
+        self.assertContains(reponse, 'destination=6.35775,2.35839')
+
+    def test_les_coordonnees_de_l_itineraire_ne_sont_pas_localisees(self):
+        """« 6,35775 » (virgule décimale française) casse le lien Google Maps."""
+        reponse = self.client.get('/carte/vaccination/', {'jour': 'tous'})
+        self.assertNotContains(reponse, 'destination=6,35775')
+        self.assertContains(reponse, 'destination=6.35775,2.35839')
+
+    def test_le_modele_distingue_les_deux_cas(self):
+        self.assertFalse(self.sans_position.coordonnees_connues)
+        self.assertTrue(self.avec_position.coordonnees_connues)
+
+    def test_la_carte_expose_le_drapeau_de_position(self):
+        reponse = self.client.get('/carte/')
+        par_nom = {e['nom']: e for e in reponse.context['etablissements']}
+        self.assertFalse(par_nom['CS Sans Position']['coordonnees'])
+        self.assertTrue(par_nom['CS Avec Position']['coordonnees'])
+
+    def test_la_carte_ne_place_pas_de_marqueur_sans_position(self):
+        html = self.client.get('/carte/').content.decode('utf-8')
+        self.assertIn('if (!e.coordonnees) return;', html)
+        self.assertIn('function lienItineraire', html)
+        self.assertIn('Position non communiquée', html)
+        self.assertIn("etablissements.filter(function (e) { return e.coordonnees; })", html)
