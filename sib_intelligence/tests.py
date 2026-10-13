@@ -17,7 +17,9 @@ Sources :
   trois écarts-types : https://www.who.int/tools/elena/interventions/sam-identification-infants
 """
 
+import json
 from datetime import date
+from types import SimpleNamespace
 from unittest import mock
 
 from django.contrib.auth.models import User
@@ -560,3 +562,65 @@ class PromptAssistantTests(TestCase):
             message='Consultation recommandée', symptomes={},
         )
         self.assertIn('Signes généraux de danger relevés : aucun', prompt)
+
+
+class ChatAssistantTests(TestCase):
+    """Le point d'entrée du chat doit transmettre les signes au prompt système."""
+
+    def _faux_client(self, prompts):
+        """Un client Groq de substitution qui enregistre le prompt système."""
+
+        class FauxCompletions:
+            def create(self, **parametres):
+                prompts.append(parametres['messages'][0]['content'])
+                choix = SimpleNamespace(
+                    message=SimpleNamespace(content='Réponse de test'))
+                return SimpleNamespace(choices=[choix])
+
+        return SimpleNamespace(
+            chat=SimpleNamespace(completions=FauxCompletions()))
+
+    def _poster(self, contexte):
+        return self.client.post(
+            '/triage/chat/',
+            data=json.dumps({'message': 'Que dois-je faire ?',
+                             'contexte': contexte}),
+            content_type='application/json',
+        )
+
+    def test_les_signes_de_danger_arrivent_dans_le_prompt_du_chat(self):
+        prompts = []
+        with mock.patch('sib_intelligence.views._client_groq',
+                        return_value=self._faux_client(prompts)):
+            reponse = self._poster({
+                'enfant_nom': 'Kofi', 'age_mois': 18, 'niveau': 'rouge',
+                'message': 'Urgence immédiate',
+                'signes_danger': [SIGNE_CONVULSIONS, SIGNE_RESPIRATION],
+                'symptomes': {'convulsions': 'oui', 'sexe': 'M'},
+            })
+        self.assertEqual(reponse.status_code, 200)
+        self.assertEqual(reponse.json()['suggestion'], 'hospital')
+        self.assertEqual(len(prompts), 1)
+        self.assertIn(SIGNE_CONVULSIONS, prompts[0])
+        self.assertIn(SIGNE_RESPIRATION, prompts[0])
+        self.assertIn('Un seul de ces signes suffit', prompts[0])
+        self.assertIn('en mots simples', prompts[0])
+        self.assertIn('Sexe : M', prompts[0])
+
+    def test_le_chat_sans_cle_api_ne_fait_pas_planter_les_signes(self):
+        with mock.patch('sib_intelligence.views._client_groq', return_value=None):
+            reponse = self._poster({
+                'niveau': 'rouge', 'signes_danger': [SIGNE_CONVULSIONS],
+            })
+        self.assertEqual(reponse.status_code, 200)
+        donnees = reponse.json()
+        self.assertEqual(donnees['status'], 'ok')
+        self.assertIn('professionnel de santé', donnees['reponse'])
+
+    def test_un_contexte_sans_signes_ne_fait_pas_planter_le_chat(self):
+        prompts = []
+        with mock.patch('sib_intelligence.views._client_groq',
+                        return_value=self._faux_client(prompts)):
+            reponse = self._poster({'niveau': 'vert', 'symptomes': {}})
+        self.assertEqual(reponse.status_code, 200)
+        self.assertIn('relevés : aucun', prompts[0])
