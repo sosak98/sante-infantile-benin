@@ -11,6 +11,14 @@ from enfants.models import Enfant
 
 from types import SimpleNamespace
 
+# Poids pour la taille selon les standards OMS (tables LMS embarquées dans
+# enfants/data/oms). Import tolérant : si les tables venaient à manquer, le
+# triage continue de fonctionner et l'indicateur est simplement ignoré.
+try:
+    from enfants.oms_lms import z_poids_taille
+except Exception:  # tables absentes : l'indicateur est simplement ignoré
+    z_poids_taille = None
+
 # Initialisation du client Groq (optionnelle : l'IA est désactivée si la clé est absente)
 GROQ_API_KEY = os.getenv('GROQ_API_KEY') or getattr(settings, 'GROQ_API_KEY', '')
 GROQ_MODEL = os.getenv('GROQ_MODEL') or getattr(settings, 'GROQ_MODEL', 'openai/gpt-oss-20b')
@@ -36,8 +44,115 @@ def _client_groq():
         return None
 
 
-def calculer_score_triage(symptomes, poids=None, taille=None, muac=None):
-    """Calcule le score de gravité et retourne le niveau (rouge/jaune/vert)"""
+def z_poids_pour_taille(symptomes, age_mois=None):
+    """Écart-type du poids pour la taille, selon les standards OMS.
+
+    L'ancienne version calculait un IMC et le comparait à 14 et 16. Un IMC
+    brut n'a pas de sens avant cinq ans : il culmine vers 6 à 9 mois puis
+    décroît, si bien qu'un seuil fixe classe mal à tous les âges. L'OMS
+    retient le poids pour la taille exprimé en écarts-types, par sexe.
+
+    Retourne None quand l'indicateur ne peut pas être calculé correctement
+    (sexe, poids, taille ou âge absent, tables OMS indisponibles) : il est
+    alors ignoré silencieusement plutôt que mal calculé.
+
+    Source : OMS, standards de croissance de l'enfant, tables LMS
+    poids pour la taille (enfants/oms_lms.py).
+    """
+    if z_poids_taille is None or age_mois is None:
+        return None
+    sexe = symptomes.get('sexe')
+    poids = symptomes.get('poids')
+    taille = symptomes.get('taille')
+    if not (sexe and poids and taille):
+        return None
+    try:
+        return z_poids_taille(float(poids), float(taille), sexe, int(age_mois))
+    except (TypeError, ValueError, ZeroDivisionError):
+        return None
+
+
+def reperer_signes_danger(symptomes, muac=None, age_mois=None):
+    """Signes généraux de danger de la PCIME.
+
+    Un seul de ces signes impose une prise en charge immédiate, quel que
+    soit le reste du tableau clinique. Ils ne peuvent donc pas être traités
+    comme des points qui s'additionnent : une convulsion isolée pesait
+    4 points sur un seuil de 6 et ressortait en consultation sous 48 heures.
+    Ils court-circuitent maintenant le score.
+
+    Sources :
+    - PCIME Bénin, OMS, signes généraux de danger :
+      https://platform.who.int/docs/default-source/mca-documents/policy-documents/operational-guidance/ben-mn-62-01-operationalguidance-fra-imnci-booklet.pdf
+    - OMS et UNICEF, 2009, identification de la malnutrition aiguë sévère,
+      seuil du périmètre brachial porté à 115 mm pour les 6 à 59 mois :
+      https://www.who.int/publications/i/item/9789241598163
+    - OMS, malnutrition aiguë sévère avant 6 mois, définie par le poids pour
+      la taille sous moins trois écarts-types ou des œdèmes bilatéraux :
+      https://www.who.int/tools/elena/interventions/sam-identification-infants
+    """
+    signes = []
+    if symptomes.get('convulsions') == 'oui':
+        signes.append('convulsions pendant la maladie actuelle')
+    if symptomes.get('eveil') in ('difficile', 'non'):
+        signes.append('enfant léthargique ou inconscient')
+    if symptomes.get('alimentation') == 'refuse':
+        signes.append('incapable de boire ou de prendre le sein')
+    if symptomes.get('vomissement') == 'oui_tout':
+        signes.append('vomit tout ce qu\u2019il consomme')
+    if symptomes.get('respiration') == 'difficile':
+        signes.append('difficulté respiratoire')
+    # Le périmètre brachial n'est interprétable qu'entre 6 et 59 mois.
+    if muac and str(muac).strip() and (age_mois is None or 6 <= age_mois <= 59):
+        try:
+            if float(muac) < 11.5:
+                signes.append('périmètre brachial inférieur à 11,5 cm')
+        except (TypeError, ValueError):
+            pass
+    z = z_poids_pour_taille(symptomes, age_mois)
+    if z is not None and z < -3:
+        signes.append('poids pour la taille inférieur à moins trois '
+                      'écarts-types, malnutrition aiguë sévère')
+    return signes
+
+
+def reperer_motifs_consultation(symptomes, muac=None, age_mois=None):
+    """Situations qui imposent au minimum une consultation.
+
+    Elles ne sont pas des urgences vitales, mais elles ne peuvent pas non
+    plus se résoudre par des conseils à domicile. Sans cette liste, une
+    malnutrition aiguë modérée isolée valait 2 points sur un seuil de 3 et
+    ressortait en vert.
+
+    Sources : OMS et UNICEF, 2009, seuils du périmètre brachial (115 à
+    125 mm) et du poids pour la taille (moins deux à moins trois
+    écarts-types) pour la malnutrition aiguë modérée, entre 6 et 59 mois.
+    """
+    motifs = []
+    if muac and str(muac).strip() and (age_mois is None or 6 <= age_mois <= 59):
+        try:
+            valeur = float(muac)
+            if 11.5 <= valeur < 12.5:
+                motifs.append('périmètre brachial entre 11,5 et 12,5 cm, '
+                              'malnutrition aiguë modérée')
+        except (TypeError, ValueError):
+            pass
+    z = z_poids_pour_taille(symptomes, age_mois)
+    if z is not None and -3 <= z < -2:
+        motifs.append('poids pour la taille entre moins deux et moins trois '
+                      'écarts-types, malnutrition aiguë modérée')
+    return motifs
+
+
+def calculer_score_triage(symptomes, poids=None, taille=None, muac=None, age_mois=None):
+    """Calcule le score de gravité et retourne (niveau, message, score, signes).
+
+    Les signes généraux de danger de la PCIME ne sont plus des points qui
+    s'additionnent : un seul d'entre eux impose une prise en charge
+    immédiate et court-circuite le score. Le score ne porte donc plus que
+    sur les symptômes gradués qui ne figurent pas dans cette liste, et le
+    bloc IMC a été retiré au profit du poids pour la taille en écarts-types.
+    """
     score = 0
 
     # Fièvre
@@ -54,74 +169,67 @@ def calculer_score_triage(symptomes, poids=None, taille=None, muac=None):
     elif diarrhee == 'oui_simple':
         score += 1
 
-    # Respiration
-    respiration = symptomes.get('respiration')
-    if respiration == 'difficile':
-        score += 3
-    elif respiration == 'rapide':
+    # Respiration. La respiration difficile, le tirage et le geignement sont
+    # un signe général de danger traité à part : seule la respiration rapide
+    # compte ici.
+    if symptomes.get('respiration') == 'rapide':
         score += 2
 
-    # Éveil
-    eveil = symptomes.get('eveil')
-    if eveil == 'non':
-        score += 3
-    elif eveil == 'difficile':
-        score += 2
-
-    # Alimentation
-    alimentation = symptomes.get('alimentation')
-    if alimentation == 'refuse':
-        score += 3
-    elif alimentation == 'diminuee':
+    # Alimentation. L'incapacité de boire ou de prendre le sein est un signe
+    # général de danger traité à part : seule la diminution compte ici.
+    if symptomes.get('alimentation') == 'diminuee':
         score += 1
 
-    # Convulsions
-    if symptomes.get('convulsions') == 'oui':
-        score += 4
-
-    # Vomissements
+    # Vomissements. "Vomit tout ce qu'il consomme" est un signe général de
+    # danger traité à part. Des vomissements répétés qui gardent des liquides
+    # n'en sont pas un : la PCIME distingue explicitement les deux.
     vomissement = symptomes.get('vomissement')
     if vomissement == 'oui_repete':
         score += 2
     elif vomissement == 'oui_simple':
         score += 1
 
-    # MUAC (malnutrition aiguë)
-    if muac and muac.strip():
-        try:
-            muac_val = float(muac)
-            if muac_val < 11.5:
-                score += 4
-            elif muac_val < 12.5:
-                score += 2
-        except ValueError:
-            pass
-
-    # IMC (malnutrition chronique)
-    if poids and taille and poids.strip() and taille.strip():
-        try:
-            poids_val = float(poids)
-            taille_val = float(taille) / 100
-            if taille_val > 0:
-                imc = poids_val / (taille_val ** 2)
-                if imc < 14:
-                    score += 3
-                elif imc < 16:
-                    score += 1
-        except (ValueError, ZeroDivisionError):
-            pass
-
-    # Classification
+    # Classification. Un signe général de danger prime sur le score.
+    signes = reperer_signes_danger(symptomes, muac, age_mois)
+    if signes:
+        return ('rouge', 'Urgence immédiate : rendez-vous au centre de santé '
+                'le plus proche maintenant.', score, signes)
     if score >= 6:
-        return 'rouge', '🔴 Urgence immédiate : consultez un médecin maintenant !', score
-    elif score >= 3:
-        return 'jaune', 'Consultation recommandée dans les 24-48h', score
+        return ('rouge', 'Urgence immédiate : rendez-vous au centre de santé '
+                'le plus proche maintenant.', score, signes)
+    if score >= 3 or reperer_motifs_consultation(symptomes, muac, age_mois):
+        return 'jaune', 'Consultation recommandée dans les 24-48h', score, signes
+    return 'vert', 'Conseils à domicile suffisants pour le moment', score, signes
+
+
+def construire_contexte_systeme(enfant_nom, age_mois, niveau, message, symptomes,
+                                signes_danger=None):
+    """Construit le prompt système sécurisé pour l'IA selon le niveau de gravité du triage.
+
+    `signes_danger` porte les signes généraux de danger relevés par le triage.
+    Ils sont transmis à l'assistant avec la consigne de les nommer au parent
+    en mots simples : ce sont eux qui motivent l'orientation, le parent doit
+    pouvoir les reconnaître et les redire à l'agent de santé.
+    """
+
+    if signes_danger:
+        liste_signes = '\n'.join('  - ' + signe for signe in signes_danger)
+        bloc_signes = (
+            "- Signes généraux de danger relevés :\n"
+            f"{liste_signes}\n"
+            "  Un seul de ces signes suffit à imposer une prise en charge "
+            "immédiate, quels que soient les autres symptômes.\n"
+            "  CONSIGNE : nomme chacun de ces signes au parent en mots simples, "
+            "sans jargon médical, et explique pourquoi il impose de se rendre "
+            "immédiatement au centre de santé le plus proche."
+        )
     else:
-        return 'vert', 'Conseils à domicile suffisants pour le moment', score
+        bloc_signes = "- Signes généraux de danger relevés : aucun"
 
-
-def construire_contexte_systeme(enfant_nom, age_mois, niveau, message, symptomes):
-    """Construit le prompt système sécurisé pour l'IA selon le niveau de gravité du triage"""
+    # L'âge peut manquer (triage sans dossier, champ vide) : on l'écrit alors
+    # en toutes lettres plutôt que "None mois" dans le prompt.
+    age_libelle = (f'{age_mois} mois'
+                   if isinstance(age_mois, (int, float)) else str(age_mois))
 
     if niveau == 'rouge':
         consignes_specifiques = """RÈGLES STRICTES D'URGENCE MÉDICALE (NIVEAU ROUGE) :
@@ -156,9 +264,10 @@ Tu aides les parents béninois à comprendre les résultats du triage et à adop
 
 Contexte de l'enfant :
 - Prénom : {enfant_nom}
-- Âge : {age_mois} mois
+- Âge : {age_libelle}
 - Niveau de gravité : {niveau.upper()}
 - Message du triage : {message}
+{bloc_signes}
 - Symptômes observés :
   * Fièvre : {symptomes.get('fievre', 'Non renseigné')}
   * Diarrhée : {symptomes.get('diarrhee', 'Non renseigné')}
@@ -167,9 +276,10 @@ Contexte de l'enfant :
   * Alimentation : {symptomes.get('alimentation', 'Non renseigné')}
   * Convulsions : {symptomes.get('convulsions', 'Non renseigné')}
   * Vomissements : {symptomes.get('vomissement', 'Non renseigné')}
+  * Sexe : {symptomes.get('sexe', 'Non renseigné')}
   * Poids : {symptomes.get('poids', 'Non renseigné')} kg
   * Taille : {symptomes.get('taille', 'Non renseigné')} cm
-  * MUAC (bras) : {symptomes.get('muac', 'Non renseigné')} cm
+  * Périmètre brachial : {symptomes.get('muac', 'Non renseigné')} cm
 
 {consignes_specifiques}
 
@@ -191,6 +301,7 @@ def _symptomes_from_post(post):
         'alimentation': post.get('alimentation'),
         'convulsions': post.get('convulsions'),
         'vomissement': post.get('vomissement'),
+        'sexe': post.get('sexe'),
         'poids': post.get('poids'),
         'taille': post.get('taille'),
         'muac': post.get('muac'),
@@ -217,24 +328,31 @@ def triage(request):
             prenom = enfant.prenom
         else:
             prenom = (request.POST.get('prenom') or 'votre enfant').strip()
+            # Un âge absent ou illisible reste None : le périmètre brachial et
+            # le poids pour la taille sont alors ignorés plutôt que calculés
+            # sur un âge faux.
+            age_brut = (request.POST.get('age_mois') or '').strip()
             try:
-                age_mois = int(request.POST.get('age_mois') or 0)
+                age_mois = int(age_brut)
             except ValueError:
-                age_mois = 0
+                age_mois = None
             enfant = SimpleNamespace(prenom=prenom)
 
         symptomes = _symptomes_from_post(request.POST)
         poids = symptomes.get('poids')
         taille = symptomes.get('taille')
         muac = symptomes.get('muac')
-        niveau, message, score = calculer_score_triage(symptomes, poids, taille, muac)
+        niveau, message, score, signes = calculer_score_triage(
+            symptomes, poids, taille, muac, age_mois
+        )
 
         contexte = {
             'enfant_nom': prenom,
-            'age_mois': age_mois,
+            'age_mois': age_mois if age_mois is not None else 'non précisé',
             'niveau': niveau,
             'message': message,
             'invite': not request.user.is_authenticated,
+            'signes_danger': signes,
             'symptomes': {
                 'fievre': symptomes.get('fievre') or 'Non renseigné',
                 'diarrhee': symptomes.get('diarrhee') or 'Non renseigné',
@@ -243,6 +361,7 @@ def triage(request):
                 'alimentation': symptomes.get('alimentation') or 'Non renseigné',
                 'convulsions': symptomes.get('convulsions') or 'Non renseigné',
                 'vomissement': symptomes.get('vomissement') or 'Non renseigné',
+                'sexe': symptomes.get('sexe') or 'Non renseigné',
                 'poids': poids or 'Non renseigné',
                 'taille': taille or 'Non renseigné',
                 'muac': muac or 'Non renseigné',
@@ -254,6 +373,7 @@ def triage(request):
             'niveau': niveau,
             'message': message,
             'score': score,
+            'signes': signes,
             'contexte': contexte,
             'enfants': enfants,
             'age_mois': age_mois,
@@ -301,7 +421,8 @@ def chat(request):
                 age_mois=contexte.get('age_mois', '?'),
                 niveau=contexte.get('niveau', '?'),
                 message=contexte.get('message', ''),
-                symptomes=symptomes
+                symptomes=symptomes,
+                signes_danger=contexte.get('signes_danger') or [],
             )
 
             completion = client.chat.completions.create(

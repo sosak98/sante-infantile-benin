@@ -28,6 +28,12 @@
   .typing span:nth-child(2) { animation-delay: .2s; }
   .typing span:nth-child(3) { animation-delay: .4s; }
   @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+  /* Signes généraux de danger relevés par le triage */
+  .signes-danger { margin-top: 16px; text-align: left; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.5); border-radius: 12px; padding: 14px 18px; }
+  .signes-danger h3 { margin: 0 0 8px; font-size: .95rem; font-weight: 800; text-transform: uppercase; letter-spacing: .02em; }
+  .signes-danger ul { margin: 0 0 10px; padding-left: 20px; }
+  .signes-danger li { margin-bottom: 4px; font-weight: 700; }
+  .signes-danger .rappel { margin: 0; font-size: .88rem; opacity: .95; }
 </style>
 {% endblock %}
 
@@ -44,7 +50,7 @@
 <div class="page-head">
   <div class="container">
     <h1>Résultat du triage</h1>
-    <p>Analyse pour {{ enfant.prenom }} - {{ age_mois }} mois.</p>
+    <p>Analyse pour {{ enfant.prenom }}{% if age_mois is not None %} - {{ age_mois }} mois{% endif %}.</p>
   </div>
 </div>
 
@@ -59,6 +65,17 @@
       {% else %}Situation stable{% endif %}
     </h2>
     <p>{{ message }}</p>
+    {% if signes %}
+    <div class="signes-danger">
+      <h3>Signes de danger relevés</h3>
+      <ul>
+        {% for signe in signes %}
+        <li>{{ signe }}</li>
+        {% endfor %}
+      </ul>
+      <p class="rappel">Un seul de ces signes suffit à imposer une prise en charge immédiate, quels que soient les autres symptômes.</p>
+    </div>
+    {% endif %}
   </div>
 
   <div class="grid2" style="align-items:start;">
@@ -72,7 +89,7 @@
           <div class="message bot">
             <div class="message-name">SIB Intelligence</div>
             <div class="message-bubble">
-              <p>Bonjour ! J'ai analysé les symptômes de <strong>{{ enfant.prenom }}</strong> ({{ age_mois }} mois).</p>
+              <p>Bonjour ! J'ai analysé les symptômes de <strong>{{ enfant.prenom }}</strong>{% if age_mois is not None %} ({{ age_mois }} mois){% endif %}.</p>
               {% if niveau == 'rouge' %}
                 <p>Le résultat indique une <strong>urgence médicale immédiate</strong>. Rendez-vous au centre de santé le plus proche ou appelez le <strong>112</strong> sans attendre. En attendant les soins, restez calme et suivez les gestes de premiers secours.</p>
               {% elif niveau == 'jaune' %}
