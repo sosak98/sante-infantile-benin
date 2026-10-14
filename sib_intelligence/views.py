@@ -53,13 +53,26 @@ def z_poids_pour_taille(symptomes, age_mois=None):
     retient le poids pour la taille exprimé en écarts-types, par sexe.
 
     Retourne None quand l'indicateur ne peut pas être calculé correctement
-    (sexe, poids, taille ou âge absent, tables OMS indisponibles) : il est
-    alors ignoré silencieusement plutôt que mal calculé.
+    (sexe, poids, taille ou âge absent, âge hors de la fenêtre de 0 à
+    59 mois, tables OMS indisponibles) : il est alors ignoré silencieusement
+    plutôt que mal calculé.
 
     Source : OMS, standards de croissance de l'enfant, tables LMS
     poids pour la taille (enfants/oms_lms.py).
     """
     if z_poids_taille is None or age_mois is None:
+        return None
+    # Le poids pour la taille est la référence OMS des enfants de moins de
+    # cinq ans. Au-delà, la référence devient l'IMC pour l'âge (5 à 19 ans),
+    # que ce module ne calcule pas : l'indicateur est ignoré silencieusement,
+    # comme le périmètre brachial hors de sa fenêtre de 6 à 59 mois. Les
+    # tables embarquées montent pourtant jusqu'à 120 cm, d'où cette borne
+    # explicite, qui évite de lire un enfant de 6 à 10 ans sur la courbe des
+    # moins de cinq ans.
+    try:
+        if not 0 <= int(age_mois) <= 59:
+            return None
+    except (TypeError, ValueError):
         return None
     sexe = symptomes.get('sexe')
     poids = symptomes.get('poids')

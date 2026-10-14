@@ -61,6 +61,17 @@ SEVERE = {'sexe': 'M', 'poids': '8.0', 'taille': '80'}
 MODEREE = {'sexe': 'M', 'poids': '8.6', 'taille': '80'}
 NORMAL = {'sexe': 'M', 'poids': '10.5', 'taille': '80'}
 
+# Fille de 59 mois pour 110 cm, d'après les tables LMS OMS : médiane 18,7 kg,
+# moins deux écarts-types 15,6 kg, moins trois écarts-types 14,3 kg. C'est la
+# dernière borne de la fenêtre de lecture du poids pour la taille.
+SEVERE_59_MOIS = {'sexe': 'F', 'poids': '14.0', 'taille': '110'}
+MODEREE_59_MOIS = {'sexe': 'F', 'poids': '15.3', 'taille': '110'}
+
+# Nouveau-né : garçon de 0 mois pour 49 cm, médiane 3,17 kg, moins trois
+# écarts-types 2,45 kg. Le poids pour la taille est lu dès la naissance,
+# comme le prévoit l'OMS pour la malnutrition aiguë sévère avant 6 mois.
+SEVERE_NOUVEAU_NE = {'sexe': 'M', 'poids': '2.4', 'taille': '49'}
+
 
 def _naissance_il_y_a_mois(mois):
     """Une date de naissance qui donne exactement `mois` mois d'âge.
@@ -315,6 +326,69 @@ class PoidsPourLaTailleTests(TestCase):
             age_mois=18)
         self.assertEqual(niveau, 'vert')
         self.assertEqual(signes, [])
+
+    def test_poids_pour_la_taille_lu_des_la_naissance(self):
+        """Avant 6 mois, l'OMS retient le poids pour la taille sous moins trois ET."""
+        self.assertLess(z_poids_pour_taille(dict(SEVERE_NOUVEAU_NE), 0), -3)
+        niveau, _, _, signes = calculer_score_triage(
+            dict(SEVERE_NOUVEAU_NE), poids=SEVERE_NOUVEAU_NE['poids'],
+            taille=SEVERE_NOUVEAU_NE['taille'], age_mois=0)
+        self.assertEqual(niveau, 'rouge')
+        self.assertEqual(signes, [SIGNE_POIDS_TAILLE])
+
+    def test_poids_pour_la_taille_lu_a_59_mois(self):
+        """59 mois est la dernière borne lue : la mesure ne doit pas sauter."""
+        self.assertLess(z_poids_pour_taille(dict(SEVERE_59_MOIS), 59), -3)
+        niveau, _, _, signes = calculer_score_triage(
+            dict(SEVERE_59_MOIS), poids=SEVERE_59_MOIS['poids'],
+            taille=SEVERE_59_MOIS['taille'], age_mois=59)
+        self.assertEqual(niveau, 'rouge')
+        self.assertEqual(signes, [SIGNE_POIDS_TAILLE])
+
+    def test_poids_pour_la_taille_ignora_a_60_mois(self):
+        """À cinq ans révolus, la référence OMS devient l'IMC pour l'âge."""
+        self.assertIsNone(z_poids_pour_taille(dict(SEVERE_59_MOIS), 60))
+        niveau, _, _, signes = calculer_score_triage(
+            dict(SEVERE_59_MOIS), poids=SEVERE_59_MOIS['poids'],
+            taille=SEVERE_59_MOIS['taille'], age_mois=60)
+        self.assertEqual(niveau, 'vert')
+        self.assertEqual(signes, [])
+        self.assertEqual(reperer_motifs_consultation(dict(SEVERE_59_MOIS), None, 60),
+                         [])
+
+    def test_poids_pour_la_taille_ignora_au_dela_de_cinq_ans(self):
+        for age in (60, 72, 96, 120):
+            with self.subTest(age_mois=age):
+                self.assertIsNone(
+                    z_poids_pour_taille(dict(SEVERE_59_MOIS), age))
+                niveau, _, _, signes = calculer_score_triage(
+                    dict(SEVERE_59_MOIS), poids=SEVERE_59_MOIS['poids'],
+                    taille=SEVERE_59_MOIS['taille'], age_mois=age)
+                self.assertEqual(niveau, 'vert')
+                self.assertEqual(signes, [])
+
+    def test_motif_modere_ignora_aussi_a_60_mois(self):
+        """La borne vaut pour le signe sévère comme pour le motif modéré."""
+        self.assertEqual(
+            reperer_motifs_consultation(dict(MODEREE_59_MOIS), None, 59),
+            [MOTIF_POIDS_TAILLE])
+        self.assertEqual(
+            reperer_motifs_consultation(dict(MODEREE_59_MOIS), None, 60), [])
+
+    def test_age_negatif_fait_ignorer_l_indicateur(self):
+        self.assertIsNone(z_poids_pour_taille(dict(SEVERE), -3))
+
+    def test_age_non_numerique_fait_ignorer_l_indicateur(self):
+        self.assertIsNone(z_poids_pour_taille(dict(SEVERE), 'dix-huit'))
+
+    def test_signes_cliniques_lus_a_tout_age(self):
+        """Les signes de danger ne dépendent pas de l'âge, eux."""
+        for age in (0, 3, 18, 59, 72, 120, None):
+            with self.subTest(age_mois=age):
+                niveau, _, _, signes = calculer_score_triage(
+                    {'convulsions': 'oui'}, age_mois=age)
+                self.assertEqual(niveau, 'rouge')
+                self.assertEqual(signes, [SIGNE_CONVULSIONS])
 
 
 class VomissementsTests(TestCase):
