@@ -519,7 +519,13 @@ class PageRdvAvecCentreTests(TestCase):
         resultats = self._resultats(reponse)
         self.assertIsNone(resultats['rtss_1']['date_centre'])
         self.assertTrue(resultats['rtss_1']['non_administre_ici'])
-        self.assertEqual(resultats['penta_1']['date_centre'].weekday(), 1)   # mardi
+        # Le centre de la fixture vaccine le Pentavalent le mardi ET le jeudi,
+        # et ce test part de la date du jour : selon le jour de la semaine où
+        # il tourne, la première séance utile tombe sur l'un ou sur l'autre.
+        # Mercredi, l'échéance des 6 semaines tombe un mercredi et la première
+        # séance suivante est le jeudi. Même attente que
+        # test_le_pentavalent_tombe_un_jour_pentavalent.
+        self.assertIn(resultats['penta_1']['date_centre'].weekday(), (1, 3))
         self.assertEqual(resultats['bcg']['date_centre'].weekday(), 0)       # lundi
         self.assertIsNotNone(resultats['var_1']['date_centre'])
 
