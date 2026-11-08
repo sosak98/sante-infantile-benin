@@ -13,6 +13,10 @@ urlpatterns = [
     # PWA
     path('robots.txt', seo.robots_txt, name='robots_txt'),
     path('sitemap.xml', seo.sitemap_xml, name='sitemap_xml'),
+    # Vérification Google Search Console, pilotée par la variable
+    # d'environnement GOOGLE_SITE_VERIFICATION (404 si elle est vide).
+    path('google<str:jeton>.html', seo.verification_google,
+         name='verification_google'),
     path('llms.txt', seo.llms_txt, name='llms_txt'),
     path('llms-full.txt', seo.llms_full_txt, name='llms_full_txt'),
     path('manifest.json', pwa.manifest, name='manifest'),
