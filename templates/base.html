@@ -11,10 +11,18 @@
   <meta property="og:title" content="Santé Infantile Bénin (SIB)">
   <meta property="og:description" content="Vaccination, nutrition, dépistage de la malnutrition, premiers secours et triage pédiatrique pour vos enfants au Bénin.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}/">
-  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/logo.png' %}">
+  <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+  <meta property="og:site_name" content="Santé Infantile Bénin">
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-sib.jpg' %}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Santé Infantile Bénin : prévenir, suivre et orienter la santé des 0-5 ans">
   <meta property="og:locale" content="fr_BJ">
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Santé Infantile Bénin (SIB)">
+  <meta name="twitter:description" content="Vaccination, dépistage de la malnutrition, conseils, carte des centres, premiers secours et triage pédiatrique. Gratuit, sans compte.">
+  <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-sib.jpg' %}">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
 

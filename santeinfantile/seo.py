@@ -1,5 +1,7 @@
 """Robots, plan de site et fichiers pour assistants IA (llms.txt), servis sans app Django."""
-from django.http import HttpResponse
+import os
+
+from django.http import Http404, HttpResponse
 from django.views.decorators.http import require_GET
 
 from . import llms
@@ -59,6 +61,22 @@ BOTS_IA = [
     "DuckAssistBot",
     "MistralAI-User",
 ]
+
+
+@require_GET
+def verification_google(request, jeton):
+    """Fichier de vérification de Google Search Console.
+
+    Le jeton est lu dans la variable d'environnement
+    GOOGLE_SITE_VERIFICATION : la valeur à renseigner est le jeton seul,
+    sans le préfixe google ni le .html. Tant que la variable est vide, la
+    route répond 404 et rien n'est exposé.
+    """
+    attendu = (os.getenv('GOOGLE_SITE_VERIFICATION') or '').strip()
+    if not attendu or jeton != attendu:
+        raise Http404('Jeton de vérification inconnu.')
+    return HttpResponse('google-site-verification: google%s.html\n' % attendu,
+                        content_type='text/html')
 
 
 @require_GET
